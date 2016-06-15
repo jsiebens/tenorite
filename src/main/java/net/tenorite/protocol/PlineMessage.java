@@ -8,6 +8,10 @@ import org.immutables.value.Value;
 @ImmutableStyle
 public abstract class PlineMessage implements Message {
 
+    public static PlineMessage of(String message) {
+        return PlineMessage.of(0, message);
+    }
+
     public static PlineMessage of(int sender, String message) {
         return new PlineMessageBuilder().sender(sender).message(message).build();
     }
