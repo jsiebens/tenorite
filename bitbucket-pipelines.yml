@@ -4,4 +4,4 @@ pipelines:
   default:
     - step:
         script:
-          - mvn -B clean install
+          - mvn -B clean install | grep -v 'Download.* http://'
