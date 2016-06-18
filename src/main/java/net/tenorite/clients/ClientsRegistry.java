@@ -7,6 +7,6 @@ import java.util.concurrent.CompletionStage;
 
 public interface ClientsRegistry {
 
-    CompletionStage<ClientRegistered> registerClient(Tempo tempo, String name, ClientChannel channel);
+    CompletionStage<ClientRegistered> registerClient(Tempo tempo, String name, MessageSink sink);
 
 }

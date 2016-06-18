@@ -39,4 +39,12 @@ public abstract class AbstractActorTestCase extends AbstractTestCase {
         }};
     }
 
+    protected final Predicate<Object> accept(Class<?> type) {
+        return type::isInstance;
+    }
+
+    protected final Predicate<Object> ignore(Class<?> type) {
+        return accept(type).negate();
+    }
+
 }

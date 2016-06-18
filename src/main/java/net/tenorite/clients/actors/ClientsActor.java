@@ -12,8 +12,14 @@ import scala.Option;
 
 public final class ClientsActor extends AbstractActor {
 
-    public static Props props() {
-        return Props.create(ClientsActor.class);
+    public static Props props(ActorRef channels) {
+        return Props.create(ClientsActor.class, channels);
+    }
+
+    private final ActorRef channels;
+
+    public ClientsActor(ActorRef channels) {
+        this.channels = channels;
     }
 
     @Override
@@ -39,7 +45,7 @@ public final class ClientsActor extends AbstractActor {
             replyWith(ClientRegistrationFailed.nameAlreadyInUse());
         }
         else {
-            ActorRef client = context().actorOf(ClientActor.props(rc.getTempo(), rc.getName(), rc.getChannel()), key);
+            ActorRef client = context().actorOf(ClientActor.props(rc.getTempo(), rc.getName(), rc.getChannel(), channels), key);
             replyWith(ClientRegistered.of(client));
         }
     }

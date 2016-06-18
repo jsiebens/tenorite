@@ -2,7 +2,7 @@ package net.tenorite.clients;
 
 import net.tenorite.protocol.Message;
 
-public interface ClientChannel {
+public interface MessageSink {
 
     void write(Message message);
 

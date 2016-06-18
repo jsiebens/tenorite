@@ -4,7 +4,7 @@ import akka.actor.Props;
 import akka.actor.UntypedActor;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.tenorite.AbstractActorTestCase;
-import net.tenorite.clients.ClientChannel;
+import net.tenorite.clients.MessageSink;
 import net.tenorite.clients.ClientRegistrationException;
 import net.tenorite.clients.ClientsRegistry;
 import net.tenorite.clients.events.ClientRegistered;
@@ -24,9 +24,9 @@ public class TetrinetServerHandlerTest extends AbstractActorTestCase {
 
     private static class ClientStubActor extends UntypedActor {
 
-        private ClientChannel channel;
+        private MessageSink channel;
 
-        public ClientStubActor(ClientChannel channel) {
+        public ClientStubActor(MessageSink channel) {
             this.channel = channel;
         }
 

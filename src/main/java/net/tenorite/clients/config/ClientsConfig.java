@@ -10,6 +10,7 @@ import net.tenorite.clients.commands.RegisterClient;
 import net.tenorite.clients.events.ClientRegistered;
 import net.tenorite.clients.events.ClientRegistrationFailed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import scala.compat.java8.FutureConverters;
@@ -24,9 +25,13 @@ public class ClientsConfig {
     @Autowired
     private ActorSystem actorSystem;
 
+    @Autowired
+    @Qualifier("channels")
+    private ActorRef channels;
+
     @Bean(name = "clients")
     public ActorRef clients() {
-        return actorSystem.actorOf(ClientsActor.props());
+        return actorSystem.actorOf(ClientsActor.props(channels));
     }
 
     @Bean

@@ -4,7 +4,7 @@ import akka.actor.ActorRef;
 import akka.actor.PoisonPill;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import net.tenorite.clients.ClientChannel;
+import net.tenorite.clients.MessageSink;
 import net.tenorite.clients.ClientRegistrationException;
 import net.tenorite.clients.ClientsRegistry;
 import net.tenorite.core.Tempo;
@@ -36,8 +36,6 @@ final class TetrinetServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String message) throws Exception {
-        System.out.println("============ " + message);
-
         if (finished) {
             received.add(Inbound.of(message));
             flush();
@@ -107,8 +105,8 @@ final class TetrinetServerHandler extends SimpleChannelInboundHandler<String> {
         }
     }
 
-    private ClientChannel clientChannel(Tempo tempo, ChannelHandlerContext ctx) {
-        return new ClientChannel() {
+    private MessageSink clientChannel(Tempo tempo, ChannelHandlerContext ctx) {
+        return new MessageSink() {
 
             @Override
             public void write(Message message) {
