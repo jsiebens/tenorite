@@ -2,6 +2,9 @@ package net.tenorite.channel.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
+import net.tenorite.channel.Channel;
+import net.tenorite.channel.Channels;
+import net.tenorite.channel.commands.ListChannels;
 import net.tenorite.channel.commands.ReserveSlot;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Tempo;
@@ -34,13 +37,17 @@ public class ChannelsActor extends AbstractActor {
             ReserveSlot rs = (ReserveSlot) o;
             actors.get(rs.getTempo()).forward(o, context());
         }
+        else if (o instanceof ListChannels) {
+            ListChannels lc = (ListChannels) o;
+            actors.get(lc.getTempo()).forward(o, context());
+        }
     }
 
     private static class ChannelsPerModeActor extends AbstractActor {
 
         private final Tempo tempo;
 
-        private final List<String> channels = new ArrayList<>();
+        private final List<Channel> channels = new ArrayList<>();
 
         public ChannelsPerModeActor(Tempo tempo) {
             this.tempo = tempo;
@@ -58,6 +65,9 @@ public class ChannelsActor extends AbstractActor {
             if (o instanceof ReserveSlot) {
                 handleReserveSlot((ReserveSlot) o);
             }
+            else if (o instanceof ListChannels) {
+                handleListChannels();
+            }
         }
 
         private void handleReserveSlot(ReserveSlot o) {
@@ -67,14 +77,18 @@ public class ChannelsActor extends AbstractActor {
                 channel.get().forward(o, context());
             }
             else {
-                sender().tell(SlotReservationFailed.channelNotAvailable(), self());
+                replyWith(SlotReservationFailed.channelNotAvailable());
             }
+        }
+
+        private void handleListChannels() {
+            replyWith(Channels.of(channels));
         }
 
         private void createChannel(String name) {
             if (context().child(name).isEmpty()) {
                 context().actorOf(ChannelActor.props(tempo, name), name);
-                channels.add(name);
+                channels.add(Channel.of(name));
             }
         }
     }

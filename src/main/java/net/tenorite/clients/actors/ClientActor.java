@@ -2,8 +2,10 @@ package net.tenorite.clients.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
+import net.tenorite.channel.Channels;
 import net.tenorite.channel.commands.ConfirmSlot;
 import net.tenorite.channel.commands.LeaveChannel;
+import net.tenorite.channel.commands.ListChannels;
 import net.tenorite.channel.commands.ReserveSlot;
 import net.tenorite.channel.events.ChannelLeft;
 import net.tenorite.channel.events.SlotReservationFailed;
@@ -37,6 +39,7 @@ final class ClientActor extends AbstractActor {
 
         this.commands = new Commands()
             .register("/join", (i, s) -> channels.tell(ReserveSlot.of(tempo, s, name), self()))
+            .register("/list", (i, s) -> channels.tell(ListChannels.of(tempo), self()))
             .register("/exit", (i, s) -> context().stop(self()));
     }
 
@@ -46,8 +49,12 @@ final class ClientActor extends AbstractActor {
             PlayerNumMessage.of(1),
             PlineMessage.of(""),
             PlineMessage.of("Welcome on Tenorite TetriNET Server!"),
+            PlineMessage.of(""),
+            PlineMessage.of("Join a channel to start playing..."),
             PlineMessage.of("")
         );
+
+        commands.run(PlineMessage.of("/list"));
     }
 
     @Override
@@ -87,6 +94,9 @@ final class ClientActor extends AbstractActor {
         else if (o instanceof ChannelLeft) {
             this.channel.tell(ConfirmSlot.instance(), self());
         }
+        else if (o instanceof Channels) {
+            handleChannels((Channels) o);
+        }
     }
 
     private void handleInbound(Inbound o) {
@@ -95,6 +105,15 @@ final class ClientActor extends AbstractActor {
                 ofNullable(channel).ifPresent(c -> c.tell(m, self()));
             }
         });
+    }
+
+    private void handleChannels(Channels o) {
+        o.getChannels()
+            .stream()
+            .forEach(c -> write(PlineMessage.of("   " + c.getName())));
+
+        write(PlineMessage.of(""));
+        write(PlineMessage.of("(type /join <name>)"));
     }
 
     private void write(Message... messages) {
