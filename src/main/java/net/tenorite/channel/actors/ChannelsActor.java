@@ -8,6 +8,7 @@ import net.tenorite.channel.commands.ListChannels;
 import net.tenorite.channel.commands.ReserveSlot;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Tempo;
+import net.tenorite.game.GameMode;
 import net.tenorite.util.AbstractActor;
 import scala.Option;
 
@@ -55,9 +56,9 @@ public class ChannelsActor extends AbstractActor {
 
         @Override
         public void preStart() throws Exception {
-            createChannel("channel:1");
-            createChannel("channel:2");
-            createChannel("channel:3");
+            createChannel(GameMode.DEFAULT, "channel:1");
+            createChannel(GameMode.CLASSIC, "channel:2");
+            createChannel(GameMode.PURE, "channel:3");
         }
 
         @Override
@@ -85,9 +86,9 @@ public class ChannelsActor extends AbstractActor {
             replyWith(Channels.of(channels));
         }
 
-        private void createChannel(String name) {
+        private void createChannel(GameMode gameMode, String name) {
             if (context().child(name).isEmpty()) {
-                context().actorOf(ChannelActor.props(tempo, name), name);
+                context().actorOf(ChannelActor.props(tempo, gameMode, name), name);
                 channels.add(Channel.of(name));
             }
         }
