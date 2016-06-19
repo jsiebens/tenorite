@@ -31,8 +31,8 @@ public class ClientActorTest extends AbstractActorTestCase {
 
     private static final Set<PlineMessage> WELCOME_MESSAGES = new HashSet<>(asList(
         PlineMessage.of(""),
-        PlineMessage.of("Welcome on Tenorite TetriNET Server!"),
-        PlineMessage.of("Join a channel to start playing...")
+        PlineMessage.of("Welcome on <b>Tenorite TetriNET</b> Server!"),
+        PlineMessage.of("<i>Join a channel to start playing...</i>")
     ));
 
     private static Predicate<Object> ignoreWelcomeMessages() {
@@ -87,7 +87,7 @@ public class ClientActorTest extends AbstractActorTestCase {
         client.tell(SlotReservationFailed.channelIsFull(), noSender());
 
         channels.expectMsgAllOf(ListChannels.of(Tempo.FAST));
-        output.expectMsgAllOf(PlineMessage.of("channel is FULL"));
+        output.expectMsgAllOf(PlineMessage.of("channel is <b>FULL</b>"));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class ClientActorTest extends AbstractActorTestCase {
         client.tell(SlotReservationFailed.channelNotAvailable(), noSender());
 
         channels.expectMsgAllOf(ListChannels.of(Tempo.FAST));
-        output.expectMsgAllOf(PlineMessage.of("channel is not available"));
+        output.expectMsgAllOf(PlineMessage.of("channel is <b>not available</b>"));
     }
 
     @Test
@@ -139,7 +139,7 @@ public class ClientActorTest extends AbstractActorTestCase {
             PlineMessage.of("   channel:A"),
             PlineMessage.of("   channel:B"),
             PlineMessage.of("   channel:C"),
-            PlineMessage.of("(type /join <name>)")
+            PlineMessage.of("<gray>(type /join <name>)</gray>")
         );
     }
 

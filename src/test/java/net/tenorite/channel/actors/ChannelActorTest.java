@@ -25,7 +25,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
 
         player1.expectMsgAllOf(
             PlineMessage.of(""),
-            PlineMessage.of("Hello John, welcome in channel azerty"),
+            PlineMessage.of("Hello <b>John</b>, welcome in channel <b>azerty</b>"),
             PlineMessage.of("")
         );
     }

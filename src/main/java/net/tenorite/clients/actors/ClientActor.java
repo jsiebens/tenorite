@@ -48,9 +48,9 @@ final class ClientActor extends AbstractActor {
         write(
             PlayerNumMessage.of(1),
             PlineMessage.of(""),
-            PlineMessage.of("Welcome on Tenorite TetriNET Server!"),
+            PlineMessage.of("Welcome on <b>Tenorite TetriNET</b> Server!"),
             PlineMessage.of(""),
-            PlineMessage.of("Join a channel to start playing..."),
+            PlineMessage.of("<i>Join a channel to start playing...</i>"),
             PlineMessage.of("")
         );
 
@@ -84,10 +84,10 @@ final class ClientActor extends AbstractActor {
             SlotReservationFailed srf = (SlotReservationFailed) o;
             switch (srf) {
                 case CHANNEL_IS_FULL:
-                    write(PlineMessage.of("channel is FULL"));
+                    write(PlineMessage.of("channel is <b>FULL</b>"));
                     break;
                 case CHANNEL_NOT_AVAILABLE:
-                    write(PlineMessage.of("channel is not available"));
+                    write(PlineMessage.of("channel is <b>not available</b>"));
                     break;
             }
         }
@@ -113,7 +113,7 @@ final class ClientActor extends AbstractActor {
             .forEach(c -> write(PlineMessage.of("   " + c.getName())));
 
         write(PlineMessage.of(""));
-        write(PlineMessage.of("(type /join <name>)"));
+        write(PlineMessage.of("<gray>(type /join <name>)</gray>"));
     }
 
     private void write(Message... messages) {

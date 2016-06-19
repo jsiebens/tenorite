@@ -10,6 +10,8 @@ import net.tenorite.clients.ClientsRegistry;
 import net.tenorite.core.Tempo;
 import net.tenorite.protocol.Inbound;
 import net.tenorite.protocol.Message;
+import net.tenorite.protocol.PlineMessage;
+import net.tenorite.util.Style;
 
 import java.util.ArrayDeque;
 import java.util.Optional;
@@ -110,7 +112,12 @@ final class TetrinetServerHandler extends SimpleChannelInboundHandler<String> {
 
             @Override
             public void write(Message message) {
-                ctx.writeAndFlush(message.raw(tempo));
+                if (message instanceof PlineMessage) {
+                    ctx.writeAndFlush(Style.apply(message.raw(tempo)));
+                }
+                else {
+                    ctx.writeAndFlush(message.raw(tempo));
+                }
             }
 
             @Override

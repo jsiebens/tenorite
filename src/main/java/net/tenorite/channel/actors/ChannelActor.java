@@ -110,7 +110,7 @@ class ChannelActor extends AbstractActor {
 
             // send welcome message
             slot.send(PlineMessage.of(""));
-            slot.send(PlineMessage.of(format("Hello %s, welcome in channel %s", slot.name, name)));
+            slot.send(PlineMessage.of(format("Hello <b>%s</b>, welcome in channel <b>%s</b>", slot.name, name)));
             slot.send(PlineMessage.of(""));
 
             slots.put(sender(), slot);
