@@ -70,6 +70,9 @@ class ChannelActor extends AbstractActor {
         if (o instanceof PlineMessage) {
             handlePline((PlineMessage) o);
         }
+        else if (o instanceof TeamMessage) {
+            handleTeam((TeamMessage) o);
+        }
     }
 
     private void handleReserveSlot(ReserveSlot o) {
@@ -100,7 +103,10 @@ class ChannelActor extends AbstractActor {
             forEachSlot(p -> p.send(PlayerJoinMessage.of(slot.nr, slot.name)));
 
             // send current player list
-            forEachSlot(p -> slot.send(PlayerJoinMessage.of(p.nr, p.name)));
+            forEachSlot(p -> {
+                slot.send(PlayerJoinMessage.of(p.nr, p.name));
+                slot.send(TeamMessage.of(p.nr, ofNullable(p.team).orElse("")));
+            });
 
             // send welcome message
             slot.send(PlineMessage.of(""));
@@ -142,6 +148,17 @@ class ChannelActor extends AbstractActor {
         forEachSlot(p -> p.nr != pline.getSender(), p -> p.send(pline));
     }
 
+    private void handleTeam(TeamMessage o) {
+        forEachSlot(p -> {
+            if (p.nr == o.getSender()) {
+                p.team = o.getTeam();
+            }
+            else {
+                p.send(o);
+            }
+        });
+    }
+
     // =================================================================================================================
 
     private void forEachSlot(Consumer<Slot> playerConsumer) {
@@ -178,6 +195,8 @@ class ChannelActor extends AbstractActor {
         private final String name;
 
         private final ActorRef actor;
+
+        private String team;
 
         Slot(int nr, String name, ActorRef actor) {
             this.nr = nr;

@@ -8,10 +8,7 @@ import net.tenorite.channel.commands.LeaveChannel;
 import net.tenorite.channel.commands.ReserveSlot;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Tempo;
-import net.tenorite.protocol.PlayerJoinMessage;
-import net.tenorite.protocol.PlayerLeaveMessage;
-import net.tenorite.protocol.PlayerNumMessage;
-import net.tenorite.protocol.PlineMessage;
+import net.tenorite.protocol.*;
 import org.junit.Test;
 
 public class ChannelActorTest extends AbstractActorTestCase {
@@ -138,6 +135,61 @@ public class ChannelActorTest extends AbstractActorTestCase {
 
         player1.expectMsgAllOf(PlayerLeaveMessage.of(3));
         player2.expectMsgAllOf(PlayerLeaveMessage.of(3));
+    }
+
+    @Test
+    public void testNewPlayerReceviesTeamMessageWhenJoining() {
+        JavaTestKit player1 = newTestKit(accept(TeamMessage.class));
+        JavaTestKit player2 = newTestKit(accept(TeamMessage.class));
+        JavaTestKit player3 = newTestKit(accept(TeamMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, "channel"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+
+        channelActor.tell(TeamMessage.of(1, "Doe's"), player1.getRef());
+        channelActor.tell(TeamMessage.of(2, "Doe's"), player2.getRef());
+
+        joinChannel(player3, "nick", channelActor);
+
+        player3.expectMsgAllOf(TeamMessage.of(1, "Doe's"), TeamMessage.of(2, "Doe's"));
+    }
+
+    @Test
+    public void testPlayerCanClearHisHerTeam() {
+        JavaTestKit player1 = newTestKit(accept(TeamMessage.class));
+        JavaTestKit player2 = newTestKit(accept(TeamMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, "channel"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+
+        channelActor.tell(TeamMessage.of(1, "Doe's"), player1.getRef());
+        channelActor.tell(TeamMessage.of(1, ""), player1.getRef());
+
+        player2.expectMsgAllOf(TeamMessage.of(1, "Doe's"), TeamMessage.of(1, ""));
+    }
+
+    @Test
+    public void testTeamMessageAreForwardedOnlyToOtherPlayers() {
+        JavaTestKit player1 = newTestKit(accept(TeamMessage.class));
+        JavaTestKit player2 = newTestKit(accept(TeamMessage.class));
+        JavaTestKit player3 = newTestKit(accept(TeamMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, "channel"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+        joinChannel(player3, "nick", channelActor);
+
+        channelActor.tell(TeamMessage.of(1, "Doe's"), player1.getRef());
+        channelActor.tell(TeamMessage.of(2, "Doe's"), player2.getRef());
+
+        player1.expectMsgAllOf(TeamMessage.of(2, "Doe's"));
+        player2.expectMsgAllOf(TeamMessage.of(1, ""), TeamMessage.of(1, "Doe's"));
+        player3.expectMsgAllOf(TeamMessage.of(1, ""), TeamMessage.of(2, ""), TeamMessage.of(1, "Doe's"), TeamMessage.of(2, "Doe's"));
     }
 
     private void joinChannel(JavaTestKit player, String name, ActorRef channel) {
