@@ -30,6 +30,8 @@ class ChannelActor extends AbstractActor {
         return Props.create(ChannelActor.class, tempo, gameMode, name);
     }
 
+    private static final GameRankCalculator RANK_CALCULATOR = new GameRankCalculator();
+
     private final Map<ActorRef, Slot> slots = new HashMap<>();
 
     private final Map<ActorRef, Slot> pending = new HashMap<>();
@@ -314,6 +316,14 @@ class ChannelActor extends AbstractActor {
 
     private void endGame(Game game) {
         forEachSlot(p -> p.send(EndGameMessage.of()));
+
+        List<Player> ranking = RANK_CALCULATOR.calculate(game);
+
+        if (!ranking.isEmpty()) {
+            PlayerWonMessage message = PlayerWonMessage.of(ranking.get(0).getSlot());
+            forEachSlot(p -> p.send(message));
+        }
+
         resetGameRecorder();
     }
 

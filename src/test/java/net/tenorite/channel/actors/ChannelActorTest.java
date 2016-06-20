@@ -56,9 +56,9 @@ public class ChannelActorTest extends AbstractActorTestCase {
 
     @Test
     public void testEndGameMessageShouldBeReceivedWhenAllButOnePlayerIsLost() {
-        JavaTestKit player1 = newTestKit(accept(PlayerLostMessage.class).or(accept(EndGameMessage.class)));
-        JavaTestKit player2 = newTestKit(accept(PlayerLostMessage.class).or(accept(EndGameMessage.class)));
-        JavaTestKit player3 = newTestKit(accept(PlayerLostMessage.class).or(accept(EndGameMessage.class)));
+        JavaTestKit player1 = newTestKit(accept(PlayerLostMessage.class).or(accept(EndGameMessage.class).or(accept(PlayerWonMessage.class))));
+        JavaTestKit player2 = newTestKit(accept(PlayerLostMessage.class).or(accept(EndGameMessage.class).or(accept(PlayerWonMessage.class))));
+        JavaTestKit player3 = newTestKit(accept(PlayerLostMessage.class).or(accept(EndGameMessage.class).or(accept(PlayerWonMessage.class))));
 
         ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, GameMode.CLASSIC, "channel"));
 
@@ -70,9 +70,9 @@ public class ChannelActorTest extends AbstractActorTestCase {
         channelActor.tell(PlayerLostMessage.of(2), player2.getRef());
         channelActor.tell(PlayerLostMessage.of(3), player3.getRef());
 
-        player1.expectMsgAllOf(PlayerLostMessage.of(2), PlayerLostMessage.of(3), EndGameMessage.of());
-        player2.expectMsgAllOf(PlayerLostMessage.of(2), PlayerLostMessage.of(3), EndGameMessage.of());
-        player3.expectMsgAllOf(PlayerLostMessage.of(2), PlayerLostMessage.of(3), EndGameMessage.of());
+        player1.expectMsgAllOf(PlayerLostMessage.of(2), PlayerLostMessage.of(3), EndGameMessage.of(), PlayerWonMessage.of(1));
+        player2.expectMsgAllOf(PlayerLostMessage.of(2), PlayerLostMessage.of(3), EndGameMessage.of(), PlayerWonMessage.of(1));
+        player3.expectMsgAllOf(PlayerLostMessage.of(2), PlayerLostMessage.of(3), EndGameMessage.of(), PlayerWonMessage.of(1));
     }
 
     @Test
