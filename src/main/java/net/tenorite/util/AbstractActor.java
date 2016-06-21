@@ -8,4 +8,12 @@ public abstract class AbstractActor extends UntypedActor {
         sender().tell(o, self());
     }
 
+    protected final void publish(Object o) {
+        getContext().system().eventStream().publish(o);
+    }
+
+    protected final void subscribe(Class<?> type) {
+        getContext().system().eventStream().subscribe(self(), type);
+    }
+
 }

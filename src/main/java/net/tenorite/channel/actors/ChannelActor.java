@@ -6,13 +6,16 @@ import akka.actor.Terminated;
 import net.tenorite.channel.commands.ConfirmSlot;
 import net.tenorite.channel.commands.LeaveChannel;
 import net.tenorite.channel.commands.ReserveSlot;
+import net.tenorite.channel.events.ChannelJoined;
 import net.tenorite.channel.events.ChannelLeft;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.channel.events.SlotReserved;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.*;
+import net.tenorite.game.events.GameFinished;
 import net.tenorite.protocol.*;
 import net.tenorite.util.AbstractActor;
+import net.tenorite.winlist.events.WinlistUpdated;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -53,6 +56,11 @@ class ChannelActor extends AbstractActor {
     }
 
     @Override
+    public void preStart() throws Exception {
+        subscribe(WinlistUpdated.class);
+    }
+
+    @Override
     public void postStop() throws Exception {
         ofNullable(gameRecorder).ifPresent(GameRecorder::stop);
     }
@@ -73,6 +81,9 @@ class ChannelActor extends AbstractActor {
         }
         else if (o instanceof Terminated) {
             handleLeaveChannel(((Terminated) o).actor(), true);
+        }
+        else if (o instanceof WinlistUpdated) {
+            handleWinlistUpdated((WinlistUpdated) o);
         }
     }
 
@@ -156,6 +167,8 @@ class ChannelActor extends AbstractActor {
                 });
             }
 
+            publish(ChannelJoined.of(tempo, gameMode, name, slot.name));
+
             slots.put(sender(), slot);
         }
     }
@@ -187,6 +200,12 @@ class ChannelActor extends AbstractActor {
                 context().unwatch(sender());
             }
         });
+    }
+
+    private void handleWinlistUpdated(WinlistUpdated o) {
+        if (o.getGameMode().equals(gameMode)) {
+            forEachSlot(s -> s.send(WinlistMessage.of(o.getItems().stream().map(e -> e.getType().getLetter() + e.getName() + ";" + e.getScore()).collect(toList()))));
+        }
     }
 
     private void handlePline(PlineMessage pline) {
@@ -323,6 +342,8 @@ class ChannelActor extends AbstractActor {
             PlayerWonMessage message = PlayerWonMessage.of(ranking.get(0).getSlot());
             forEachSlot(p -> p.send(message));
         }
+
+        publish(GameFinished.of(game, ranking));
 
         resetGameRecorder();
     }

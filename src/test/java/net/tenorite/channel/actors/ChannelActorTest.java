@@ -12,7 +12,12 @@ import net.tenorite.core.Tempo;
 import net.tenorite.game.Field;
 import net.tenorite.game.GameMode;
 import net.tenorite.protocol.*;
+import net.tenorite.winlist.WinlistItem;
+import net.tenorite.winlist.events.WinlistUpdated;
 import org.junit.Test;
+
+import static akka.actor.ActorRef.noSender;
+import static java.util.Arrays.asList;
 
 public class ChannelActorTest extends AbstractActorTestCase {
 
@@ -369,6 +374,38 @@ public class ChannelActorTest extends AbstractActorTestCase {
         channelActor.tell(ClassicStyleAddMessage.of(1, 4), player1.getRef());
 
         player2.expectNoMsg();
+    }
+
+    @Test
+    public void testPlayerReceivesWinlistMessageWhenWinlistIsUpdated() {
+        JavaTestKit player1 = newTestKit(accept(WinlistMessage.class));
+        JavaTestKit player2 = newTestKit(accept(WinlistMessage.class));
+        JavaTestKit player3 = newTestKit(accept(WinlistMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, GameMode.CLASSIC, "channel"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+        joinChannel(player3, "nick", channelActor);
+
+        channelActor.tell(WinlistUpdated.of(TEMPO, GameMode.CLASSIC, asList(WinlistItem.of(WinlistItem.Type.PLAYER, "a", 1, 1000), WinlistItem.of(WinlistItem.Type.TEAM, "b", 2, 2000))), noSender());
+
+        player1.expectMsgAllOf(WinlistMessage.of(asList("pa;1", "tb;2")));
+        player2.expectMsgAllOf(WinlistMessage.of(asList("pa;1", "tb;2")));
+        player3.expectMsgAllOf(WinlistMessage.of(asList("pa;1", "tb;2")));
+    }
+
+    @Test
+    public void testWinlistUpdatedFromOtherGameModesAreIgnored() {
+        JavaTestKit player1 = newTestKit(accept(WinlistMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, GameMode.CLASSIC, "channel"));
+
+        joinChannel(player1, "john", channelActor);
+
+        channelActor.tell(WinlistUpdated.of(TEMPO, GameMode.DEFAULT, asList(WinlistItem.of(WinlistItem.Type.PLAYER, "a", 1, 1000), WinlistItem.of(WinlistItem.Type.TEAM, "b", 2, 2000))), noSender());
+
+        player1.expectNoMsg();
     }
 
     private void joinChannel(JavaTestKit player, String name, ActorRef channel) {
