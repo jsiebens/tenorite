@@ -14,6 +14,7 @@ import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.channel.events.SlotReserved;
 import net.tenorite.clients.MessageSink;
 import net.tenorite.core.Tempo;
+import net.tenorite.game.GameMode;
 import net.tenorite.protocol.Inbound;
 import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.Message;
@@ -131,14 +132,14 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), channelsKit.getRef()));
 
-        Channels channels = Channels.of(Channel.of("channel:A"), Channel.of("channel:B"), Channel.of("channel:C"));
+        Channels channels = Channels.of(Channel.of(GameMode.CLASSIC, "channel:A"), Channel.of(GameMode.CLASSIC, "channel:B"), Channel.of(GameMode.CLASSIC, "channel:C"));
 
         client.tell(channels, noSender());
 
         output.expectMsgAllOf(
-            PlineMessage.of("   channel:A"),
-            PlineMessage.of("   channel:B"),
-            PlineMessage.of("   channel:C"),
+            PlineMessage.of("   channel:A<gray> - classic TetriFAST</gray> "),
+            PlineMessage.of("   channel:B<gray> - classic TetriFAST</gray> "),
+            PlineMessage.of("   channel:C<gray> - classic TetriFAST</gray> "),
             PlineMessage.of("<gray>(type /join <name>)</gray>")
         );
     }

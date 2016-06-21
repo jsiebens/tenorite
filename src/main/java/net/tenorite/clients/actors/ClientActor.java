@@ -14,6 +14,7 @@ import net.tenorite.clients.MessageSink;
 import net.tenorite.core.Tempo;
 import net.tenorite.protocol.*;
 import net.tenorite.util.AbstractActor;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ final class ClientActor extends AbstractActor {
         return Props.create(ClientActor.class, tempo, name, sink, channels);
     }
 
+    private final Tempo tempo;
+
     private final MessageSink sink;
 
     private final Commands commands;
@@ -35,6 +38,7 @@ final class ClientActor extends AbstractActor {
     private ActorRef channel;
 
     public ClientActor(Tempo tempo, String name, MessageSink sink, ActorRef channels) {
+        this.tempo = tempo;
         this.sink = sink;
 
         this.commands = new Commands()
@@ -110,7 +114,10 @@ final class ClientActor extends AbstractActor {
     private void handleChannels(Channels o) {
         o.getChannels()
             .stream()
-            .forEach(c -> write(PlineMessage.of("   " + c.getName())));
+            .forEach(c -> {
+                String gameMode = ofNullable(c.getGameMode().getDescription(tempo)).filter(StringUtils::hasText).map(s -> "<gray> - " + s + "</gray> ").orElse(" ");
+                write(PlineMessage.of(String.format("   %s%s", c.getName(), gameMode)));
+            });
 
         write(PlineMessage.of(""));
         write(PlineMessage.of("<gray>(type /join <name>)</gray>"));

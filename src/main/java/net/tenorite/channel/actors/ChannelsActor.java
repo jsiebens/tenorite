@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import net.tenorite.channel.Channel;
 import net.tenorite.channel.Channels;
+import net.tenorite.channel.commands.CreateChannel;
 import net.tenorite.channel.commands.ListChannels;
 import net.tenorite.channel.commands.ReserveSlot;
 import net.tenorite.channel.events.SlotReservationFailed;
@@ -16,6 +17,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static akka.actor.ActorRef.noSender;
+import static java.util.stream.IntStream.range;
 
 public class ChannelsActor extends AbstractActor {
 
@@ -30,11 +34,21 @@ public class ChannelsActor extends AbstractActor {
         super.preStart();
         actors.put(Tempo.NORMAL, context().actorOf(Props.create(ChannelsPerModeActor.class, Tempo.NORMAL), Tempo.NORMAL.name()));
         actors.put(Tempo.FAST, context().actorOf(Props.create(ChannelsPerModeActor.class, Tempo.FAST), Tempo.FAST.name()));
+
+        range(1, 6).mapToObj(i -> "tetrinet:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.NORMAL, GameMode.CLASSIC, m), noSender()));
+        range(1, 6).mapToObj(i -> "tetrifast:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.FAST, GameMode.CLASSIC, m), noSender()));
+
+        range(1, 2).mapToObj(i -> "pure:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.NORMAL, GameMode.PURE, m), noSender()));
+        range(1, 2).mapToObj(i -> "pure:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.FAST, GameMode.PURE, m), noSender()));
     }
 
     @Override
     public void onReceive(Object o) throws Exception {
-        if (o instanceof ReserveSlot) {
+        if (o instanceof CreateChannel) {
+            CreateChannel cc = (CreateChannel) o;
+            actors.get(cc.getTempo()).forward(o, context());
+        }
+        else if (o instanceof ReserveSlot) {
             ReserveSlot rs = (ReserveSlot) o;
             actors.get(rs.getTempo()).forward(o, context());
         }
@@ -55,15 +69,11 @@ public class ChannelsActor extends AbstractActor {
         }
 
         @Override
-        public void preStart() throws Exception {
-            createChannel(GameMode.DEFAULT, "channel:1");
-            createChannel(GameMode.CLASSIC, "channel:2");
-            createChannel(GameMode.PURE, "channel:3");
-        }
-
-        @Override
         public void onReceive(Object o) throws Exception {
-            if (o instanceof ReserveSlot) {
+            if (o instanceof CreateChannel) {
+                createChannel((CreateChannel) o);
+            }
+            else if (o instanceof ReserveSlot) {
                 handleReserveSlot((ReserveSlot) o);
             }
             else if (o instanceof ListChannels) {
@@ -86,10 +96,10 @@ public class ChannelsActor extends AbstractActor {
             replyWith(Channels.of(channels));
         }
 
-        private void createChannel(GameMode gameMode, String name) {
-            if (context().child(name).isEmpty()) {
-                context().actorOf(ChannelActor.props(tempo, gameMode, name), name);
-                channels.add(Channel.of(name));
+        private void createChannel(CreateChannel c) {
+            if (context().child(c.getName()).isEmpty()) {
+                context().actorOf(ChannelActor.props(tempo, c.getGameMode(), c.getName()), c.getName());
+                channels.add(Channel.of(c.getGameMode(), c.getName()));
             }
         }
     }
