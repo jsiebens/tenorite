@@ -1,10 +1,8 @@
 package net.tenorite.game;
 
+import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
-import net.tenorite.protocol.FieldMessage;
-import net.tenorite.protocol.Message;
-import net.tenorite.protocol.PlayerLeaveMessage;
-import net.tenorite.protocol.PlayerLostMessage;
+import net.tenorite.protocol.*;
 import net.tenorite.util.DeterministicStopWatch;
 import net.tenorite.util.Scheduler;
 import net.tenorite.util.StopWatch;
@@ -132,7 +130,94 @@ public class GameRecorderTest {
         assertThat(recorder.getField(3).isPresent()).isFalse();
     }
 
-    public Consumer<Message> noop() {
+    @Test
+    public void testGameRecorderShouldRecordLvlMessages() {
+        Player playerA = Player.of(1, "A", null);
+        Player playerB = Player.of(2, "B", null);
+
+        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.CLASSIC, asList(playerA, playerB), scheduler, noop());
+
+        recorder.start();
+        recorder.onLvlMessage(LvlMessage.of(1, 5));
+        recorder.onLvlMessage(LvlMessage.of(2, 7));
+        Game game = recorder.onPlayerLostMessage(PlayerLostMessage.of(1)).get();
+
+        LvlMessage messageA = (LvlMessage) game.getMessages().get(0).getMessage();
+        LvlMessage messageB = (LvlMessage) game.getMessages().get(1).getMessage();
+
+        assertThat(messageA).isEqualTo(LvlMessage.of(1, 5));
+        assertThat(messageB).isEqualTo(LvlMessage.of(2, 7));
+    }
+
+    @Test
+    public void testGameRecorderShouldRecordSpecialBlockMessages() {
+        Player playerA = Player.of(1, "A", null);
+        Player playerB = Player.of(2, "B", null);
+
+        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.CLASSIC, asList(playerA, playerB), scheduler, noop());
+
+        recorder.start();
+        recorder.onSpecialBlockMessage(SpecialBlockMessage.of(1, Special.ADDLINE, 2));
+        recorder.onSpecialBlockMessage(SpecialBlockMessage.of(2, Special.QUAKEFIELD, 1));
+        recorder.onSpecialBlockMessage(SpecialBlockMessage.of(2, Special.NUKEFIELD, 2));
+        Game game = recorder.onPlayerLostMessage(PlayerLostMessage.of(1)).get();
+
+        SpecialBlockMessage messageA = (SpecialBlockMessage) game.getMessages().get(0).getMessage();
+        SpecialBlockMessage messageB = (SpecialBlockMessage) game.getMessages().get(1).getMessage();
+        SpecialBlockMessage messageC = (SpecialBlockMessage) game.getMessages().get(2).getMessage();
+
+        assertThat(messageA).isEqualTo(SpecialBlockMessage.of(1, Special.ADDLINE, 2));
+        assertThat(messageB).isEqualTo(SpecialBlockMessage.of(2, Special.QUAKEFIELD, 1));
+        assertThat(messageC).isEqualTo(SpecialBlockMessage.of(2, Special.NUKEFIELD, 2));
+    }
+
+
+    @Test
+    public void testGameRecorderShouldAlwaysStartWithClassicRulesEnabledToTrackClassics() {
+        Player playerA = Player.of(1, "A", null);
+
+        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.DEFAULT, singletonList(playerA), scheduler, noop());
+
+        assertThat(recorder.start().getClassicRules()).isTrue();
+    }
+
+    @Test
+    public void testGameRecorderShouldBlockClassicSpecialsIfClassicRulesAreDisabled() {
+        Player playerA = Player.of(1, "A", null);
+        Player playerB = Player.of(2, "B", null);
+
+        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.DEFAULT, asList(playerA, playerB), scheduler, noop());
+
+        assertThat(recorder.start().getClassicRules()).isTrue();
+        assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(1, 1))).isFalse();
+        assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(1, 2))).isFalse();
+        assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(1, 4))).isFalse();
+
+        Game game = recorder.onPlayerLostMessage(PlayerLostMessage.of(1)).get();
+
+        ClassicStyleAddMessage messageA = (ClassicStyleAddMessage) game.getMessages().get(0).getMessage();
+        ClassicStyleAddMessage messageB = (ClassicStyleAddMessage) game.getMessages().get(1).getMessage();
+        ClassicStyleAddMessage messageC = (ClassicStyleAddMessage) game.getMessages().get(2).getMessage();
+
+        assertThat(messageA).isEqualTo(ClassicStyleAddMessage.of(1, 1));
+        assertThat(messageB).isEqualTo(ClassicStyleAddMessage.of(1, 2));
+        assertThat(messageC).isEqualTo(ClassicStyleAddMessage.of(1, 4));
+    }
+
+    @Test
+    public void testGameRecorderShouldAllowClassicSpecialIfClassicRulesAreDisabledButSenderIsTheServer() {
+        Player playerA = Player.of(1, "A", null);
+        Player playerB = Player.of(2, "B", null);
+
+        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.DEFAULT, asList(playerA, playerB), scheduler, noop());
+
+        assertThat(recorder.start().getClassicRules()).isTrue();
+        assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(0, 1))).isTrue();
+        assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(0, 2))).isTrue();
+        assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(0, 4))).isTrue();
+    }
+
+    private Consumer<Message> noop() {
         return m -> {
         };
     }
@@ -143,7 +228,7 @@ public class GameRecorderTest {
 
         private final StopWatch stopWatch;
 
-        public InternalScheduler(ScheduledExecutorService scheduler, StopWatch stopWatch) {
+        InternalScheduler(ScheduledExecutorService scheduler, StopWatch stopWatch) {
             this.scheduler = scheduler;
             this.stopWatch = stopWatch;
         }

@@ -15,11 +15,11 @@ import static java.util.Optional.ofNullable;
 
 final class SuddenDeathMonitor {
 
-    private static final ClassicStyleAddMessage FOUR_LINES = ClassicStyleAddMessage.of(0, 4, true);
+    private static final ClassicStyleAddMessage FOUR_LINES = ClassicStyleAddMessage.of(0, 4);
 
-    private static final ClassicStyleAddMessage TWO_LINES = ClassicStyleAddMessage.of(0, 2, true);
+    private static final ClassicStyleAddMessage TWO_LINES = ClassicStyleAddMessage.of(0, 2);
 
-    private static final ClassicStyleAddMessage ONE_LINE = ClassicStyleAddMessage.of(0, 1, true);
+    private static final ClassicStyleAddMessage ONE_LINE = ClassicStyleAddMessage.of(0, 1);
 
     static final String START_MESSAGE_TEMPLATE = "SUDDEN DEATH enabled! %s line(s) added every %s second(s)";
 

@@ -1,15 +1,11 @@
 package net.tenorite.game;
 
 import net.tenorite.core.Tempo;
-import net.tenorite.protocol.FieldMessage;
-import net.tenorite.protocol.Message;
-import net.tenorite.protocol.PlayerLeaveMessage;
-import net.tenorite.protocol.PlayerLostMessage;
+import net.tenorite.protocol.*;
 import net.tenorite.util.Scheduler;
 import net.tenorite.util.StopWatch;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -52,7 +48,7 @@ public final class GameRecorder {
     public GameRules start() {
         stopWatch.start();
         suddenDeathMonitor.start();
-        return gameMode.getGameRules();
+        return GameRules.from(gameMode.getGameRules(), b -> b.classicRules(true));
     }
 
     public void stop() {
@@ -81,6 +77,19 @@ public final class GameRecorder {
         else {
             return false;
         }
+    }
+
+    public void onLvlMessage(LvlMessage lvlMessage) {
+        messages.add(GameMessage.of(stopWatch.getTime(), lvlMessage));
+    }
+
+    public void onSpecialBlockMessage(SpecialBlockMessage specialBlockMessage) {
+        messages.add(GameMessage.of(stopWatch.getTime(), specialBlockMessage));
+    }
+
+    public boolean onClassicStyleAddMessage(ClassicStyleAddMessage classicStyleAddMessage) {
+        messages.add(GameMessage.of(stopWatch.getTime(), classicStyleAddMessage));
+        return gameMode.getGameRules().getClassicRules() || classicStyleAddMessage.getSender() == 0;
     }
 
     public boolean onFieldMessage(FieldMessage fieldMessage) {

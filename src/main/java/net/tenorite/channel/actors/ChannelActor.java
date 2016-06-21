@@ -341,6 +341,7 @@ class ChannelActor extends AbstractActor {
     private void handleLvlMessage(LvlMessage lvl) {
         findSlot(lvl.getSender()).ifPresent(player -> {
             if (gameRecorder != null) {
+                gameRecorder.onLvlMessage(lvl);
                 forEachSlot(op -> op.send(lvl));
             }
         });
@@ -358,18 +359,21 @@ class ChannelActor extends AbstractActor {
     private void handleSpecialBlockMessage(SpecialBlockMessage message) {
         findSlot(message.getSender()).ifPresent(player -> {
             if (gameRecorder != null) {
+                gameRecorder.onSpecialBlockMessage(message);
                 forEachSlot(op -> op.nr != player.nr, op -> op.send(message));
             }
         });
     }
 
     private void handleClassicStyleAddMessage(ClassicStyleAddMessage message) {
-        if (message.isServerMessage()) {
-            forEachSlot(op -> op.send(message));
+        if (message.getSender() == 0) {
+            if (gameRecorder != null && gameRecorder.onClassicStyleAddMessage(message)) {
+                forEachSlot(op -> op.send(message));
+            }
         }
         else {
             findSlot(message.getSender()).ifPresent(player -> {
-                if (gameRecorder != null) {
+                if (gameRecorder != null && gameRecorder.onClassicStyleAddMessage(message)) {
                     forEachSlot(op -> op.nr != player.nr, op -> op.send(message));
                 }
             });

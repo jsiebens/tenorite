@@ -50,14 +50,14 @@ public class SuddenDeathMonitorTest {
 
         assertThat(messages).containsExactly(
             GmsgMessage.of(format(SuddenDeathMonitor.START_MESSAGE_TEMPLATE, 11, 5)),
-            ClassicStyleAddMessage.of(0, 4, true),
-            ClassicStyleAddMessage.of(0, 4, true),
-            ClassicStyleAddMessage.of(0, 2, true),
-            ClassicStyleAddMessage.of(0, 1, true),
-            ClassicStyleAddMessage.of(0, 4, true),
-            ClassicStyleAddMessage.of(0, 4, true),
-            ClassicStyleAddMessage.of(0, 2, true),
-            ClassicStyleAddMessage.of(0, 1, true)
+            ClassicStyleAddMessage.of(0, 4),
+            ClassicStyleAddMessage.of(0, 4),
+            ClassicStyleAddMessage.of(0, 2),
+            ClassicStyleAddMessage.of(0, 1),
+            ClassicStyleAddMessage.of(0, 4),
+            ClassicStyleAddMessage.of(0, 4),
+            ClassicStyleAddMessage.of(0, 2),
+            ClassicStyleAddMessage.of(0, 1)
         );
     }
 
