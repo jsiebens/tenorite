@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
 final class ClientActor extends AbstractActor {
@@ -114,9 +115,15 @@ final class ClientActor extends AbstractActor {
     private void handleChannels(Channels o) {
         o.getChannels()
             .stream()
+            .sorted((a, b) -> a.getName().compareTo(b.getName()))
             .forEach(c -> {
                 String gameMode = ofNullable(c.getGameMode().getDescription(tempo)).filter(StringUtils::hasText).map(s -> "<gray> - " + s + "</gray> ").orElse(" ");
-                write(PlineMessage.of(String.format("   %s%s", c.getName(), gameMode)));
+                if (c.getNrOfPlayers() < 6) {
+                    write(PlineMessage.of(format("   %s%s <blue>(%s/%s)</blue>", c.getName(), gameMode, c.getNrOfPlayers(), 6)));
+                }
+                else {
+                    write(PlineMessage.of(format("   %s%s <red>(FULL)</red>", c.getName(), gameMode)));
+                }
             });
 
         write(PlineMessage.of(""));

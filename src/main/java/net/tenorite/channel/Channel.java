@@ -9,11 +9,13 @@ import org.immutables.value.Value;
 public abstract class Channel {
 
     public static Channel of(GameMode gameMode, String name) {
-        return new ChannelBuilder().gameMode(gameMode).name(name).build();
+        return new ChannelBuilder().gameMode(gameMode).name(name).nrOfPlayers(0).build();
     }
 
     public abstract GameMode getGameMode();
 
     public abstract String getName();
+
+    public abstract int getNrOfPlayers();
 
 }

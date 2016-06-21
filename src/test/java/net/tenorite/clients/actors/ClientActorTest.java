@@ -137,9 +137,9 @@ public class ClientActorTest extends AbstractActorTestCase {
         client.tell(channels, noSender());
 
         output.expectMsgAllOf(
-            PlineMessage.of("   channel:A<gray> - classic TetriFAST</gray> "),
-            PlineMessage.of("   channel:B<gray> - classic TetriFAST</gray> "),
-            PlineMessage.of("   channel:C<gray> - classic TetriFAST</gray> "),
+            PlineMessage.of("   channel:A<gray> - classic TetriFAST</gray>  <blue>(0/6)</blue>"),
+            PlineMessage.of("   channel:B<gray> - classic TetriFAST</gray>  <blue>(0/6)</blue>"),
+            PlineMessage.of("   channel:C<gray> - classic TetriFAST</gray>  <blue>(0/6)</blue>"),
             PlineMessage.of("<gray>(type /join <name>)</gray>")
         );
     }

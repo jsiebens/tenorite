@@ -213,6 +213,9 @@ class ChannelActor extends AbstractActor {
                 gameRecorder.onPlayerLeaveMessage(PlayerLeaveMessage.of(slot.nr)).ifPresent(e -> resetGameRecorder());
             }
 
+            // publish leave
+            publish(ChannelLeft.of(tempo, name, slot.name));
+
             if (!disconnected) {
                 actor.tell(ChannelLeft.of(tempo, name, slot.name), self());
                 context().unwatch(sender());
@@ -491,7 +494,7 @@ class ChannelActor extends AbstractActor {
         public StopWatch stopWatch() {
             return new CommonsStopWatch();
         }
-        
+
     }
 
 }
