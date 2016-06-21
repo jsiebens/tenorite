@@ -1,6 +1,7 @@
 package net.tenorite.channel.actors;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.Terminated;
 import net.tenorite.channel.commands.ConfirmSlot;
@@ -15,9 +16,14 @@ import net.tenorite.game.*;
 import net.tenorite.game.events.GameFinished;
 import net.tenorite.protocol.*;
 import net.tenorite.util.AbstractActor;
+import net.tenorite.util.CommonsStopWatch;
+import net.tenorite.util.Scheduler;
+import net.tenorite.util.StopWatch;
 import net.tenorite.winlist.events.WinlistUpdated;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -47,12 +53,15 @@ class ChannelActor extends AbstractActor {
 
     private final String name;
 
+    private final Scheduler scheduler;
+
     private GameRecorder gameRecorder;
 
     public ChannelActor(Tempo tempo, GameMode gameMode, String name) {
         this.tempo = tempo;
         this.gameMode = gameMode;
         this.name = name;
+        this.scheduler = new AkkaScheduler(context().system());
     }
 
     @Override
@@ -251,7 +260,9 @@ class ChannelActor extends AbstractActor {
     private void handleStartGame(StartGameMessage start) {
         findSlot(start.getSender()).ifPresent(moderator -> {
             if (gameRecorder == null) {
-                gameRecorder = new GameRecorder(tempo, gameMode, currentPlayers());
+                ActorRef self = self();
+
+                gameRecorder = new GameRecorder(tempo, gameMode, currentPlayers(), scheduler, message -> self.tell(message, noSender()));
 
                 GameRules rules = gameRecorder.start();
 
@@ -350,11 +361,16 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleClassicStyleAddMessage(ClassicStyleAddMessage message) {
-        findSlot(message.getSender()).ifPresent(player -> {
-            if (gameRecorder != null) {
-                forEachSlot(op -> op.nr != player.nr, op -> op.send(message));
-            }
-        });
+        if (message.isServerMessage()) {
+            forEachSlot(op -> op.send(message));
+        }
+        else {
+            findSlot(message.getSender()).ifPresent(player -> {
+                if (gameRecorder != null) {
+                    forEachSlot(op -> op.nr != player.nr, op -> op.send(message));
+                }
+            });
+        }
     }
 
     private void handlePlayerLostMessage(PlayerLostMessage message) {
@@ -446,6 +462,36 @@ class ChannelActor extends AbstractActor {
             return Player.of(nr, name, team);
         }
 
+    }
+
+    private static class AkkaScheduler implements Scheduler {
+
+        private final ActorSystem sytem;
+
+        public AkkaScheduler(ActorSystem sytem) {
+            this.sytem = sytem;
+        }
+
+        @Override
+        public Cancellable scheduleOnce(long delay, TimeUnit timeUnit, Runnable task) {
+            FiniteDuration duration = FiniteDuration.create(delay, timeUnit);
+            akka.actor.Cancellable c = sytem.scheduler().scheduleOnce(duration, task, sytem.dispatcher());
+            return c::cancel;
+        }
+
+        @Override
+        public Cancellable schedule(long initial, long delay, TimeUnit timeUnit, Runnable task) {
+            FiniteDuration initialDuration = FiniteDuration.create(initial, timeUnit);
+            FiniteDuration delayDuration = FiniteDuration.create(delay, timeUnit);
+            akka.actor.Cancellable c = sytem.scheduler().schedule(initialDuration, delayDuration, task, sytem.dispatcher());
+            return c::cancel;
+        }
+
+        @Override
+        public StopWatch stopWatch() {
+            return new CommonsStopWatch();
+        }
+        
     }
 
 }

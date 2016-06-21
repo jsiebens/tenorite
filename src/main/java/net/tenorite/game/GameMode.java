@@ -11,14 +11,16 @@ public enum GameMode {
 
     DEFAULT(
         t -> t.equals(Tempo.FAST) ? "TetriFAST" : "TetriNET",
-        defaultGameRules()
+        defaultGameRules(),
+        SuddenDeath.of(300, 10, 1)
     ),
 
     CLASSIC(
         t -> t.equals(Tempo.FAST) ? "classic TetriFAST" : "classic TetriNET",
         gameRules(b -> b
             .classicRules(true)
-        )
+        ),
+        SuddenDeath.of(300, 10, 1)
     ),
 
     PURE(
@@ -27,16 +29,20 @@ public enum GameMode {
             .classicRules(true)
             .specialAdded(0)
             .specialCapacity(0)
-        )
+        ),
+        SuddenDeath.of(300, 10, 1)
     );
 
     private final Function<Tempo, String> description;
 
     private final GameRules gameRules;
 
-    GameMode(Function<Tempo, String> description, GameRules gameRules) {
+    private final SuddenDeath suddenDeath;
+
+    GameMode(Function<Tempo, String> description, GameRules gameRules, SuddenDeath suddenDeath) {
         this.description = description;
         this.gameRules = gameRules;
+        this.suddenDeath = suddenDeath;
     }
 
     public String getDescription(Tempo tempo) {
@@ -45,6 +51,10 @@ public enum GameMode {
 
     public GameRules getGameRules() {
         return gameRules;
+    }
+
+    public SuddenDeath getSuddenDeath() {
+        return suddenDeath;
     }
 
 }

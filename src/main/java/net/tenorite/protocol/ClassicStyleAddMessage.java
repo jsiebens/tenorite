@@ -9,12 +9,18 @@ import org.immutables.value.Value;
 public abstract class ClassicStyleAddMessage implements Message {
 
     public static ClassicStyleAddMessage of(int sender, int lines) {
-        return new ClassicStyleAddMessageBuilder().sender(sender).lines(lines).build();
+        return of(sender, lines, false);
+    }
+
+    public static ClassicStyleAddMessage of(int sender, int lines, boolean serverMessage) {
+        return new ClassicStyleAddMessageBuilder().sender(sender).lines(lines).serverMessage(serverMessage).build();
     }
 
     public abstract int getSender();
 
     public abstract int getLines();
+
+    public abstract boolean isServerMessage();
 
     @Override
     public String raw(Tempo tempo) {

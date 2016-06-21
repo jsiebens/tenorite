@@ -2,19 +2,21 @@ package net.tenorite.game;
 
 import net.tenorite.core.Tempo;
 import net.tenorite.protocol.FieldMessage;
+import net.tenorite.protocol.Message;
 import net.tenorite.protocol.PlayerLeaveMessage;
 import net.tenorite.protocol.PlayerLostMessage;
-import org.apache.commons.lang3.time.StopWatch;
+import net.tenorite.util.Scheduler;
+import net.tenorite.util.StopWatch;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.util.Optional.*;
 import static java.util.stream.Collectors.toMap;
 
 public final class GameRecorder {
-
-    private final StopWatch stopWatch = new StopWatch();
 
     private final String id;
 
@@ -24,13 +26,17 @@ public final class GameRecorder {
 
     private final List<Player> players;
 
+    private final StopWatch stopWatch;
+
+    private final SuddenDeathMonitor suddenDeathMonitor;
+
     private final Map<Integer, Field> fields = new HashMap<>();
 
     private final Map<Integer, Player> slots = new HashMap<>();
 
     private final List<GameMessage> messages = new ArrayList<>();
 
-    public GameRecorder(Tempo tempo, GameMode gameMode, List<Player> players) {
+    public GameRecorder(Tempo tempo, GameMode gameMode, List<Player> players, Scheduler scheduler, Consumer<Message> channel) {
         this.id = newGameId();
         this.tempo = tempo;
         this.gameMode = gameMode;
@@ -38,10 +44,14 @@ public final class GameRecorder {
         this.players = Collections.unmodifiableList(players);
         this.fields.putAll(players.stream().collect(toMap(Player::getSlot, p -> Field.empty())));
         this.slots.putAll(players.stream().collect(toMap(Player::getSlot, Function.identity())));
+
+        this.stopWatch = scheduler.stopWatch();
+        this.suddenDeathMonitor = new SuddenDeathMonitor(gameMode.getSuddenDeath(), scheduler, channel);
     }
 
     public GameRules start() {
         stopWatch.start();
+        suddenDeathMonitor.start();
         return gameMode.getGameRules();
     }
 
@@ -54,6 +64,7 @@ public final class GameRecorder {
     public boolean pause() {
         if (stopWatch.isStarted()) {
             stopWatch.suspend();
+            suddenDeathMonitor.pause();
             return true;
         }
         else {
@@ -64,6 +75,7 @@ public final class GameRecorder {
     public boolean resume() {
         if (stopWatch.isSuspended()) {
             stopWatch.resume();
+            suddenDeathMonitor.resume();
             return true;
         }
         else {
@@ -103,6 +115,7 @@ public final class GameRecorder {
 
     private Game finishRecording() {
         stopWatch.stop();
+        suddenDeathMonitor.stop();
         return Game.of(id, stopWatch.getStartTime(), stopWatch.getTime(), tempo, gameMode, players, messages);
     }
 
