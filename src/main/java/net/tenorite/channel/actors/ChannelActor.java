@@ -91,6 +91,12 @@ class ChannelActor extends AbstractActor {
         if (o instanceof PlineMessage) {
             handlePline((PlineMessage) o);
         }
+        else if (o instanceof PlineActMessage) {
+            handlePlineAct((PlineActMessage) o);
+        }
+        else if (o instanceof GmsgMessage) {
+            handleGmsg((GmsgMessage) o);
+        }
         else if (o instanceof TeamMessage) {
             handleTeam((TeamMessage) o);
         }
@@ -105,6 +111,9 @@ class ChannelActor extends AbstractActor {
         }
         else if (o instanceof ResumeGameMessage) {
             handleResumeGame((ResumeGameMessage) o);
+        }
+        else if (o instanceof LvlMessage) {
+            handleLvlMessage((LvlMessage) o);
         }
         else if (o instanceof FieldMessage) {
             handleFieldMessage((FieldMessage) o);
@@ -209,18 +218,34 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handlePline(PlineMessage pline) {
-        forEachSlot(p -> p.nr != pline.getSender(), p -> p.send(pline));
+        findSlot(pline.getSender()).ifPresent(s ->
+            forEachSlot(p -> p.nr != s.nr, p -> p.send(pline))
+        );
+    }
+
+    private void handlePlineAct(PlineActMessage plineAct) {
+        findSlot(plineAct.getSender()).ifPresent(s ->
+            forEachSlot(p -> p.nr != s.nr, p -> p.send(plineAct))
+        );
+    }
+
+    private void handleGmsg(GmsgMessage gmsg) {
+        if (gameRecorder != null) {
+            forEachSlot(p -> p.send(gmsg));
+        }
     }
 
     private void handleTeam(TeamMessage o) {
-        forEachSlot(p -> {
-            if (p.nr == o.getSender()) {
-                p.team = o.getTeam();
-            }
-            else {
-                p.send(o);
-            }
-        });
+        findSlot(o.getSender()).ifPresent(s ->
+            forEachSlot(p -> {
+                if (p.nr == o.getSender()) {
+                    p.team = o.getTeam();
+                }
+                else {
+                    p.send(o);
+                }
+            })
+        );
     }
 
     private void handleStartGame(StartGameMessage start) {
@@ -295,6 +320,14 @@ class ChannelActor extends AbstractActor {
             }
             else {
                 moderator.send(PlineMessage.of("<red>no paused game is available!</red>"));
+            }
+        });
+    }
+
+    private void handleLvlMessage(LvlMessage lvl) {
+        findSlot(lvl.getSender()).ifPresent(player -> {
+            if (gameRecorder != null) {
+                forEachSlot(op -> op.send(lvl));
             }
         });
     }

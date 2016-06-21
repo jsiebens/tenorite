@@ -39,6 +39,97 @@ public class ChannelActorTest extends AbstractActorTestCase {
     }
 
     @Test
+    public void testPartyLineChatActionsAreForwardedOnlyToOtherPlayers() {
+        JavaTestKit player1 = newTestKit(accept(PlineActMessage.class));
+        JavaTestKit player2 = newTestKit(accept(PlineActMessage.class));
+        JavaTestKit player3 = newTestKit(accept(PlineActMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, GameMode.CLASSIC, "azerty"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+        joinChannel(player3, "nick", channelActor);
+
+        channelActor.tell(PlineActMessage.of(1, "dancing"), player1.getRef());
+
+        player1.expectNoMsg();
+        player2.expectMsgAllOf(PlineActMessage.of(1, "dancing"));
+        player3.expectMsgAllOf(PlineActMessage.of(1, "dancing"));
+    }
+
+    @Test
+    public void testGameChatMessagesAreForwardedOnlyToOtherPlayers() {
+        JavaTestKit player1 = newTestKit(accept(GmsgMessage.class));
+        JavaTestKit player2 = newTestKit(accept(GmsgMessage.class));
+        JavaTestKit player3 = newTestKit(accept(GmsgMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, GameMode.CLASSIC, "azerty"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+        joinChannel(player3, "nick", channelActor);
+
+        channelActor.tell(StartGameMessage.of(1), player1.getRef());
+        channelActor.tell(GmsgMessage.of("Hello World"), player1.getRef());
+
+        player1.expectMsgAllOf(GmsgMessage.of("Hello World"));
+        player2.expectMsgAllOf(GmsgMessage.of("Hello World"));
+        player3.expectMsgAllOf(GmsgMessage.of("Hello World"));
+    }
+
+    @Test
+    public void testGameChatMessagesAreIgnoreWhenIdle() {
+        JavaTestKit player1 = newTestKit(accept(GmsgMessage.class));
+        JavaTestKit player2 = newTestKit(accept(GmsgMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, GameMode.CLASSIC, "azerty"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+
+        channelActor.tell(GmsgMessage.of("Hello World"), player1.getRef());
+
+        player1.expectNoMsg();
+        player2.expectNoMsg();
+    }
+
+    @Test
+    public void testLevelMessageAreForwardedToAllPlayers() throws InterruptedException {
+        JavaTestKit player1 = newTestKit(accept(LvlMessage.class));
+        JavaTestKit player2 = newTestKit(accept(LvlMessage.class));
+        JavaTestKit player3 = newTestKit(accept(LvlMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, GameMode.CLASSIC, "azerty"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+        joinChannel(player3, "nick", channelActor);
+
+        channelActor.tell(StartGameMessage.of(1), player1.getRef());
+        channelActor.tell(LvlMessage.of(1, 5), player1.getRef());
+
+        player1.expectMsgAllOf(LvlMessage.of(1, 5));
+        player2.expectMsgAllOf(LvlMessage.of(1, 5));
+        player3.expectMsgAllOf(LvlMessage.of(1, 5));
+    }
+
+    @Test
+    public void testLevelMessageAreIgnoredWhenChannelIsIdle() throws InterruptedException {
+        JavaTestKit player1 = newTestKit(accept(LvlMessage.class));
+        JavaTestKit player2 = newTestKit(accept(LvlMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, GameMode.CLASSIC, "azerty"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+
+        channelActor.tell(LvlMessage.of(1, 5), player1.getRef());
+
+        player1.expectNoMsg();
+        player2.expectNoMsg();
+    }
+
+    @Test
     public void testStartPauseResumeStopGame() {
         NewGameMessage newgame = NewGameMessage.of(GameMode.CLASSIC.getGameRules().toString());
 
