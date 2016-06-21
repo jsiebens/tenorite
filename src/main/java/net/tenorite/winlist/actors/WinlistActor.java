@@ -22,7 +22,7 @@ import java.util.List;
 public final class WinlistActor extends AbstractActor {
 
     public static Props props(WinlistRepository repository) {
-        return Props.create(WinlistActor.class, repository);
+        return Props.create(WinlistActor.class, repository).withDispatcher("winlist-dispatcher");
     }
 
     private final WinlistRepository winlistRepository;
