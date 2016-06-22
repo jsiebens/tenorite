@@ -6,6 +6,7 @@ import net.tenorite.util.Scheduler;
 import net.tenorite.util.StopWatch;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -80,25 +81,26 @@ public final class GameRecorder {
     }
 
     public void onLvlMessage(LvlMessage lvlMessage) {
-        messages.add(GameMessage.of(stopWatch.getTime(), lvlMessage));
+        recordMessage(stopWatch.getTime(), lvlMessage);
     }
 
     public void onSpecialBlockMessage(SpecialBlockMessage specialBlockMessage) {
-        messages.add(GameMessage.of(stopWatch.getTime(), specialBlockMessage));
+        recordMessage(stopWatch.getTime(), specialBlockMessage);
     }
 
     public boolean onClassicStyleAddMessage(ClassicStyleAddMessage classicStyleAddMessage) {
-        messages.add(GameMessage.of(stopWatch.getTime(), classicStyleAddMessage));
+        recordMessage(stopWatch.getTime(), classicStyleAddMessage);
         return gameMode.getGameRules().getClassicRules() || classicStyleAddMessage.getSender() == 0;
     }
 
-    public boolean onFieldMessage(FieldMessage fieldMessage) {
+    public void onFieldMessage(FieldMessage fieldMessage) {
         int slot = fieldMessage.getSender();
-        return Optional.ofNullable(fields.computeIfPresent(slot, (s, f) -> f.update(fieldMessage.getUpdate()))).isPresent();
+        ofNullable(fields.computeIfPresent(slot, updateWith(fieldMessage.getUpdate())))
+            .ifPresent(f -> recordMessage(stopWatch.getTime(), FieldMessage.of(slot, f.getFieldString())));
     }
 
     public Optional<Game> onPlayerLeaveMessage(PlayerLeaveMessage playerLeaveMessage) {
-        messages.add(GameMessage.of(stopWatch.getTime(), playerLeaveMessage));
+        recordMessage(stopWatch.getTime(), playerLeaveMessage);
 
         if (slots.remove(playerLeaveMessage.getSender()) != null && slots.isEmpty()) {
             return of(finishRecording());
@@ -109,7 +111,7 @@ public final class GameRecorder {
     }
 
     public Optional<Game> onPlayerLostMessage(PlayerLostMessage playerLostMessage) {
-        messages.add(GameMessage.of(stopWatch.getTime(), playerLostMessage));
+        recordMessage(stopWatch.getTime(), playerLostMessage);
         Player loser = slots.remove(playerLostMessage.getSender());
         return loser != null && (slots.isEmpty() || teamCount() <= 1) ? of(finishRecording()) : empty();
     }
@@ -120,6 +122,10 @@ public final class GameRecorder {
 
     public boolean isPaused() {
         return stopWatch.isSuspended();
+    }
+
+    private void recordMessage(long time, Message message) {
+        messages.add(GameMessage.of(time, message));
     }
 
     private Game finishRecording() {
@@ -136,6 +142,10 @@ public final class GameRecorder {
 
     private static String newGameId() {
         return UUID.randomUUID().toString().replaceAll("-", "");
+    }
+
+    private static BiFunction<Integer, Field, Field> updateWith(String update) {
+        return (k, f) -> f.update(update);
     }
 
 }

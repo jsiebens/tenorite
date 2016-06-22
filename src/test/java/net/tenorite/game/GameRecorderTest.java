@@ -101,6 +101,12 @@ public class GameRecorderTest {
         String expectedField = Field.empty().update("&8G9G9H:H").update("#9E8F9F:F").getFieldString();
 
         assertThat(recordedField).isEqualTo(expectedField);
+
+        String update1 = ((FieldMessage) game.getMessages().get(0).getMessage()).getUpdate();
+        String update2 = ((FieldMessage) game.getMessages().get(1).getMessage()).getUpdate();
+
+        assertThat(update1).isEqualTo(Field.empty().update("&8G9G9H:H").getFieldString());
+        assertThat(update2).isEqualTo(expectedField);
     }
 
     @Test
