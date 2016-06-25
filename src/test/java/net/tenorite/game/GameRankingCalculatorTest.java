@@ -98,4 +98,27 @@ public class GameRankingCalculatorTest {
         assertThat(result).extracting("level").containsExactly(16, 17);
     }
 
+    @Test
+    public void testCalculatorShouldRecordNrOfLinesBasedOnLevelForEachPlayer() {
+        Player playerA = Player.of(1, "A", null);
+        Player playerB = Player.of(2, "B", null);
+
+        Game game = newGame(GameMode.CLASSIC, b -> b
+            .addPlayers(playerA, playerB)
+            .addMessages(
+                GameMessage.of(100, LvlMessage.of(1, 5)),
+                GameMessage.of(200, LvlMessage.of(2, 5)),
+                GameMessage.of(300, LvlMessage.of(1, 16)),
+                GameMessage.of(400, LvlMessage.of(2, 17)),
+                GameMessage.of(500, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        int lpl = game.getGameMode().getGameRules().getLinesPerLevel();
+
+        assertThat(result).extracting("nrOfLines").containsExactly(16 * lpl, 17 * lpl);
+    }
+
 }

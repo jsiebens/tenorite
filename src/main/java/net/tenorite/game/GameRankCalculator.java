@@ -6,6 +6,7 @@ import net.tenorite.protocol.PlayerLostMessage;
 
 import java.util.*;
 
+import static java.lang.Math.max;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
@@ -70,12 +71,14 @@ public final class GameRankCalculator {
         }
 
         private PlayingStats stats(Player player) {
+            GameRules gameRules = game.getGameMode().getGameRules();
             int slot = player.getSlot();
 
             return PlayingStats.of(
                 player,
                 playingTimes.getOrDefault(slot, game.getDuration()),
-                levels.get(slot)
+                levels.get(slot),
+                max(0, levels.get(slot) - gameRules.getStartingLevel()) * gameRules.getLinesPerLevel()
             );
         }
 
