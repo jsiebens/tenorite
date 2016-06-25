@@ -1,6 +1,7 @@
 package net.tenorite.game;
 
 import net.tenorite.core.Tempo;
+import net.tenorite.protocol.ClassicStyleAddMessage;
 import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.PlayerLeaveMessage;
 import net.tenorite.protocol.PlayerLostMessage;
@@ -119,6 +120,33 @@ public class GameRankingCalculatorTest {
         int lpl = game.getGameMode().getGameRules().getLinesPerLevel();
 
         assertThat(result).extracting("nrOfLines").containsExactly(16 * lpl, 17 * lpl);
+    }
+
+    @Test
+    public void testCalcularShouldUseClassicSpecialsToTrackNrOfCombos() {
+
+        Player playerA = Player.of(1, "A", null);
+        Player playerB = Player.of(2, "B", null);
+
+        Game game = newGame(GameMode.CLASSIC, b -> b
+            .addPlayers(playerA, playerB)
+            .addMessages(
+                GameMessage.of(100, ClassicStyleAddMessage.of(1, 1)),
+                GameMessage.of(200, ClassicStyleAddMessage.of(1, 2)),
+                GameMessage.of(300, ClassicStyleAddMessage.of(1, 1)),
+                GameMessage.of(500, ClassicStyleAddMessage.of(1, 1)),
+                GameMessage.of(500, ClassicStyleAddMessage.of(0, 1)),
+                GameMessage.of(600, ClassicStyleAddMessage.of(1, 2)),
+                GameMessage.of(700, ClassicStyleAddMessage.of(1, 4)),
+                GameMessage.of(900, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        assertThat(result).extracting("nrOfTwoLineCombos").containsExactly(3, 0);
+        assertThat(result).extracting("nrOfThreeLineCombos").containsExactly(2, 0);
+        assertThat(result).extracting("nrOfFourLineCombos").containsExactly(1, 0);
     }
 
 }

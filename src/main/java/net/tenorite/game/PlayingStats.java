@@ -11,8 +11,20 @@ public abstract class PlayingStats {
         return new PlayingStatsBuilder().player(player).build();
     }
 
-    public static PlayingStats of(Player player, long playingTime, int level, int nrOfLines) {
-        return new PlayingStatsBuilder().player(player).playingTime(playingTime).level(level).nrOfLines(nrOfLines).build();
+    public static PlayingStats of(Player player, long playingTime, int level, int nrOfLines,
+                                  int nrOfTwoLineCombos,
+                                  int nrOfThreeLineCombos,
+                                  int nrOfFourLineCombos) {
+        return
+            new PlayingStatsBuilder()
+                .player(player)
+                .playingTime(playingTime)
+                .level(level)
+                .nrOfLines(nrOfLines)
+                .nrOfTwoLineCombos(nrOfTwoLineCombos)
+                .nrOfThreeLineCombos(nrOfThreeLineCombos)
+                .nrOfFourLineCombos(nrOfFourLineCombos)
+                .build();
     }
 
     public abstract Player getPlayer();
@@ -30,6 +42,26 @@ public abstract class PlayingStats {
     @Value.Default
     public int getNrOfLines() {
         return 0;
+    }
+
+    @Value.Default
+    public int getNrOfTwoLineCombos() {
+        return 0;
+    }
+
+    @Value.Default
+    public int getNrOfThreeLineCombos() {
+        return 0;
+    }
+
+    @Value.Default
+    public int getNrOfFourLineCombos() {
+        return 0;
+    }
+
+    @Value.Lazy
+    public int getNrOfCombos() {
+        return getNrOfTwoLineCombos() + getNrOfThreeLineCombos() + getNrOfFourLineCombos();
     }
 
 }

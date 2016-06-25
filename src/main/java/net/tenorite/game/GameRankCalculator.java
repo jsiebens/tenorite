@@ -1,5 +1,6 @@
 package net.tenorite.game;
 
+import net.tenorite.protocol.ClassicStyleAddMessage;
 import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.PlayerLeaveMessage;
 import net.tenorite.protocol.PlayerLostMessage;
@@ -9,7 +10,6 @@ import java.util.*;
 import static java.lang.Math.max;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 public final class GameRankCalculator {
@@ -30,11 +30,20 @@ public final class GameRankCalculator {
 
         private final Map<Integer, Integer> levels = new HashMap<>();
 
+        private final Map<Integer, Integer> twoLineCombos = new HashMap<>();
+
+        private final Map<Integer, Integer> threeLineCombos = new HashMap<>();
+
+        private final Map<Integer, Integer> fourLineCombos = new HashMap<>();
+
         private Calculator(Game game) {
             this.game = game;
             this.players.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, identity())));
 
             this.levels.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
+            this.twoLineCombos.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
+            this.threeLineCombos.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
+            this.fourLineCombos.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
         }
 
         private List<PlayingStats> process() {
@@ -53,6 +62,9 @@ public final class GameRankCalculator {
             else if (m.getMessage() instanceof LvlMessage) {
                 process((LvlMessage) m.getMessage());
             }
+            else if (m.getMessage() instanceof ClassicStyleAddMessage) {
+                process((ClassicStyleAddMessage) m.getMessage());
+            }
         }
 
         private void process(long timestamp, PlayerLostMessage message) {
@@ -64,6 +76,21 @@ public final class GameRankCalculator {
 
         private void process(LvlMessage message) {
             levels.put(message.getSender(), message.getLevel());
+        }
+
+        private void process(ClassicStyleAddMessage message) {
+            int sender = message.getSender();
+            switch (message.getLines()) {
+                case 1:
+                    twoLineCombos.computeIfPresent(sender, (i, c) -> c + 1);
+                    break;
+                case 2:
+                    threeLineCombos.computeIfPresent(sender, (i, c) -> c + 1);
+                    break;
+                case 4:
+                    fourLineCombos.computeIfPresent(sender, (i, c) -> c + 1);
+                    break;
+            }
         }
 
         private void process(PlayerLeaveMessage message) {
@@ -78,7 +105,10 @@ public final class GameRankCalculator {
                 player,
                 playingTimes.getOrDefault(slot, game.getDuration()),
                 levels.get(slot),
-                max(0, levels.get(slot) - gameRules.getStartingLevel()) * gameRules.getLinesPerLevel()
+                max(0, levels.get(slot) - gameRules.getStartingLevel()) * gameRules.getLinesPerLevel(),
+                twoLineCombos.get(slot),
+                threeLineCombos.get(slot),
+                fourLineCombos.get(slot)
             );
         }
 
