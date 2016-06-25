@@ -1,10 +1,7 @@
 package net.tenorite.game;
 
 import net.tenorite.core.Tempo;
-import net.tenorite.protocol.ClassicStyleAddMessage;
-import net.tenorite.protocol.LvlMessage;
-import net.tenorite.protocol.PlayerLeaveMessage;
-import net.tenorite.protocol.PlayerLostMessage;
+import net.tenorite.protocol.*;
 import org.junit.Test;
 
 import java.util.List;
@@ -147,6 +144,39 @@ public class GameRankingCalculatorTest {
         assertThat(result).extracting("nrOfTwoLineCombos").containsExactly(3, 0);
         assertThat(result).extracting("nrOfThreeLineCombos").containsExactly(2, 0);
         assertThat(result).extracting("nrOfFourLineCombos").containsExactly(1, 0);
+    }
+
+    @Test
+    public void testCalculatorShouldTrackMaxFieldHeightOfFinishingPlayers() {
+        Player playerA = Player.of(1, "A", null);
+        Player playerB = Player.of(2, "B", null);
+
+        Game game = newGame(GameMode.CLASSIC, b -> b
+            .addPlayers(playerA, playerB)
+            .addMessages(
+                GameMessage.of(100, FieldMessage.of(1, createField(10))),
+                GameMessage.of(200, FieldMessage.of(1, createField(5))),
+                GameMessage.of(300, FieldMessage.of(2, createField(22))),
+                GameMessage.of(400, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        assertThat(result).extracting("maxFieldHeight").containsExactly(10, 22);
+    }
+
+    private String createField(int maxHeight) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = Field.HEIGHT - 1; i >= 0; i--) {
+            if (i == (maxHeight - 1)) {
+                builder.append("000000550000");
+            }
+            else {
+                builder.append("000000000000");
+            }
+        }
+        return builder.toString();
     }
 
 }

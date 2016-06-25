@@ -90,6 +90,17 @@ public final class Field {
         return new String(buffer);
     }
 
+    public int getHighest() {
+        for (int i = HEIGHT - 1; i >= 0; i--) {
+            for (int j = 0; j < WIDTH; j++) {
+                if (field[j][i] != EMPTY) {
+                    return i + 1;
+                }
+            }
+        }
+        return 0;
+    }
+
     char getBlock(int x, int y) {
         return field[x][y];
     }

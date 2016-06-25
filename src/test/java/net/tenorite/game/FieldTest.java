@@ -109,4 +109,34 @@ public class FieldTest {
             .isEqualTo(buffer.toString());
     }
 
+    @Test
+    public void testGetHighest() {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000005500");
+        buffer.append("000000005500");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("000000000000");
+        buffer.append("acnrsbgqo000");
+        buffer.append("012345000001");
+
+        assertThat(Field.empty().getHighest()).isEqualTo(0);
+        assertThat(Field.of(buffer.toString()).getHighest()).isEqualTo(18);
+    }
+
 }

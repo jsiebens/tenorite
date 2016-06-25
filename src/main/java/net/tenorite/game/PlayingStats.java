@@ -14,7 +14,10 @@ public abstract class PlayingStats {
     public static PlayingStats of(Player player, long playingTime, int level, int nrOfLines,
                                   int nrOfTwoLineCombos,
                                   int nrOfThreeLineCombos,
-                                  int nrOfFourLineCombos) {
+                                  int nrOfFourLineCombos,
+                                  int lastFieldHeight,
+                                  int maxFieldHeight
+    ) {
         return
             new PlayingStatsBuilder()
                 .player(player)
@@ -24,6 +27,8 @@ public abstract class PlayingStats {
                 .nrOfTwoLineCombos(nrOfTwoLineCombos)
                 .nrOfThreeLineCombos(nrOfThreeLineCombos)
                 .nrOfFourLineCombos(nrOfFourLineCombos)
+                .lastFieldHeight(lastFieldHeight)
+                .maxFieldHeight(maxFieldHeight)
                 .build();
     }
 
@@ -62,6 +67,16 @@ public abstract class PlayingStats {
     @Value.Lazy
     public int getNrOfCombos() {
         return getNrOfTwoLineCombos() + getNrOfThreeLineCombos() + getNrOfFourLineCombos();
+    }
+
+    @Value.Default
+    public int getMaxFieldHeight() {
+        return 0;
+    }
+
+    @Value.Default
+    public int getLastFieldHeight() {
+        return 0;
     }
 
 }

@@ -1,9 +1,6 @@
 package net.tenorite.game;
 
-import net.tenorite.protocol.ClassicStyleAddMessage;
-import net.tenorite.protocol.LvlMessage;
-import net.tenorite.protocol.PlayerLeaveMessage;
-import net.tenorite.protocol.PlayerLostMessage;
+import net.tenorite.protocol.*;
 
 import java.util.*;
 
@@ -36,6 +33,10 @@ public final class GameRankCalculator {
 
         private final Map<Integer, Integer> fourLineCombos = new HashMap<>();
 
+        private final Map<Integer, Integer> lastFieldHeights = new HashMap<>();
+
+        private final Map<Integer, Integer> maxFieldHeights = new HashMap<>();
+
         private Calculator(Game game) {
             this.game = game;
             this.players.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, identity())));
@@ -44,6 +45,8 @@ public final class GameRankCalculator {
             this.twoLineCombos.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
             this.threeLineCombos.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
             this.fourLineCombos.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
+            this.maxFieldHeights.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
+            this.lastFieldHeights.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
         }
 
         private List<PlayingStats> process() {
@@ -61,6 +64,9 @@ public final class GameRankCalculator {
             }
             else if (m.getMessage() instanceof LvlMessage) {
                 process((LvlMessage) m.getMessage());
+            }
+            else if (m.getMessage() instanceof FieldMessage) {
+                process((FieldMessage) m.getMessage());
             }
             else if (m.getMessage() instanceof ClassicStyleAddMessage) {
                 process((ClassicStyleAddMessage) m.getMessage());
@@ -93,6 +99,13 @@ public final class GameRankCalculator {
             }
         }
 
+        private void process(FieldMessage message) {
+            int slot = message.getSender();
+            int currentHeight = Field.of(message.getUpdate()).getHighest();
+            lastFieldHeights.put(slot, currentHeight);
+            maxFieldHeights.compute(slot, (k, v) -> max(v, currentHeight));
+        }
+
         private void process(PlayerLeaveMessage message) {
             players.remove(message.getSender());
         }
@@ -108,7 +121,9 @@ public final class GameRankCalculator {
                 max(0, levels.get(slot) - gameRules.getStartingLevel()) * gameRules.getLinesPerLevel(),
                 twoLineCombos.get(slot),
                 threeLineCombos.get(slot),
-                fourLineCombos.get(slot)
+                fourLineCombos.get(slot),
+                lastFieldHeights.get(slot),
+                maxFieldHeights.get(slot)
             );
         }
 
