@@ -11,14 +11,19 @@ public abstract class PlayingStats {
         return new PlayingStatsBuilder().player(player).build();
     }
 
-    public static PlayingStats of(Player player, long playingTime) {
-        return new PlayingStatsBuilder().player(player).playingTime(playingTime).build();
+    public static PlayingStats of(Player player, long playingTime, int level) {
+        return new PlayingStatsBuilder().player(player).playingTime(playingTime).level(level).build();
     }
 
     public abstract Player getPlayer();
 
     @Value.Default
     public long getPlayingTime() {
+        return 0;
+    }
+
+    @Value.Default
+    public int getLevel() {
         return 0;
     }
 

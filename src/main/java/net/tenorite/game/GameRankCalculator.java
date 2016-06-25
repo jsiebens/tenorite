@@ -1,5 +1,6 @@
 package net.tenorite.game;
 
+import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.PlayerLeaveMessage;
 import net.tenorite.protocol.PlayerLostMessage;
 
@@ -26,9 +27,13 @@ public final class GameRankCalculator {
 
         private final Map<Integer, Long> playingTimes = new HashMap<>();
 
+        private final Map<Integer, Integer> levels = new HashMap<>();
+
         private Calculator(Game game) {
             this.game = game;
             this.players.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, identity())));
+
+            this.levels.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
         }
 
         private List<PlayingStats> process() {
@@ -44,6 +49,9 @@ public final class GameRankCalculator {
             else if (m.getMessage() instanceof PlayerLeaveMessage) {
                 process((PlayerLeaveMessage) m.getMessage());
             }
+            else if (m.getMessage() instanceof LvlMessage) {
+                process((LvlMessage) m.getMessage());
+            }
         }
 
         private void process(long timestamp, PlayerLostMessage message) {
@@ -53,6 +61,10 @@ public final class GameRankCalculator {
             });
         }
 
+        private void process(LvlMessage message) {
+            levels.put(message.getSender(), message.getLevel());
+        }
+
         private void process(PlayerLeaveMessage message) {
             players.remove(message.getSender());
         }
@@ -60,7 +72,11 @@ public final class GameRankCalculator {
         private PlayingStats stats(Player player) {
             int slot = player.getSlot();
 
-            return PlayingStats.of(player, playingTimes.getOrDefault(slot, game.getDuration()));
+            return PlayingStats.of(
+                player,
+                playingTimes.getOrDefault(slot, game.getDuration()),
+                levels.get(slot)
+            );
         }
 
     }
