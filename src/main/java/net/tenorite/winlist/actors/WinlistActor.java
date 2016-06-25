@@ -6,6 +6,7 @@ import net.tenorite.core.Tempo;
 import net.tenorite.game.Game;
 import net.tenorite.game.GameMode;
 import net.tenorite.game.Player;
+import net.tenorite.game.PlayingStats;
 import net.tenorite.game.events.GameFinished;
 import net.tenorite.util.AbstractActor;
 import net.tenorite.util.ImmutableStyle;
@@ -82,13 +83,14 @@ public final class WinlistActor extends AbstractActor {
         publish(WinlistUpdated.of(tempo, mode, winlistRepository.winlistOps(tempo).loadWinlist(mode)));
     }
 
-    private List<Tuple> createWinlistUpdate(List<Player> ranking) {
+    private List<Tuple> createWinlistUpdate(List<PlayingStats> ranking) {
         LinkedList<Tuple> result = new LinkedList<>();
 
-        ArrayList<Player> players = new ArrayList<>(ranking);
+        ArrayList<PlayingStats> players = new ArrayList<>(ranking);
         Collections.reverse(players);
 
-        for (Player player : players) {
+        for (PlayingStats stats : players) {
+            Player player = stats.getPlayer();
             if (player.isTeamPlayer()) {
                 Tuple tuple = tuple(WinlistItem.Type.TEAM, player.getTeam().get());
                 result.remove(tuple);

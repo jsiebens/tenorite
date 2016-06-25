@@ -8,6 +8,7 @@ import net.tenorite.core.Tempo;
 import net.tenorite.game.Game;
 import net.tenorite.game.GameMode;
 import net.tenorite.game.Player;
+import net.tenorite.game.PlayingStats;
 import net.tenorite.game.events.GameFinished;
 import net.tenorite.winlist.WinlistRepositoryStub;
 import net.tenorite.winlist.events.WinlistUpdated;
@@ -54,7 +55,7 @@ public class WinlistActorTest extends AbstractActorTestCase {
         Player playerB = Player.of(2, "jane", null);
 
         Game game = Game.of("lorem", 1000, 2000, Tempo.NORMAL, GameMode.CLASSIC, asList(playerA, playerB), emptyList());
-        GameFinished gf = GameFinished.of(game, asList(playerA, playerB));
+        GameFinished gf = GameFinished.of(game, asList(PlayingStats.of(playerA), PlayingStats.of(playerB)));
 
         winlist.tell(gf, noSender());
 
@@ -77,7 +78,7 @@ public class WinlistActorTest extends AbstractActorTestCase {
         Player playerC = Player.of(3, "nick", null);
 
         Game game = Game.of("lorem", 1000, 2000, Tempo.NORMAL, GameMode.CLASSIC, asList(playerA, playerB, playerC), emptyList());
-        GameFinished gf = GameFinished.of(game, asList(playerA, playerB, playerC));
+        GameFinished gf = GameFinished.of(game, asList(PlayingStats.of(playerA), PlayingStats.of(playerB), PlayingStats.of(playerC)));
 
         winlist.tell(gf, noSender());
 
@@ -103,11 +104,11 @@ public class WinlistActorTest extends AbstractActorTestCase {
 
         Game game = Game.of("lorem", 1000, 2000, Tempo.NORMAL, GameMode.CLASSIC, asList(playerA, playerB, playerC, playerD, playerE), emptyList());
         GameFinished gf = GameFinished.of(game, asList(
-            playerA,
-            playerB,
-            playerC,
-            playerD,
-            playerE
+            PlayingStats.of(playerA),
+            PlayingStats.of(playerB),
+            PlayingStats.of(playerC),
+            PlayingStats.of(playerD),
+            PlayingStats.of(playerE)
         ));
 
         winlist.tell(gf, noSender());

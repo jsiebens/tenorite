@@ -51,9 +51,29 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<Player> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(game);
 
-        assertThat(result).extracting("name").containsExactly("C", "A", "B");
+        assertThat(result).extracting("player.name").containsExactly("C", "A", "B");
+    }
+
+    @Test
+    public void testCalculatorShouldTrackPlayingTimeOfFinishingPlayers() {
+        Player playerA = Player.of(1, "A", null);
+        Player playerB = Player.of(2, "B", null);
+        Player playerC = Player.of(3, "C", "doe");
+        Player playerD = Player.of(4, "D", "doe");
+
+        Game game = newGame(GameMode.CLASSIC, b -> b
+            .addPlayers(playerA, playerB, playerC, playerD)
+            .addMessages(
+                GameMessage.of(100, PlayerLeaveMessage.of(2)),
+                GameMessage.of(200, PlayerLostMessage.of(1))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        assertThat(result).extracting("playingTime").containsExactly(2000L, 2000L, 200L);
     }
 
 }

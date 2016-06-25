@@ -392,10 +392,10 @@ class ChannelActor extends AbstractActor {
     private void endGame(Game game) {
         forEachSlot(p -> p.send(EndGameMessage.of()));
 
-        List<Player> ranking = RANK_CALCULATOR.calculate(game);
+        List<PlayingStats> ranking = RANK_CALCULATOR.calculate(game);
 
         if (!ranking.isEmpty()) {
-            forEachSlot(p -> p.send(PlayerWonMessage.of(ranking.get(0).getSlot())));
+            forEachSlot(p -> p.send(PlayerWonMessage.of(ranking.get(0).getPlayer().getSlot())));
             publish(GameFinished.of(game, ranking));
         }
 
