@@ -396,9 +396,12 @@ class ChannelActor extends AbstractActor {
         List<PlayingStats> ranking = RANK_CALCULATOR.calculate(game);
 
         if (!ranking.isEmpty()) {
-            forEachSlot(p -> p.send(PlayerWonMessage.of(ranking.get(0).getPlayer().getSlot())));
             displayStats(game, ranking);
             publish(GameFinished.of(game, ranking));
+        }
+
+        if (ranking.size() > 1) {
+            forEachSlot(p -> p.send(PlayerWonMessage.of(ranking.get(0).getPlayer().getSlot())));
         }
 
         resetGameRecorder();

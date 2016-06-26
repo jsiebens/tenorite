@@ -1,5 +1,7 @@
 package net.tenorite.game;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
 
@@ -10,6 +12,7 @@ import static java.util.Optional.ofNullable;
 
 @Value.Immutable
 @ImmutableStyle
+@JsonDeserialize(as = PlayerBuilder.ImmutablePlayer.class)
 public abstract class Player {
 
     public static Player of(int slot, String name, String team) {
@@ -22,14 +25,17 @@ public abstract class Player {
 
     public abstract Optional<String> getTeam();
 
+    @JsonIgnore
     public final boolean isTeamPlayer() {
         return getTeam().filter(t -> !t.trim().isEmpty()).isPresent();
     }
 
+    @JsonIgnore
     public final boolean isSoloPlayer() {
         return !isTeamPlayer();
     }
 
+    @JsonIgnore
     public final boolean isTeamPlayerOf(Player other) {
         return isTeamPlayer() && Objects.equals(getTeam(), other.getTeam());
     }

@@ -1,5 +1,8 @@
 package net.tenorite.game;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import net.tenorite.core.Tempo;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
@@ -8,6 +11,7 @@ import java.util.List;
 
 @Value.Immutable
 @ImmutableStyle
+@JsonDeserialize(as = GameBuilder.ImmutableGame.class)
 public abstract class Game {
 
     public static Game of(String id,
@@ -29,6 +33,7 @@ public abstract class Game {
                 .build();
     }
 
+    @JsonProperty("_id")
     public abstract String getId();
 
     public abstract Tempo getTempo();
@@ -44,6 +49,7 @@ public abstract class Game {
     public abstract List<GameMessage> getMessages();
 
     @Value.Lazy
+    @JsonIgnore
     public GameRules getGameRules() {
         return getGameMode().getGameRules();
     }
