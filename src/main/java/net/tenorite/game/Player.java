@@ -3,6 +3,7 @@ package net.tenorite.game;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
@@ -27,6 +28,10 @@ public abstract class Player {
 
     public final boolean isSoloPlayer() {
         return !isTeamPlayer();
+    }
+
+    public final boolean isTeamPlayerOf(Player other) {
+        return isTeamPlayer() && Objects.equals(getTeam(), other.getTeam());
     }
 
 }

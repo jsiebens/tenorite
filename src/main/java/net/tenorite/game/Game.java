@@ -43,4 +43,9 @@ public abstract class Game {
 
     public abstract List<GameMessage> getMessages();
 
+    @Value.Lazy
+    public GameRules getGameRules() {
+        return getGameMode().getGameRules();
+    }
+
 }

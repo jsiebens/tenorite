@@ -16,7 +16,8 @@ public abstract class PlayingStats {
                                   int nrOfThreeLineCombos,
                                   int nrOfFourLineCombos,
                                   int lastFieldHeight,
-                                  int maxFieldHeight
+                                  int maxFieldHeight,
+                                  int nrOfBlocks
     ) {
         return
             new PlayingStatsBuilder()
@@ -29,6 +30,7 @@ public abstract class PlayingStats {
                 .nrOfFourLineCombos(nrOfFourLineCombos)
                 .lastFieldHeight(lastFieldHeight)
                 .maxFieldHeight(maxFieldHeight)
+                .nrOfBlocks(nrOfBlocks)
                 .build();
     }
 
@@ -76,6 +78,11 @@ public abstract class PlayingStats {
 
     @Value.Default
     public int getLastFieldHeight() {
+        return 0;
+    }
+
+    @Value.Default
+    public int getNrOfBlocks() {
         return 0;
     }
 

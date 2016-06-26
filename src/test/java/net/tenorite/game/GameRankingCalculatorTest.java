@@ -1,5 +1,6 @@
 package net.tenorite.game;
 
+import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
 import net.tenorite.protocol.*;
 import org.junit.Test;
@@ -164,6 +165,160 @@ public class GameRankingCalculatorTest {
         List<PlayingStats> result = calculator.calculate(game);
 
         assertThat(result).extracting("maxFieldHeight").containsExactly(10, 22);
+    }
+
+    @Test
+    public void testCalculatorShouldRecordBlockCountsWhenFieldIsUpdatedExceptFirstUpdate() {
+        Player playerA = Player.of(1, "nick", null);
+        Player playerB = Player.of(2, "john", null);
+
+        Game game = newGame(GameMode.CLASSIC, b -> b
+            .addPlayers(playerA, playerB)
+            .addMessages(
+                GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(200, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(400, FieldMessage.of(2, "$3G3H4H5H")),
+                GameMessage.of(500, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        assertThat(result).extracting("nrOfBlocks").containsExactly(2, 0);
+    }
+
+    @Test
+    public void testCalculatorShouldDecreaseBlockCountOfTargetWhenSpecialIsSent() {
+        Player playerA = Player.of(1, "nick", null);
+        Player playerB = Player.of(2, "john", null);
+
+        Game game = newGame(GameMode.CLASSIC, b -> b
+            .addPlayers(playerA, playerB)
+            .addMessages(
+                GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(200, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(400, FieldMessage.of(2, "$3G3H4H5H")),
+                GameMessage.of(500, SpecialBlockMessage.of(2, Special.ADDLINE, 1)),
+                GameMessage.of(600, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        assertThat(result).extracting("nrOfBlocks").containsExactly(1, 0);
+    }
+
+    @Test
+    public void testCalculatorShouldDecreaseBlockCountOfAllOpponentsWhenPlayerSentAClassicSpecial() {
+        Player playerA = Player.of(1, "nick", null);
+        Player playerB = Player.of(2, "john", null);
+
+        Game game = newGame(GameMode.CLASSIC, b -> b
+            .addPlayers(playerA, playerB)
+            .addMessages(
+                GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(200, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(400, FieldMessage.of(2, "$3G3H4H5H")),
+                GameMessage.of(500, ClassicStyleAddMessage.of(2, 1)),
+                GameMessage.of(500, ClassicStyleAddMessage.of(2, 2)),
+                GameMessage.of(500, ClassicStyleAddMessage.of(2, 4)),
+                GameMessage.of(600, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        assertThat(result).extracting("nrOfBlocks").containsExactly(1, 0);
+    }
+
+    @Test
+    public void testCalculatorShouldNotDecreaseBlockCountWhenClassicSpecialIsSentAndClassicModeIsDisabled() {
+        Player playerA = Player.of(1, "nick", null);
+        Player playerB = Player.of(2, "john", null);
+
+        Game game = newGame(GameMode.DEFAULT, b -> b
+            .addPlayers(playerA, playerB)
+            .addMessages(
+                GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(200, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(400, FieldMessage.of(2, "$3G3H4H5H")),
+                GameMessage.of(500, ClassicStyleAddMessage.of(2, 1)),
+                GameMessage.of(500, ClassicStyleAddMessage.of(2, 2)),
+                GameMessage.of(500, ClassicStyleAddMessage.of(2, 4)),
+                GameMessage.of(600, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        assertThat(result).extracting("nrOfBlocks").containsExactly(4, 0);
+    }
+
+    @Test
+    public void testGameShouldDecreaseBlockCountWhenClassicSpecialIsSentByServerEvenWhenClassicModeIsDisabled() {
+        Player playerA = Player.of(1, "nick", null);
+        Player playerB = Player.of(2, "john", null);
+
+        Game game = newGame(GameMode.DEFAULT, b -> b
+            .addPlayers(playerA, playerB)
+            .addMessages(
+                GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(200, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(400, FieldMessage.of(2, "$3G3H4H5H")),
+                GameMessage.of(500, ClassicStyleAddMessage.of(0, 1)),
+                GameMessage.of(500, ClassicStyleAddMessage.of(0, 2)),
+                GameMessage.of(500, ClassicStyleAddMessage.of(0, 4)),
+                GameMessage.of(600, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        assertThat(result).extracting("nrOfBlocks").containsExactly(1, 0);
+    }
+
+    @Test
+    public void testCalculatorShouldNotDecreaseBlockCountOfTeamPlayersWhenPlayerSentAClassicSpecial() {
+        Player playerA = Player.of(1, "nick", "doe");
+        Player playerB = Player.of(2, "john", "doe");
+        Player playerC = Player.of(3, "jane", null);
+
+        Game game = newGame(GameMode.CLASSIC, b -> b
+            .addPlayers(playerA, playerB, playerC)
+            .addMessages(
+                GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(200, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(400, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(500, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(100, FieldMessage.of(3, "$3G3H4H5H")),
+                GameMessage.of(200, FieldMessage.of(3, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(3, "$3G3H4H5H")),
+                GameMessage.of(400, FieldMessage.of(3, "$3G3H4H5H")),
+                GameMessage.of(500, FieldMessage.of(3, "$3G3H4H5H")),
+                GameMessage.of(600, FieldMessage.of(2, "$3G3H4H5H")),
+                GameMessage.of(500, ClassicStyleAddMessage.of(2, 1)),
+                GameMessage.of(500, ClassicStyleAddMessage.of(2, 2)),
+                GameMessage.of(500, ClassicStyleAddMessage.of(2, 4)),
+                GameMessage.of(1200, PlayerLostMessage.of(2)),
+                GameMessage.of(1300, PlayerLostMessage.of(3))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        assertThat(result).extracting("nrOfBlocks").containsExactly(4, 1, 0);
     }
 
     private String createField(int maxHeight) {
