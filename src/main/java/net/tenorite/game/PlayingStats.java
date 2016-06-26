@@ -104,4 +104,29 @@ public abstract class PlayingStats {
 
     public abstract Map<Special, Integer> getNrOfSpecialsOnSelf();
 
+    @Value.Lazy
+    public int getTotalNrOfSpecialsReceived() {
+        return getNrOfSpecialsReceived().values().stream().mapToInt(i -> i).sum();
+    }
+
+    @Value.Lazy
+    public int getTotalNrOfSpecialsOnOpponent() {
+        return getNrOfSpecialsOnOpponent().values().stream().mapToInt(i -> i).sum();
+    }
+
+    @Value.Lazy
+    public int getTotalNrOfSpecialsOnTeamPlayer() {
+        return getNrOfSpecialsOnTeamPlayer().values().stream().mapToInt(i -> i).sum();
+    }
+
+    @Value.Lazy
+    public int getTotalNrOfSpecialsOnSelf() {
+        return getNrOfSpecialsOnSelf().values().stream().mapToInt(i -> i).sum();
+    }
+
+    @Value.Lazy
+    public int getTotalNrOfSpecialsUsed() {
+        return getTotalNrOfSpecialsOnOpponent() + getTotalNrOfSpecialsOnTeamPlayer() + getTotalNrOfSpecialsOnSelf();
+    }
+    
 }

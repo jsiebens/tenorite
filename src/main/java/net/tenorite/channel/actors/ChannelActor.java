@@ -22,6 +22,7 @@ import net.tenorite.util.StopWatch;
 import net.tenorite.winlist.events.WinlistUpdated;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -396,6 +397,7 @@ class ChannelActor extends AbstractActor {
 
         if (!ranking.isEmpty()) {
             forEachSlot(p -> p.send(PlayerWonMessage.of(ranking.get(0).getPlayer().getSlot())));
+            displayStats(game, ranking);
             publish(GameFinished.of(game, ranking));
         }
 
@@ -404,6 +406,22 @@ class ChannelActor extends AbstractActor {
 
     private void resetGameRecorder() {
         this.gameRecorder = null;
+    }
+
+    private final DecimalFormat df = new DecimalFormat("0.00");
+
+    private void displayStats(Game game, List<PlayingStats> ranking) {
+        ranking.forEach(ps -> {
+            String bpm = df.format((double) ps.getNrOfBlocks() * 60000 / (double) ps.getPlayingTime());
+            String part1 = format("<purple><b>%s</b></purple>: <aqua>%d blocks @ %s bpm</aqua>", ps.getPlayer().getName(), ps.getNrOfBlocks(), bpm);
+            String part2 = format("<blue>%s/%s/%s specials</blue>", ps.getTotalNrOfSpecialsOnOpponent() + ps.getTotalNrOfSpecialsOnTeamPlayer(), ps.getTotalNrOfSpecialsReceived(), ps.getTotalNrOfSpecialsOnSelf());
+            String part3 = format("%s/%s/%s combos", ps.getNrOfTwoLineCombos(), ps.getNrOfThreeLineCombos(), ps.getNrOfFourLineCombos());
+            String part4 = format("lvl: %s, mxfh: %s", ps.getLevel(), ps.getMaxFieldHeight());
+
+            forEachSlot(s -> s.send(PlineMessage.of(part1 + "; " + part2 + "; " + part3 + "; " + part4)));
+        });
+
+        forEachSlot(s -> s.send(PlineMessage.of("<brown>Total game time: <black>" + df.format(game.getDuration() / 1000f) + "</black> seconds")));
     }
 
     // =================================================================================================================
