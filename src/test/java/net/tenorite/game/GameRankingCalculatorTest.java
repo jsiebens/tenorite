@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 public class GameRankingCalculatorTest {
 
@@ -319,6 +320,82 @@ public class GameRankingCalculatorTest {
         List<PlayingStats> result = calculator.calculate(game);
 
         assertThat(result).extracting("nrOfBlocks").containsExactly(4, 1, 0);
+    }
+
+    @Test
+    public void testCalculatorShouldTrackNrOfSpecials() {
+        Player playerA = Player.of(1, "john", "doe");
+        Player playerB = Player.of(2, "nick", "");
+        Player playerC = Player.of(3, "jane", "doe");
+
+        Game game = newGame(GameMode.CLASSIC, b -> b
+            .addPlayers(playerA, playerB, playerC)
+            .addMessages(
+                GameMessage.of(100, SpecialBlockMessage.of(1, Special.ADDLINE, 2)),
+                GameMessage.of(200, SpecialBlockMessage.of(1, Special.ADDLINE, 2)),
+                GameMessage.of(300, SpecialBlockMessage.of(1, Special.ADDLINE, 2)),
+                GameMessage.of(400, SpecialBlockMessage.of(1, Special.CLEARLINE, 2)),
+                GameMessage.of(400, SpecialBlockMessage.of(1, Special.GRAVITY, 1)),
+                GameMessage.of(500, SpecialBlockMessage.of(1, Special.CLEARLINE, 2)),
+                GameMessage.of(600, SpecialBlockMessage.of(1, Special.QUAKEFIELD, 2)),
+                GameMessage.of(600, SpecialBlockMessage.of(1, Special.NUKEFIELD, 1)),
+                GameMessage.of(600, SpecialBlockMessage.of(1, Special.CLEARLINE, 3)),
+                GameMessage.of(600, SpecialBlockMessage.of(1, Special.CLEARLINE, 3)),
+                GameMessage.of(600, SpecialBlockMessage.of(1, Special.GRAVITY, 3)),
+                GameMessage.of(600, PlayerLostMessage.of(3)),
+                GameMessage.of(600, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(game);
+
+        assertThat(result.get(0).getNrOfSpecialsOnOpponent()).containsOnly(
+            entry(Special.ADDLINE, 3),
+            entry(Special.CLEARLINE, 2),
+            entry(Special.NUKEFIELD, 0),
+            entry(Special.RANDOMCLEAR, 0),
+            entry(Special.SWITCHFIELD, 0),
+            entry(Special.CLEARSPECIAL, 0),
+            entry(Special.GRAVITY, 0),
+            entry(Special.QUAKEFIELD, 1),
+            entry(Special.BLOCKBOMB, 0)
+        );
+
+        assertThat(result.get(0).getNrOfSpecialsOnTeamPlayer()).containsOnly(
+            entry(Special.ADDLINE, 0),
+            entry(Special.CLEARLINE, 2),
+            entry(Special.NUKEFIELD, 0),
+            entry(Special.RANDOMCLEAR, 0),
+            entry(Special.SWITCHFIELD, 0),
+            entry(Special.CLEARSPECIAL, 0),
+            entry(Special.GRAVITY, 1),
+            entry(Special.QUAKEFIELD, 0),
+            entry(Special.BLOCKBOMB, 0)
+        );
+
+        assertThat(result.get(0).getNrOfSpecialsOnSelf()).containsOnly(
+            entry(Special.ADDLINE, 0),
+            entry(Special.CLEARLINE, 0),
+            entry(Special.NUKEFIELD, 1),
+            entry(Special.RANDOMCLEAR, 0),
+            entry(Special.SWITCHFIELD, 0),
+            entry(Special.CLEARSPECIAL, 0),
+            entry(Special.GRAVITY, 1),
+            entry(Special.QUAKEFIELD, 0),
+            entry(Special.BLOCKBOMB, 0)
+        );
+
+        assertThat(result.get(1).getNrOfSpecialsReceived()).containsOnly(
+            entry(Special.ADDLINE, 3),
+            entry(Special.CLEARLINE, 2),
+            entry(Special.NUKEFIELD, 0),
+            entry(Special.RANDOMCLEAR, 0),
+            entry(Special.SWITCHFIELD, 0),
+            entry(Special.CLEARSPECIAL, 0),
+            entry(Special.GRAVITY, 0),
+            entry(Special.QUAKEFIELD, 1),
+            entry(Special.BLOCKBOMB, 0)
+        );
     }
 
     private String createField(int maxHeight) {

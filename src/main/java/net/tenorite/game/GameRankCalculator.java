@@ -1,9 +1,12 @@
 package net.tenorite.game;
 
+import net.tenorite.core.Special;
 import net.tenorite.protocol.*;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
 import static java.util.Optional.ofNullable;
@@ -40,6 +43,14 @@ public final class GameRankCalculator {
 
         private final Map<Integer, Integer> blocks = new HashMap<>();
 
+        private final Map<Integer, Map<Special, Integer>> specialsReceived = new HashMap<>();
+
+        private final Map<Integer, Map<Special, Integer>> specialsOnSelf = new HashMap<>();
+
+        private final Map<Integer, Map<Special, Integer>> specialsOnOpponent = new HashMap<>();
+
+        private final Map<Integer, Map<Special, Integer>> specialsOnTeamPlayer = new HashMap<>();
+
         private Calculator(Game game) {
             this.game = game;
             this.players.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, identity())));
@@ -51,6 +62,11 @@ public final class GameRankCalculator {
             this.maxFieldHeights.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
             this.lastFieldHeights.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
             this.blocks.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> -1)));
+
+            this.specialsOnOpponent.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> initSpecialsCounts())));
+            this.specialsReceived.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> initSpecialsCounts())));
+            this.specialsOnSelf.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> initSpecialsCounts())));
+            this.specialsOnTeamPlayer.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> initSpecialsCounts())));
         }
 
         private List<PlayingStats> process() {
@@ -108,7 +124,33 @@ public final class GameRankCalculator {
         }
 
         private void process(SpecialBlockMessage message) {
-            ofNullable(players.get(message.getTarget())).ifPresent(decr(blocks));
+            int sender = message.getSender();
+            int target = message.getTarget();
+            Special special = message.getSpecial();
+
+            ofNullable(players.get(target)).ifPresent(decr(blocks));
+
+            if (target == sender) {
+                ofNullable(players.get(sender)).ifPresent(incrSpecialOnSelf(special));
+            }
+            else {
+                Optional<Player> optTargetPlayer = ofNullable(players.get(target));
+                Optional<Player> optSenderPlayer = ofNullable(players.get(sender));
+
+                if (optSenderPlayer.isPresent() && optTargetPlayer.isPresent()) {
+                    Player senderPlayer = optSenderPlayer.get();
+                    Player targetPlayer = optTargetPlayer.get();
+
+                    if (senderPlayer.isTeamPlayerOf(targetPlayer)) {
+                        incrSpecialOnTeamPlayer(special).accept(senderPlayer);
+                    }
+                    else {
+                        incrSpecialOnOpponent(special).accept(senderPlayer);
+                    }
+
+                    incrSpecialReceived(special).accept(targetPlayer);
+                }
+            }
         }
 
         private void process(FieldMessage message) {
@@ -148,6 +190,22 @@ public final class GameRankCalculator {
             return p -> counts.compute(p.getSlot(), (i, c) -> c - 1);
         }
 
+        private Consumer<Player> incrSpecialOnOpponent(Special special) {
+            return p -> specialsOnOpponent.get(p.getSlot()).compute(special, (i, c) -> c + 1);
+        }
+
+        private Consumer<Player> incrSpecialOnTeamPlayer(Special special) {
+            return p -> specialsOnTeamPlayer.get(p.getSlot()).compute(special, (i, c) -> c + 1);
+        }
+
+        private Consumer<Player> incrSpecialReceived(Special special) {
+            return p -> specialsReceived.get(p.getSlot()).compute(special, (i, c) -> c + 1);
+        }
+
+        private Consumer<Player> incrSpecialOnSelf(Special special) {
+            return p -> specialsOnSelf.get(p.getSlot()).compute(special, (i, c) -> c + 1);
+        }
+
         private PlayingStats stats(Player player) {
             GameRules gameRules = game.getGameRules();
             int slot = player.getSlot();
@@ -162,10 +220,18 @@ public final class GameRankCalculator {
                 fourLineCombos.get(slot),
                 lastFieldHeights.get(slot),
                 maxFieldHeights.get(slot),
-                max(blocks.get(slot), 0)
+                max(blocks.get(slot), 0),
+                specialsReceived.get(slot),
+                specialsOnOpponent.get(slot),
+                specialsOnTeamPlayer.get(slot),
+                specialsOnSelf.get(slot)
             );
         }
 
+    }
+
+    private static Map<Special, Integer> initSpecialsCounts() {
+        return Arrays.stream(Special.values()).collect(Collectors.toMap(Function.identity(), s -> 0));
     }
 
 }

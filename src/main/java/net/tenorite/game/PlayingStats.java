@@ -1,7 +1,10 @@
 package net.tenorite.game;
 
+import net.tenorite.core.Special;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
+
+import java.util.Map;
 
 @Value.Immutable
 @ImmutableStyle
@@ -17,8 +20,11 @@ public abstract class PlayingStats {
                                   int nrOfFourLineCombos,
                                   int lastFieldHeight,
                                   int maxFieldHeight,
-                                  int nrOfBlocks
-    ) {
+                                  int nrOfBlocks,
+                                  Map<Special, Integer> nrOfSpecialsReceived,
+                                  Map<Special, Integer> nrOfSpecialsOnOpponent,
+                                  Map<Special, Integer> nrOfSpecialsOnTeamPlayer,
+                                  Map<Special, Integer> nrOfSpecialsOnSelf) {
         return
             new PlayingStatsBuilder()
                 .player(player)
@@ -31,6 +37,10 @@ public abstract class PlayingStats {
                 .lastFieldHeight(lastFieldHeight)
                 .maxFieldHeight(maxFieldHeight)
                 .nrOfBlocks(nrOfBlocks)
+                .nrOfSpecialsReceived(nrOfSpecialsReceived)
+                .nrOfSpecialsOnOpponent(nrOfSpecialsOnOpponent)
+                .nrOfSpecialsOnTeamPlayer(nrOfSpecialsOnTeamPlayer)
+                .nrOfSpecialsOnSelf(nrOfSpecialsOnSelf)
                 .build();
     }
 
@@ -85,5 +95,13 @@ public abstract class PlayingStats {
     public int getNrOfBlocks() {
         return 0;
     }
+
+    public abstract Map<Special, Integer> getNrOfSpecialsReceived();
+
+    public abstract Map<Special, Integer> getNrOfSpecialsOnOpponent();
+
+    public abstract Map<Special, Integer> getNrOfSpecialsOnTeamPlayer();
+
+    public abstract Map<Special, Integer> getNrOfSpecialsOnSelf();
 
 }
