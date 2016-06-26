@@ -4,6 +4,7 @@ import net.tenorite.core.Tempo;
 
 import java.util.function.Function;
 
+import static net.tenorite.game.BlockOccurancy.blockOccurancy;
 import static net.tenorite.game.GameRules.defaultGameRules;
 import static net.tenorite.game.GameRules.gameRules;
 
@@ -29,6 +30,38 @@ public enum GameMode {
             .classicRules(true)
             .specialAdded(0)
             .specialCapacity(0)
+        ),
+        SuddenDeath.of(300, 10, 1)
+    ),
+
+    SNS(
+        t -> "sticks and squares, no specials",
+        gameRules(b -> b
+            .classicRules(true)
+            .specialAdded(0)
+            .specialCapacity(0)
+            .blockOccurancy(
+                blockOccurancy(o -> o
+                    .line(50)
+                    .square(50)
+                )
+            )
+        ),
+        SuddenDeath.of(300, 10, 1)
+    ),
+
+    JELLY(
+        t -> "just J and L bricks, no specials",
+        gameRules(b -> b
+            .classicRules(true)
+            .specialAdded(0)
+            .specialCapacity(0)
+            .blockOccurancy(
+                blockOccurancy(o -> o
+                    .leftL(50)
+                    .rightL(50)
+                )
+            )
         ),
         SuddenDeath.of(300, 10, 1)
     );

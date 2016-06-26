@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static akka.actor.ActorRef.noSender;
+import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.range;
 
 public class ChannelsActor extends AbstractActor {
@@ -39,8 +40,9 @@ public class ChannelsActor extends AbstractActor {
         range(1, 6).mapToObj(i -> "tetrinet:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.NORMAL, GameMode.CLASSIC, m), noSender()));
         range(1, 6).mapToObj(i -> "tetrifast:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.FAST, GameMode.CLASSIC, m), noSender()));
 
-        range(1, 2).mapToObj(i -> "pure:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.NORMAL, GameMode.PURE, m), noSender()));
-        range(1, 2).mapToObj(i -> "pure:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.FAST, GameMode.PURE, m), noSender()));
+        stream(Tempo.values()).forEach(t -> range(1, 2).mapToObj(i -> "pure:" + i).forEach(m -> self().tell(CreateChannel.of(t, GameMode.PURE, m), noSender())));
+        stream(Tempo.values()).forEach(t -> range(1, 2).mapToObj(i -> "sns:" + i).forEach(m -> self().tell(CreateChannel.of(t, GameMode.SNS, m), noSender())));
+        stream(Tempo.values()).forEach(t -> range(1, 2).mapToObj(i -> "jelly:" + i).forEach(m -> self().tell(CreateChannel.of(t, GameMode.JELLY, m), noSender())));
 
         subscribe(ChannelJoined.class);
         subscribe(ChannelLeft.class);
