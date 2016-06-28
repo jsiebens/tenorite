@@ -1,4 +1,4 @@
-package net.tenorite.game;
+package net.tenorite.game.listeners;
 
 import net.tenorite.protocol.ClassicStyleAddMessage;
 import net.tenorite.protocol.GmsgMessage;
@@ -16,9 +16,10 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SuddenDeathMonitorTest {
+public class SuddenDeathTest {
 
     @Test
     public void testWarningMessage() {
@@ -26,8 +27,8 @@ public class SuddenDeathMonitorTest {
         DeterministicStopWatch stopWatch = new DeterministicStopWatch();
         List<Message> messages = new ArrayList<>();
 
-        SuddenDeathMonitor suddenDeath = new SuddenDeathMonitor(SuddenDeath.of(50, 5, 7), new InternalScheduler(scheduler, stopWatch), messages::add);
-        suddenDeath.start();
+        SuddenDeath suddenDeath = new SuddenDeath(50, 5, 7, new InternalScheduler(scheduler, stopWatch), messages::add);
+        suddenDeath.onStartGame(emptyList());
 
         stopWatch.setTime(20 * 1000);
         scheduler.tick(300, TimeUnit.MILLISECONDS);
@@ -41,15 +42,15 @@ public class SuddenDeathMonitorTest {
         DeterministicStopWatch stopWatch = new DeterministicStopWatch();
         List<Message> messages = new ArrayList<>();
 
-        SuddenDeathMonitor suddenDeath = new SuddenDeathMonitor(SuddenDeath.of(50, 5, 11), new InternalScheduler(scheduler, stopWatch), messages::add);
-        suddenDeath.start();
+        SuddenDeath suddenDeath = new SuddenDeath(50, 5, 11, new InternalScheduler(scheduler, stopWatch), messages::add);
+        suddenDeath.onStartGame(emptyList());
 
         stopWatch.setTime(60 * 1000);
         scheduler.tick(300, TimeUnit.MILLISECONDS);
         scheduler.tick(5001, TimeUnit.MILLISECONDS);
 
         assertThat(messages).containsExactly(
-            GmsgMessage.of(format(SuddenDeathMonitor.START_MESSAGE_TEMPLATE, 11, 5)),
+            GmsgMessage.of(format(SuddenDeath.START_MESSAGE_TEMPLATE, 11, 5)),
             ClassicStyleAddMessage.of(0, 4),
             ClassicStyleAddMessage.of(0, 4),
             ClassicStyleAddMessage.of(0, 2),
@@ -67,13 +68,13 @@ public class SuddenDeathMonitorTest {
         DeterministicStopWatch stopWatch = new DeterministicStopWatch();
         List<Message> messages = new ArrayList<>();
 
-        SuddenDeathMonitor suddenDeath = new SuddenDeathMonitor(SuddenDeath.of(50, 5, 11), new InternalScheduler(scheduler, stopWatch), messages::add);
-        suddenDeath.start();
+        SuddenDeath suddenDeath = new SuddenDeath(50, 5, 11, new InternalScheduler(scheduler, stopWatch), messages::add);
+        suddenDeath.onStartGame(emptyList());
 
         stopWatch.setTime(60 * 1000);
         scheduler.tick(300, TimeUnit.MILLISECONDS);
 
-        suddenDeath.stop();
+        suddenDeath.onEndGame();
         messages.clear();
 
         scheduler.tick(5001, TimeUnit.MILLISECONDS);

@@ -1,7 +1,7 @@
 package net.tenorite.winlist.events;
 
 import net.tenorite.core.Tempo;
-import net.tenorite.game.GameMode;
+import net.tenorite.game.GameModeId;
 import net.tenorite.util.ImmutableStyle;
 import net.tenorite.winlist.WinlistItem;
 import org.immutables.value.Value;
@@ -12,13 +12,13 @@ import java.util.List;
 @ImmutableStyle
 public abstract class WinlistUpdated {
 
-    public static WinlistUpdated of(Tempo tempo, GameMode gameMode, List<WinlistItem> items) {
-        return new WinlistUpdatedBuilder().tempo(tempo).gameMode(gameMode).items(items).build();
+    public static WinlistUpdated of(Tempo tempo, GameModeId gameModeId, List<WinlistItem> items) {
+        return new WinlistUpdatedBuilder().tempo(tempo).gameModeId(gameModeId).items(items).build();
     }
 
     public abstract Tempo getTempo();
 
-    public abstract GameMode getGameMode();
+    public abstract GameModeId getGameModeId();
 
     public abstract List<WinlistItem> getItems();
 

@@ -117,7 +117,7 @@ final class ClientActor extends AbstractActor {
             .stream()
             .sorted((a, b) -> a.getName().compareTo(b.getName()))
             .forEach(c -> {
-                String gameMode = ofNullable(c.getGameMode().getDescription(tempo)).filter(StringUtils::hasText).map(s -> "<gray> - " + s + "</gray> ").orElse(" ");
+                String gameMode = ofNullable(c.getGameModeId().toString()).filter(StringUtils::hasText).map(s -> "<gray> - " + s + "</gray> ").orElse(" ");
                 if (c.getNrOfPlayers() < 6) {
                     write(PlineMessage.of(format("   %s%s <blue>(%s/%s)</blue>", c.getName(), gameMode, c.getNrOfPlayers(), 6)));
                 }

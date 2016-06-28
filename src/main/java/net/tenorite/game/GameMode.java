@@ -1,93 +1,40 @@
 package net.tenorite.game;
 
 import net.tenorite.core.Tempo;
+import net.tenorite.protocol.Message;
+import net.tenorite.util.Scheduler;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
-import static net.tenorite.game.BlockOccurancy.blockOccurancy;
-import static net.tenorite.game.GameRules.defaultGameRules;
-import static net.tenorite.game.GameRules.gameRules;
+public abstract class GameMode {
 
-public enum GameMode {
-
-    DEFAULT(
-        t -> t.equals(Tempo.FAST) ? "TetriFAST" : "TetriNET",
-        defaultGameRules(),
-        SuddenDeath.of(300, 10, 1)
-    ),
-
-    CLASSIC(
-        t -> t.equals(Tempo.FAST) ? "classic TetriFAST" : "classic TetriNET",
-        gameRules(b -> b
-            .classicRules(true)
-        ),
-        SuddenDeath.of(300, 10, 1)
-    ),
-
-    PURE(
-        t -> "no specials",
-        gameRules(b -> b
-            .classicRules(true)
-            .specialAdded(0)
-            .specialCapacity(0)
-        ),
-        SuddenDeath.of(300, 10, 1)
-    ),
-
-    SNS(
-        t -> "sticks and squares, no specials",
-        gameRules(b -> b
-            .classicRules(true)
-            .specialAdded(0)
-            .specialCapacity(0)
-            .blockOccurancy(
-                blockOccurancy(o -> o
-                    .line(50)
-                    .square(50)
-                )
-            )
-        ),
-        SuddenDeath.of(300, 10, 1)
-    ),
-
-    JELLY(
-        t -> "just J and L bricks, no specials",
-        gameRules(b -> b
-            .classicRules(true)
-            .specialAdded(0)
-            .specialCapacity(0)
-            .blockOccurancy(
-                blockOccurancy(o -> o
-                    .leftL(50)
-                    .rightL(50)
-                )
-            )
-        ),
-        SuddenDeath.of(300, 10, 1)
-    );
-
-    private final Function<Tempo, String> description;
+    private final GameModeId gameModeId;
 
     private final GameRules gameRules;
 
-    private final SuddenDeath suddenDeath;
+    private final BiFunction<Scheduler, Consumer<Message>, GameListener> gameRecorder;
 
-    GameMode(Function<Tempo, String> description, GameRules gameRules, SuddenDeath suddenDeath) {
-        this.description = description;
+    protected GameMode(GameModeId gameModeId, GameRules gameRules, BiFunction<Scheduler, Consumer<Message>, GameListener> gameRecorder) {
+        this.gameModeId = gameModeId;
         this.gameRules = gameRules;
-        this.suddenDeath = suddenDeath;
+        this.gameRecorder = gameRecorder;
     }
 
-    public String getDescription(Tempo tempo) {
-        return description.apply(tempo);
+    public final GameModeId getGameModeId() {
+        return gameModeId;
     }
 
-    public GameRules getGameRules() {
+    public final GameRules gameRules() {
         return gameRules;
     }
 
-    public SuddenDeath getSuddenDeath() {
-        return suddenDeath;
+    public final GameListener gameListener(Scheduler scheduler, Consumer<Message> channel) {
+        return gameRecorder.apply(scheduler, channel);
+    }
+
+    public final GameRecorder gameRecorder(Tempo tempo, Scheduler scheduler, Consumer<Message> channel) {
+        return new GameRecorder(tempo, getGameModeId(), gameRules(), gameListener(scheduler, channel));
     }
 
 }

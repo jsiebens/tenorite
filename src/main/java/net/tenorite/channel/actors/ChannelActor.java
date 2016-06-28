@@ -186,7 +186,7 @@ class ChannelActor extends AbstractActor {
                 });
             }
 
-            publish(ChannelJoined.of(tempo, gameMode, name, slot.name));
+            publish(ChannelJoined.of(tempo, gameMode.getGameModeId(), name, slot.name));
 
             slots.put(sender(), slot);
         }
@@ -225,7 +225,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleWinlistUpdated(WinlistUpdated o) {
-        if (o.getGameMode().equals(gameMode)) {
+        if (o.getGameModeId().equals(gameMode.getGameModeId())) {
             forEachSlot(s -> s.send(WinlistMessage.of(o.getItems().stream().map(e -> e.getType().getLetter() + e.getName() + ";" + e.getScore()).collect(toList()))));
         }
     }
@@ -266,9 +266,9 @@ class ChannelActor extends AbstractActor {
             if (gameRecorder == null) {
                 ActorRef self = self();
 
-                gameRecorder = new GameRecorder(tempo, gameMode, currentPlayers(), scheduler, message -> self.tell(message, noSender()));
+                gameRecorder = gameMode.gameRecorder(tempo, scheduler, m -> self.tell(m, noSender()));
 
-                GameRules rules = gameRecorder.start();
+                GameRules rules = gameRecorder.start(currentPlayers());
 
                 Message message = PlineMessage.of("<i>game started by <b>" + moderator.name + "</b></i>");
                 Message newgame = NewGameMessage.of(rules.toString());
@@ -393,7 +393,7 @@ class ChannelActor extends AbstractActor {
     private void endGame(Game game) {
         forEachSlot(p -> p.send(EndGameMessage.of()));
 
-        List<PlayingStats> ranking = RANK_CALCULATOR.calculate(game);
+        List<PlayingStats> ranking = RANK_CALCULATOR.calculate(gameMode, game);
 
         if (!ranking.isEmpty()) {
             displayStats(game, ranking);

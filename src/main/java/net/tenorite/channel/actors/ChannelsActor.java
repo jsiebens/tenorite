@@ -12,7 +12,10 @@ import net.tenorite.channel.events.ChannelJoined;
 import net.tenorite.channel.events.ChannelLeft;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Tempo;
-import net.tenorite.game.GameMode;
+import net.tenorite.game.modes.Classic;
+import net.tenorite.game.modes.Jelly;
+import net.tenorite.game.modes.Pure;
+import net.tenorite.game.modes.SticksAndSquares;
 import net.tenorite.util.AbstractActor;
 import scala.Option;
 
@@ -37,12 +40,12 @@ public class ChannelsActor extends AbstractActor {
         actors.put(Tempo.NORMAL, context().actorOf(Props.create(ChannelsPerModeActor.class), Tempo.NORMAL.name()));
         actors.put(Tempo.FAST, context().actorOf(Props.create(ChannelsPerModeActor.class), Tempo.FAST.name()));
 
-        range(1, 6).mapToObj(i -> "tetrinet:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.NORMAL, GameMode.CLASSIC, m), noSender()));
-        range(1, 6).mapToObj(i -> "tetrifast:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.FAST, GameMode.CLASSIC, m), noSender()));
+        range(1, 6).mapToObj(i -> "tetrinet:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.NORMAL, new Classic(), m), noSender()));
+        range(1, 6).mapToObj(i -> "tetrifast:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.FAST, new Classic(), m), noSender()));
 
-        stream(Tempo.values()).forEach(t -> range(1, 2).mapToObj(i -> "pure:" + i).forEach(m -> self().tell(CreateChannel.of(t, GameMode.PURE, m), noSender())));
-        stream(Tempo.values()).forEach(t -> range(1, 2).mapToObj(i -> "sns:" + i).forEach(m -> self().tell(CreateChannel.of(t, GameMode.SNS, m), noSender())));
-        stream(Tempo.values()).forEach(t -> range(1, 2).mapToObj(i -> "jelly:" + i).forEach(m -> self().tell(CreateChannel.of(t, GameMode.JELLY, m), noSender())));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Pure(), "pure"), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SticksAndSquares(), "sns"), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Jelly(), "jelly"), noSender()));
 
         subscribe(ChannelJoined.class);
         subscribe(ChannelLeft.class);
@@ -121,7 +124,7 @@ public class ChannelsActor extends AbstractActor {
         private void createChannel(CreateChannel c) {
             if (context().child(c.getName()).isEmpty()) {
                 context().actorOf(ChannelActor.props(c.getTempo(), c.getGameMode(), c.getName()), c.getName());
-                channels.put(c.getName(), Channel.of(c.getGameMode(), c.getName()));
+                channels.put(c.getName(), Channel.of(c.getGameMode().getGameModeId(), c.getName()));
             }
         }
     }

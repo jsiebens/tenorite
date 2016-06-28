@@ -1,7 +1,7 @@
 package net.tenorite.winlist;
 
 import net.tenorite.core.Tempo;
-import net.tenorite.game.GameMode;
+import net.tenorite.game.GameModeId;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,21 +28,21 @@ public class WinlistRepositoryStub implements WinlistRepository {
         }
 
         @Override
-        public Optional<WinlistItem> getWinlistItem(GameMode mode, WinlistItem.Type type, String name) {
+        public Optional<WinlistItem> getWinlistItem(GameModeId mode, WinlistItem.Type type, String name) {
             return Optional.ofNullable(winlist(mode).get(type.getLetter() + name));
         }
 
         @Override
-        public void saveWinlistItem(GameMode mode, WinlistItem score) {
+        public void saveWinlistItem(GameModeId mode, WinlistItem score) {
             winlist(mode).put(score.getType().getLetter() + score.getName(), score);
         }
 
         @Override
-        public List<WinlistItem> loadWinlist(GameMode mode) {
+        public List<WinlistItem> loadWinlist(GameModeId mode) {
             return winlist(mode).values().stream().sorted((a, b) -> new Long(b.getScore()).compareTo(a.getScore())).collect(toList());
         }
 
-        private Map<String, WinlistItem> winlist(GameMode mode) {
+        private Map<String, WinlistItem> winlist(GameModeId mode) {
             return data.computeIfAbsent(tempo + ":winlist:" + mode, s -> new HashMap<>());
         }
 

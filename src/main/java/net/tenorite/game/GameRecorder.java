@@ -2,12 +2,11 @@ package net.tenorite.game;
 
 import net.tenorite.core.Tempo;
 import net.tenorite.protocol.*;
-import net.tenorite.util.Scheduler;
+import net.tenorite.util.CommonsStopWatch;
 import net.tenorite.util.StopWatch;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.util.Optional.*;
@@ -19,37 +18,40 @@ public final class GameRecorder {
 
     private final Tempo tempo;
 
-    private final GameMode gameMode;
-
-    private final List<Player> players;
+    private final GameModeId gameModeId;
 
     private final StopWatch stopWatch;
 
-    private final SuddenDeathMonitor suddenDeathMonitor;
+    private final GameListener listener;
 
-    private final Map<Integer, Field> fields = new HashMap<>();
+    private final GameRules gameRules;
 
-    private final Map<Integer, Player> slots = new HashMap<>();
+    private List<Player> players;
 
-    private final List<GameMessage> messages = new ArrayList<>();
+    private Map<Integer, Field> fields = new HashMap<>();
 
-    public GameRecorder(Tempo tempo, GameMode gameMode, List<Player> players, Scheduler scheduler, Consumer<Message> channel) {
+    private Map<Integer, Player> slots = new HashMap<>();
+
+    private List<GameMessage> messages = new ArrayList<>();
+
+    public GameRecorder(Tempo tempo, GameModeId gameModeId, GameRules gameRules, GameListener gameListener) {
         this.id = newGameId();
         this.tempo = tempo;
-        this.gameMode = gameMode;
+        this.gameModeId = gameModeId;
 
+        this.stopWatch = new CommonsStopWatch();
+        this.gameRules = gameRules;
+        this.listener = gameListener;
+    }
+
+    public GameRules start(List<Player> players) {
         this.players = Collections.unmodifiableList(players);
         this.fields.putAll(players.stream().collect(toMap(Player::getSlot, p -> Field.empty())));
         this.slots.putAll(players.stream().collect(toMap(Player::getSlot, Function.identity())));
 
-        this.stopWatch = scheduler.stopWatch();
-        this.suddenDeathMonitor = new SuddenDeathMonitor(gameMode.getSuddenDeath(), scheduler, channel);
-    }
-
-    public GameRules start() {
         stopWatch.start();
-        suddenDeathMonitor.start();
-        return GameRules.from(gameMode.getGameRules(), b -> b.classicRules(true));
+        listener.onStartGame(players);
+        return GameRules.from(gameRules, b -> b.classicRules(true));
     }
 
     public void stop() {
@@ -61,7 +63,7 @@ public final class GameRecorder {
     public boolean pause() {
         if (stopWatch.isStarted()) {
             stopWatch.suspend();
-            suddenDeathMonitor.pause();
+            listener.onPauseGame();
             return true;
         }
         else {
@@ -72,7 +74,7 @@ public final class GameRecorder {
     public boolean resume() {
         if (stopWatch.isSuspended()) {
             stopWatch.resume();
-            suddenDeathMonitor.resume();
+            listener.onResumeGame();
             return true;
         }
         else {
@@ -85,18 +87,38 @@ public final class GameRecorder {
     }
 
     public void onSpecialBlockMessage(SpecialBlockMessage specialBlockMessage) {
-        recordMessage(stopWatch.getTime(), specialBlockMessage);
+        Player sender = slots.get(specialBlockMessage.getSender());
+        Player target = slots.get(specialBlockMessage.getTarget());
+
+        if (sender != null && target != null) {
+            listener.onSpecial(sender, specialBlockMessage.getSpecial(), target);
+            recordMessage(stopWatch.getTime(), specialBlockMessage);
+        }
     }
 
     public boolean onClassicStyleAddMessage(ClassicStyleAddMessage classicStyleAddMessage) {
-        recordMessage(stopWatch.getTime(), classicStyleAddMessage);
-        return gameMode.getGameRules().getClassicRules() || classicStyleAddMessage.getSender() == 0;
+        if (classicStyleAddMessage.getSender() == 0) {
+            recordMessage(stopWatch.getTime(), classicStyleAddMessage);
+            return true;
+        }
+        else {
+            Player sender = slots.get(classicStyleAddMessage.getSender());
+            if (sender != null) {
+                listener.onClassicStyleAdd(sender, classicStyleAddMessage.getLines());
+                recordMessage(stopWatch.getTime(), classicStyleAddMessage);
+                return gameRules.getClassicRules();
+            }
+        }
+        return false;
     }
 
     public void onFieldMessage(FieldMessage fieldMessage) {
-        int slot = fieldMessage.getSender();
-        ofNullable(fields.computeIfPresent(slot, updateWith(fieldMessage.getUpdate())))
-            .ifPresent(f -> recordMessage(stopWatch.getTime(), FieldMessage.of(slot, f.getFieldString())));
+        Player sender = slots.get(fieldMessage.getSender());
+        if (sender != null) {
+            Field field = fields.computeIfPresent(sender.getSlot(), updateWith(fieldMessage.getUpdate()));
+            listener.onFieldUpdate(sender, field);
+            recordMessage(stopWatch.getTime(), FieldMessage.of(sender.getSlot(), field.getFieldString()));
+        }
     }
 
     public Optional<Game> onPlayerLeaveMessage(PlayerLeaveMessage playerLeaveMessage) {
@@ -130,8 +152,8 @@ public final class GameRecorder {
 
     private Game finishRecording() {
         stopWatch.stop();
-        suddenDeathMonitor.stop();
-        return Game.of(id, stopWatch.getStartTime(), stopWatch.getTime(), tempo, gameMode, players, messages);
+        listener.onEndGame();
+        return Game.of(id, stopWatch.getStartTime(), stopWatch.getTime(), tempo, gameModeId, players, messages);
     }
 
     private long teamCount() {

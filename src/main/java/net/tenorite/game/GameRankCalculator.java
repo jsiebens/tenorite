@@ -15,11 +15,13 @@ import static java.util.stream.Collectors.toMap;
 
 public final class GameRankCalculator {
 
-    public List<PlayingStats> calculate(Game game) {
-        return new Calculator(game).process();
+    public List<PlayingStats> calculate(GameMode gameMode, Game game) {
+        return new Calculator(gameMode, game).process();
     }
 
     private static class Calculator {
+
+        private final GameMode gameMode;
 
         private final Game game;
 
@@ -51,8 +53,10 @@ public final class GameRankCalculator {
 
         private final Map<Integer, Map<Special, Integer>> specialsOnTeamPlayer = new HashMap<>();
 
-        private Calculator(Game game) {
+        private Calculator(GameMode gameMode, Game game) {
+            this.gameMode = gameMode;
             this.game = game;
+
             this.players.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, identity())));
 
             this.levels.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
@@ -166,7 +170,7 @@ public final class GameRankCalculator {
         }
 
         private boolean removeBlockCounts(int sender) {
-            if (game.getGameRules().getClassicRules() || sender == 0) {
+            if (gameMode.gameRules().getClassicRules() || sender == 0) {
                 if (sender == 0) {
                     players.values().stream().forEach(decr(blocks));
                 }
@@ -207,7 +211,7 @@ public final class GameRankCalculator {
         }
 
         private PlayingStats stats(Player player) {
-            GameRules gameRules = game.getGameRules();
+            GameRules gameRules = gameMode.gameRules();
             int slot = player.getSlot();
 
             return PlayingStats.of(

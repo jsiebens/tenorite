@@ -4,7 +4,7 @@ import akka.actor.Props;
 import net.tenorite.channel.events.ChannelJoined;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.Game;
-import net.tenorite.game.GameMode;
+import net.tenorite.game.GameModeId;
 import net.tenorite.game.Player;
 import net.tenorite.game.PlayingStats;
 import net.tenorite.game.events.GameFinished;
@@ -49,14 +49,14 @@ public final class WinlistActor extends AbstractActor {
     }
 
     private void handleChannelJoined(ChannelJoined event) {
-        publishWinlist(event.getTempo(), event.getGameMode());
+        publishWinlist(event.getTempo(), event.getGameModeId());
     }
 
     private void handleGameFinished(GameFinished event) {
         Game game = event.getGame();
 
         long timestamp = game.getTimestamp();
-        GameMode mode = game.getGameMode();
+        GameModeId mode = game.getGameModeId();
         Tempo tempo = game.getTempo();
 
         List<Tuple> ranking = createWinlistUpdate(event.getRanking());
@@ -79,7 +79,7 @@ public final class WinlistActor extends AbstractActor {
         }
     }
 
-    private void publishWinlist(Tempo tempo, GameMode mode) {
+    private void publishWinlist(Tempo tempo, GameModeId mode) {
         publish(WinlistUpdated.of(tempo, mode, winlistRepository.winlistOps(tempo).loadWinlist(mode)));
     }
 

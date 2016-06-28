@@ -1,7 +1,7 @@
 package net.tenorite.winlist.repository;
 
 import net.tenorite.core.Tempo;
-import net.tenorite.game.GameMode;
+import net.tenorite.game.GameModeId;
 import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.WinlistRepository;
 import org.jongo.Jongo;
@@ -43,12 +43,12 @@ public class MongoWinlistRepository implements WinlistRepository {
         }
 
         @Override
-        public Optional<WinlistItem> getWinlistItem(GameMode mode, WinlistItem.Type type, String name) {
+        public Optional<WinlistItem> getWinlistItem(GameModeId mode, WinlistItem.Type type, String name) {
             return ofNullable(collection.findOne("{mode:#, type:#, name:#}", mode, type, name).as(WinlistItem.class));
         }
 
         @Override
-        public void saveWinlistItem(GameMode mode, WinlistItem item) {
+        public void saveWinlistItem(GameModeId mode, WinlistItem item) {
             collection
                 .findAndModify("{mode:#, type:#, name:#}", mode, item.getType(), item.getName())
                 .with("{$set: {score:#, timestamp:#}}", item.getScore(), item.getTimestamp())
@@ -57,7 +57,7 @@ public class MongoWinlistRepository implements WinlistRepository {
         }
 
         @Override
-        public List<WinlistItem> loadWinlist(GameMode mode) {
+        public List<WinlistItem> loadWinlist(GameModeId mode) {
             long timestamp = System.currentTimeMillis() - MONTH;
 
             MongoCursor<WinlistItem> as =

@@ -1,6 +1,5 @@
 package net.tenorite.game;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import net.tenorite.core.Tempo;
@@ -18,16 +17,16 @@ public abstract class Game {
                           long timestamp,
                           long duration,
                           Tempo tempo,
-                          GameMode gameMode,
+                          GameModeId gameModeId,
                           List<Player> players,
                           List<GameMessage> messages) {
         return
             new GameBuilder()
                 .id(id)
-                .duration(duration)
                 .timestamp(timestamp)
+                .duration(duration)
                 .tempo(tempo)
-                .gameMode(gameMode)
+                .gameModeId(gameModeId)
                 .players(players)
                 .messages(messages)
                 .build();
@@ -36,22 +35,16 @@ public abstract class Game {
     @JsonProperty("_id")
     public abstract String getId();
 
-    public abstract Tempo getTempo();
-
-    public abstract GameMode getGameMode();
-
     public abstract long getTimestamp();
 
     public abstract long getDuration();
 
+    public abstract Tempo getTempo();
+
+    public abstract GameModeId getGameModeId();
+
     public abstract List<Player> getPlayers();
 
     public abstract List<GameMessage> getMessages();
-
-    @Value.Lazy
-    @JsonIgnore
-    public GameRules getGameRules() {
-        return getGameMode().getGameRules();
-    }
 
 }

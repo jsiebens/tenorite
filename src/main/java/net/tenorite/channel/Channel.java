@@ -1,6 +1,6 @@
 package net.tenorite.channel;
 
-import net.tenorite.game.GameMode;
+import net.tenorite.game.GameModeId;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
 
@@ -8,11 +8,11 @@ import org.immutables.value.Value;
 @ImmutableStyle
 public abstract class Channel {
 
-    public static Channel of(GameMode gameMode, String name) {
-        return new ChannelBuilder().gameMode(gameMode).name(name).nrOfPlayers(0).build();
+    public static Channel of(GameModeId gameModeId, String name) {
+        return new ChannelBuilder().gameModeId(gameModeId).name(name).nrOfPlayers(0).build();
     }
 
-    public abstract GameMode getGameMode();
+    public abstract GameModeId getGameModeId();
 
     public abstract String getName();
 

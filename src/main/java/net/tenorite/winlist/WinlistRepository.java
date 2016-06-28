@@ -1,7 +1,7 @@
 package net.tenorite.winlist;
 
 import net.tenorite.core.Tempo;
-import net.tenorite.game.GameMode;
+import net.tenorite.game.GameModeId;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,11 +12,11 @@ public interface WinlistRepository {
 
     interface WinlistOps {
 
-        Optional<WinlistItem> getWinlistItem(GameMode mode, WinlistItem.Type type, String name);
+        Optional<WinlistItem> getWinlistItem(GameModeId mode, WinlistItem.Type type, String name);
 
-        void saveWinlistItem(GameMode mode, WinlistItem score);
+        void saveWinlistItem(GameModeId mode, WinlistItem score);
 
-        List<WinlistItem> loadWinlist(GameMode mode);
+        List<WinlistItem> loadWinlist(GameModeId mode);
 
     }
 

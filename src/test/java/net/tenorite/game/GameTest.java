@@ -5,12 +5,11 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
+import net.tenorite.game.modes.Classic;
 import net.tenorite.protocol.ClassicStyleAddMessage;
 import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.SpecialBlockMessage;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +21,7 @@ public class GameTest {
     @Test
     public void testJson() throws Exception {
         Game expected =
-            Game.of("game1", 1000, 250, Tempo.NORMAL, GameMode.CLASSIC,
+            Game.of("game1", 1000, 250, Tempo.NORMAL, Classic.ID,
                 asList(
                     Player.of(1, "john", "doe"),
                     Player.of(2, "jane", "doe"),

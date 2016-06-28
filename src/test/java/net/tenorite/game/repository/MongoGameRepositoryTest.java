@@ -4,6 +4,7 @@ import net.tenorite.AbstractTenoriteServerTestCase;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.*;
+import net.tenorite.game.modes.Classic;
 import net.tenorite.protocol.ClassicStyleAddMessage;
 import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.SpecialBlockMessage;
@@ -36,7 +37,7 @@ public class MongoGameRepositoryTest extends AbstractTenoriteServerTestCase {
     @Test
     public void testSaveAndLoadGame() {
         Game game =
-            Game.of("game1", 1000, 250, Tempo.NORMAL, GameMode.CLASSIC,
+            Game.of("game1", 1000, 250, Tempo.NORMAL, Classic.ID,
                 asList(
                     Player.of(1, "john", "doe"),
                     Player.of(2, "jane", "doe"),
@@ -56,7 +57,7 @@ public class MongoGameRepositoryTest extends AbstractTenoriteServerTestCase {
     @Test
     public void testListRecentGamesIsLimitedToTenGames() {
         range(1, 31)
-            .mapToObj(i -> Game.of("id" + i, i, 10, Tempo.NORMAL, GameMode.CLASSIC, Collections.emptyList(), Collections.emptyList()))
+            .mapToObj(i -> Game.of("id" + i, i, 10, Tempo.NORMAL, Classic.ID, Collections.emptyList(), Collections.emptyList()))
             .forEach(g -> gameRepository.gameOps(Tempo.NORMAL).saveGame(g));
 
         List<Game> games = gameRepository.gameOps(Tempo.NORMAL).recentGames();

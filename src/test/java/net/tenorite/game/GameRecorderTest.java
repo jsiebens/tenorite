@@ -2,46 +2,27 @@ package net.tenorite.game;
 
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
+import net.tenorite.game.modes.Classic;
 import net.tenorite.protocol.*;
-import net.tenorite.util.DeterministicStopWatch;
-import net.tenorite.util.Scheduler;
-import net.tenorite.util.StopWatch;
-import org.jmock.lib.concurrent.DeterministicScheduler;
-import org.junit.Before;
 import org.junit.Test;
-
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static net.tenorite.game.GameRules.defaultGameRules;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GameRecorderTest {
 
     private static final Tempo TEMPO = Tempo.NORMAL;
 
-    private DeterministicScheduler deterministicScheduler = new DeterministicScheduler();
-
-    private DeterministicStopWatch deterministicStopWatch = new DeterministicStopWatch();
-
-    private Scheduler scheduler;
-
-    @Before
-    public void setUp() {
-        this.scheduler = new InternalScheduler(deterministicScheduler, deterministicStopWatch);
-    }
-
     @Test
     public void testGameRecorderRecorderShouldBeFinishedWhenEverybodyHasLeft() {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.CLASSIC, asList(playerA, playerB), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        recorder.start();
+        recorder.start(asList(playerA, playerB));
         assertThat(recorder.onPlayerLeaveMessage(PlayerLeaveMessage.of(1)).isPresent()).isFalse();
         assertThat(recorder.onPlayerLeaveMessage(PlayerLeaveMessage.of(2)).isPresent()).isTrue();
     }
@@ -52,9 +33,9 @@ public class GameRecorderTest {
         Player playerB = Player.of(2, "B", null);
         Player playerC = Player.of(3, "C", null);
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.CLASSIC, asList(playerA, playerB, playerC), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        recorder.start();
+        recorder.start(asList(playerA, playerB, playerC));
 
         assertThat(recorder.onPlayerLostMessage(PlayerLostMessage.of(2)).isPresent()).isFalse();
         assertThat(recorder.onPlayerLostMessage(PlayerLostMessage.of(1)).isPresent()).isTrue();
@@ -66,9 +47,9 @@ public class GameRecorderTest {
         Player playerB = Player.of(2, "jane", "doe");
         Player playerC = Player.of(3, "john", "doe");
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.CLASSIC, asList(playerA, playerB, playerC), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        recorder.start();
+        recorder.start(asList(playerA, playerB, playerC));
 
         assertThat(recorder.onPlayerLostMessage(PlayerLostMessage.of(1)).isPresent()).isTrue();
     }
@@ -77,9 +58,9 @@ public class GameRecorderTest {
     public void testSinglePlayerGameShouldBeFinishedWhenPlayerIsLost() {
         Player playerA = Player.of(1, "A", null);
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.CLASSIC, singletonList(playerA), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        recorder.start();
+        recorder.start(singletonList(playerA));
 
         assertThat(recorder.onPlayerLostMessage(PlayerLostMessage.of(1)).isPresent()).isTrue();
     }
@@ -89,9 +70,9 @@ public class GameRecorderTest {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.CLASSIC, asList(playerA, playerB), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        recorder.start();
+        recorder.start(asList(playerA, playerB));
 
         recorder.onFieldMessage(FieldMessage.of(1, "&8G9G9H:H"));
         recorder.onFieldMessage(FieldMessage.of(1, "#9E8F9F:F"));
@@ -121,9 +102,9 @@ public class GameRecorderTest {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.CLASSIC, asList(playerA, playerB), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        recorder.start();
+        recorder.start(asList(playerA, playerB));
         recorder.onFieldMessage(FieldMessage.of(1, fieldA1.getFieldString()));
         recorder.onFieldMessage(FieldMessage.of(1, fieldA2.getFieldString()));
         recorder.onFieldMessage(FieldMessage.of(2, fieldB.getFieldString()));
@@ -141,9 +122,9 @@ public class GameRecorderTest {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.CLASSIC, asList(playerA, playerB), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        recorder.start();
+        recorder.start(asList(playerA, playerB));
         recorder.onLvlMessage(LvlMessage.of(1, 5));
         recorder.onLvlMessage(LvlMessage.of(2, 7));
         Game game = recorder.onPlayerLostMessage(PlayerLostMessage.of(1)).get();
@@ -160,9 +141,9 @@ public class GameRecorderTest {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.CLASSIC, asList(playerA, playerB), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        recorder.start();
+        recorder.start(asList(playerA, playerB));
         recorder.onSpecialBlockMessage(SpecialBlockMessage.of(1, Special.ADDLINE, 2));
         recorder.onSpecialBlockMessage(SpecialBlockMessage.of(2, Special.QUAKEFIELD, 1));
         recorder.onSpecialBlockMessage(SpecialBlockMessage.of(2, Special.NUKEFIELD, 2));
@@ -182,9 +163,9 @@ public class GameRecorderTest {
     public void testGameRecorderShouldAlwaysStartWithClassicRulesEnabledToTrackClassics() {
         Player playerA = Player.of(1, "A", null);
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.DEFAULT, singletonList(playerA), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        assertThat(recorder.start().getClassicRules()).isTrue();
+        assertThat(recorder.start(singletonList(playerA)).getClassicRules()).isTrue();
     }
 
     @Test
@@ -192,9 +173,9 @@ public class GameRecorderTest {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.DEFAULT, asList(playerA, playerB), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        assertThat(recorder.start().getClassicRules()).isTrue();
+        assertThat(recorder.start(asList(playerA, playerB)).getClassicRules()).isTrue();
         assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(1, 1))).isFalse();
         assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(1, 2))).isFalse();
         assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(1, 4))).isFalse();
@@ -215,47 +196,16 @@ public class GameRecorderTest {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        GameRecorder recorder = new GameRecorder(TEMPO, GameMode.DEFAULT, asList(playerA, playerB), scheduler, noop());
+        GameRecorder recorder = new GameRecorder(TEMPO, Classic.ID, defaultGameRules(), gameListener());
 
-        assertThat(recorder.start().getClassicRules()).isTrue();
+        assertThat(recorder.start(asList(playerA, playerB)).getClassicRules()).isTrue();
         assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(0, 1))).isTrue();
         assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(0, 2))).isTrue();
         assertThat(recorder.onClassicStyleAddMessage(ClassicStyleAddMessage.of(0, 4))).isTrue();
     }
 
-    private Consumer<Message> noop() {
-        return m -> {
-        };
-    }
-
-    private static class InternalScheduler implements Scheduler {
-
-        private final ScheduledExecutorService scheduler;
-
-        private final StopWatch stopWatch;
-
-        InternalScheduler(ScheduledExecutorService scheduler, StopWatch stopWatch) {
-            this.scheduler = scheduler;
-            this.stopWatch = stopWatch;
-        }
-
-        @Override
-        public Cancellable scheduleOnce(long delay, TimeUnit timeUnit, Runnable task) {
-            ScheduledFuture<?> s = scheduler.schedule(task, delay, timeUnit);
-            return () -> s.cancel(true);
-        }
-
-        @Override
-        public Cancellable schedule(long initial, long delay, TimeUnit timeUnit, Runnable task) {
-            ScheduledFuture<?> s = scheduler.scheduleAtFixedRate(task, initial, delay, timeUnit);
-            return () -> s.cancel(true);
-        }
-
-        @Override
-        public StopWatch stopWatch() {
-            return stopWatch;
-        }
-
+    private GameListener gameListener() {
+        return GameListener.NOOP;
     }
 
 }

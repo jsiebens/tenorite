@@ -14,7 +14,7 @@ import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.channel.events.SlotReserved;
 import net.tenorite.clients.MessageSink;
 import net.tenorite.core.Tempo;
-import net.tenorite.game.GameMode;
+import net.tenorite.game.modes.Classic;
 import net.tenorite.protocol.Inbound;
 import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.Message;
@@ -132,14 +132,14 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), channelsKit.getRef()));
 
-        Channels channels = Channels.of(Channel.of(GameMode.CLASSIC, "channel:A"), Channel.of(GameMode.CLASSIC, "channel:B"), Channel.of(GameMode.CLASSIC, "channel:C"));
+        Channels channels = Channels.of(Channel.of(Classic.ID, "channel:A"), Channel.of(Classic.ID, "channel:B"), Channel.of(Classic.ID, "channel:C"));
 
         client.tell(channels, noSender());
 
         output.expectMsgAllOf(
-            PlineMessage.of("   channel:A<gray> - classic TetriFAST</gray>  <blue>(0/6)</blue>"),
-            PlineMessage.of("   channel:B<gray> - classic TetriFAST</gray>  <blue>(0/6)</blue>"),
-            PlineMessage.of("   channel:C<gray> - classic TetriFAST</gray>  <blue>(0/6)</blue>"),
+            PlineMessage.of("   channel:A<gray> - CLASSIC</gray>  <blue>(0/6)</blue>"),
+            PlineMessage.of("   channel:B<gray> - CLASSIC</gray>  <blue>(0/6)</blue>"),
+            PlineMessage.of("   channel:C<gray> - CLASSIC</gray>  <blue>(0/6)</blue>"),
             PlineMessage.of("<gray>(type /join <name>)</gray>")
         );
     }

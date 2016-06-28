@@ -2,6 +2,8 @@ package net.tenorite.game;
 
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
+import net.tenorite.game.modes.Classic;
+import net.tenorite.game.modes.Default;
 import net.tenorite.protocol.*;
 import org.junit.Test;
 
@@ -14,8 +16,8 @@ import static org.assertj.core.api.Assertions.entry;
 
 public class GameRankingCalculatorTest {
 
-    private static Game newGame(GameMode gameMode, Consumer<GameBuilder> consumer) {
-        GameBuilder builder = new GameBuilder().from(Game.of("id", 0, 2000, Tempo.NORMAL, gameMode, emptyList(), emptyList()));
+    private static Game newGame(GameModeId gameModeId, Consumer<GameBuilder> consumer) {
+        GameBuilder builder = new GameBuilder().from(Game.of("id", 0, 2000, Tempo.NORMAL, gameModeId, emptyList(), emptyList()));
         consumer.accept(builder);
         return builder.build();
     }
@@ -27,7 +29,7 @@ public class GameRankingCalculatorTest {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB)
             .addMessages(
                 GameMessage.of(100, PlayerLeaveMessage.of(1)),
@@ -35,7 +37,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        assertThat(calculator.calculate(game)).isEmpty();
+        assertThat(calculator.calculate(new Classic(), game)).isEmpty();
     }
 
     @Test
@@ -44,7 +46,7 @@ public class GameRankingCalculatorTest {
         Player playerB = Player.of(2, "B", null);
         Player playerC = Player.of(3, "C", null);
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB, playerC)
             .addMessages(
                 GameMessage.of(100, PlayerLostMessage.of(2)),
@@ -52,7 +54,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result).extracting("player.name").containsExactly("C", "A", "B");
     }
@@ -64,7 +66,7 @@ public class GameRankingCalculatorTest {
         Player playerC = Player.of(3, "C", "doe");
         Player playerD = Player.of(4, "D", "doe");
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB, playerC, playerD)
             .addMessages(
                 GameMessage.of(100, PlayerLeaveMessage.of(2)),
@@ -72,7 +74,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result).extracting("playingTime").containsExactly(2000L, 2000L, 200L);
     }
@@ -82,7 +84,7 @@ public class GameRankingCalculatorTest {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB)
             .addMessages(
                 GameMessage.of(100, LvlMessage.of(1, 5)),
@@ -93,17 +95,19 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result).extracting("level").containsExactly(16, 17);
     }
 
     @Test
     public void testCalculatorShouldRecordNrOfLinesBasedOnLevelForEachPlayer() {
+        Classic gameMode = new Classic();
+
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB)
             .addMessages(
                 GameMessage.of(100, LvlMessage.of(1, 5)),
@@ -114,9 +118,9 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(gameMode, game);
 
-        int lpl = game.getGameMode().getGameRules().getLinesPerLevel();
+        int lpl = gameMode.gameRules().getLinesPerLevel();
 
         assertThat(result).extracting("nrOfLines").containsExactly(16 * lpl, 17 * lpl);
     }
@@ -127,7 +131,7 @@ public class GameRankingCalculatorTest {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB)
             .addMessages(
                 GameMessage.of(100, ClassicStyleAddMessage.of(1, 1)),
@@ -141,7 +145,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result).extracting("nrOfTwoLineCombos").containsExactly(3, 0);
         assertThat(result).extracting("nrOfThreeLineCombos").containsExactly(2, 0);
@@ -153,7 +157,7 @@ public class GameRankingCalculatorTest {
         Player playerA = Player.of(1, "A", null);
         Player playerB = Player.of(2, "B", null);
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB)
             .addMessages(
                 GameMessage.of(100, FieldMessage.of(1, createField(10))),
@@ -163,7 +167,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result).extracting("maxFieldHeight").containsExactly(10, 22);
     }
@@ -173,7 +177,7 @@ public class GameRankingCalculatorTest {
         Player playerA = Player.of(1, "nick", null);
         Player playerB = Player.of(2, "john", null);
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB)
             .addMessages(
                 GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
@@ -184,7 +188,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result).extracting("nrOfBlocks").containsExactly(2, 0);
     }
@@ -194,7 +198,7 @@ public class GameRankingCalculatorTest {
         Player playerA = Player.of(1, "nick", null);
         Player playerB = Player.of(2, "john", null);
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB)
             .addMessages(
                 GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
@@ -206,7 +210,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result).extracting("nrOfBlocks").containsExactly(1, 0);
     }
@@ -216,7 +220,7 @@ public class GameRankingCalculatorTest {
         Player playerA = Player.of(1, "nick", null);
         Player playerB = Player.of(2, "john", null);
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB)
             .addMessages(
                 GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
@@ -232,7 +236,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result).extracting("nrOfBlocks").containsExactly(1, 0);
     }
@@ -242,7 +246,7 @@ public class GameRankingCalculatorTest {
         Player playerA = Player.of(1, "nick", null);
         Player playerB = Player.of(2, "john", null);
 
-        Game game = newGame(GameMode.DEFAULT, b -> b
+        Game game = newGame(Default.ID, b -> b
             .addPlayers(playerA, playerB)
             .addMessages(
                 GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
@@ -258,7 +262,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Default(), game);
 
         assertThat(result).extracting("nrOfBlocks").containsExactly(4, 0);
     }
@@ -268,7 +272,7 @@ public class GameRankingCalculatorTest {
         Player playerA = Player.of(1, "nick", null);
         Player playerB = Player.of(2, "john", null);
 
-        Game game = newGame(GameMode.DEFAULT, b -> b
+        Game game = newGame(Default.ID, b -> b
             .addPlayers(playerA, playerB)
             .addMessages(
                 GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
@@ -284,7 +288,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result).extracting("nrOfBlocks").containsExactly(1, 0);
     }
@@ -295,7 +299,7 @@ public class GameRankingCalculatorTest {
         Player playerB = Player.of(2, "john", "doe");
         Player playerC = Player.of(3, "jane", null);
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB, playerC)
             .addMessages(
                 GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
@@ -317,7 +321,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result).extracting("nrOfBlocks").containsExactly(4, 1, 0);
     }
@@ -328,7 +332,7 @@ public class GameRankingCalculatorTest {
         Player playerB = Player.of(2, "nick", "");
         Player playerC = Player.of(3, "jane", "doe");
 
-        Game game = newGame(GameMode.CLASSIC, b -> b
+        Game game = newGame(Classic.ID, b -> b
             .addPlayers(playerA, playerB, playerC)
             .addMessages(
                 GameMessage.of(100, SpecialBlockMessage.of(1, Special.ADDLINE, 2)),
@@ -347,7 +351,7 @@ public class GameRankingCalculatorTest {
             )
         );
 
-        List<PlayingStats> result = calculator.calculate(game);
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
 
         assertThat(result.get(0).getNrOfSpecialsOnOpponent()).containsOnly(
             entry(Special.ADDLINE, 3),

@@ -1,5 +1,7 @@
-package net.tenorite.game;
+package net.tenorite.game.listeners;
 
+import net.tenorite.game.GameListener;
+import net.tenorite.game.Player;
 import net.tenorite.protocol.ClassicStyleAddMessage;
 import net.tenorite.protocol.GmsgMessage;
 import net.tenorite.protocol.Message;
@@ -7,13 +9,14 @@ import net.tenorite.util.Scheduler;
 import net.tenorite.util.Scheduler.Cancellable;
 import net.tenorite.util.StopWatch;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
-final class SuddenDeathMonitor {
+public final class SuddenDeath implements GameListener {
 
     private static final ClassicStyleAddMessage FOUR_LINES = ClassicStyleAddMessage.of(0, 4);
 
@@ -21,7 +24,7 @@ final class SuddenDeathMonitor {
 
     private static final ClassicStyleAddMessage ONE_LINE = ClassicStyleAddMessage.of(0, 1);
 
-    static final String START_MESSAGE_TEMPLATE = "SUDDEN DEATH enabled! %s line(s) added every %s second(s)";
+    public static final String START_MESSAGE_TEMPLATE = "SUDDEN DEATH enabled! %s line(s) added every %s second(s)";
 
     private final StopWatch stopWatch;
 
@@ -41,17 +44,18 @@ final class SuddenDeathMonitor {
 
     private int warningDelay = 30;
 
-    SuddenDeathMonitor(SuddenDeath suddenDeath, Scheduler scheduler, Consumer<Message> channel) {
+    public SuddenDeath(int delay, int interval, int nrOfLines, Scheduler scheduler, Consumer<Message> channel) {
+        this.delay = delay;
+        this.interval = interval;
+        this.nrOfLines = nrOfLines;
         this.stopWatch = scheduler.stopWatch();
-        this.delay = suddenDeath.getDelay();
-        this.interval = suddenDeath.getInterval();
-        this.nrOfLines = suddenDeath.getNrOfLines();
         this.scheduler = scheduler;
         this.channel = channel;
-        this.warningDelay = Math.min(30, delay);
+        this.warningDelay = Math.min(30, this.delay);
     }
 
-    public void start() {
+    @Override
+    public void onStartGame(List<Player> players) {
         stopWatch.start();
 
         if (delay <= 0) {
@@ -64,15 +68,18 @@ final class SuddenDeathMonitor {
         scheduleNext();
     }
 
-    public void pause() {
+    @Override
+    public void onPauseGame() {
         stopWatch.suspend();
     }
 
-    public void resume() {
+    @Override
+    public void onResumeGame() {
         stopWatch.resume();
     }
 
-    public void stop() {
+    @Override
+    public void onEndGame() {
         stopWatch.stop();
 
         ofNullable(monitor).ifPresent(Cancellable::cancel);
