@@ -122,7 +122,7 @@ public class ChannelsActor extends AbstractActor {
         private void createChannel(CreateChannel c) {
             if (context().child(c.getName()).isEmpty()) {
                 context().actorOf(ChannelActor.props(c.getTempo(), c.getGameMode(), c.getName()), c.getName());
-                channels.put(c.getName(), Channel.of(c.getGameMode().getGameModeId(), c.getName()));
+                channels.put(c.getName(), Channel.of(c.getGameMode().getId(), c.getName()));
             }
         }
     }

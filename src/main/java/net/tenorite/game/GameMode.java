@@ -7,6 +7,7 @@ import net.tenorite.util.Scheduler;
 import java.util.Comparator;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static net.tenorite.game.PlayingStats.*;
 
@@ -18,7 +19,9 @@ public abstract class GameMode {
             .thenComparing(BY_BLOCKS.reversed()) // most blocks first
             .thenComparing(BY_MAX_HEIGTH); // lowest field first
 
-    private final GameModeId gameModeId;
+    private final GameModeId id;
+
+    private final Function<Tempo, String> title;
 
     private final GameRules gameRules;
 
@@ -26,19 +29,24 @@ public abstract class GameMode {
 
     private final Comparator<PlayingStats> rankComparator;
 
-    protected GameMode(GameModeId gameModeId, GameRules gameRules, BiFunction<Scheduler, Consumer<Message>, GameListener> gameListener) {
-        this(gameModeId, gameRules, gameListener, DEFAULT_COMPARATOR);
+    protected GameMode(GameModeId id, Function<Tempo, String> title, GameRules gameRules, BiFunction<Scheduler, Consumer<Message>, GameListener> gameListener) {
+        this(id, title, gameRules, gameListener, DEFAULT_COMPARATOR);
     }
 
-    protected GameMode(GameModeId gameModeId, GameRules gameRules, BiFunction<Scheduler, Consumer<Message>, GameListener> gameListener, Comparator<PlayingStats> rankComparator) {
-        this.gameModeId = gameModeId;
+    protected GameMode(GameModeId id, Function<Tempo, String> title, GameRules gameRules, BiFunction<Scheduler, Consumer<Message>, GameListener> gameListener, Comparator<PlayingStats> rankComparator) {
+        this.id = id;
+        this.title = title;
         this.gameRules = gameRules;
         this.gameListener = gameListener;
         this.rankComparator = rankComparator;
     }
 
-    public final GameModeId getGameModeId() {
-        return gameModeId;
+    public final GameModeId getId() {
+        return id;
+    }
+
+    public final String getTitle(Tempo tempo) {
+        return title.apply(tempo);
     }
 
     public final GameRules gameRules() {
@@ -50,7 +58,7 @@ public abstract class GameMode {
     }
 
     public final GameRecorder gameRecorder(Tempo tempo, Scheduler scheduler, Consumer<Message> channel) {
-        return new GameRecorder(tempo, getGameModeId(), gameRules(), gameListener(scheduler, channel));
+        return new GameRecorder(tempo, getId(), gameRules(), gameListener(scheduler, channel));
     }
 
     public final Comparator<PlayingStats> rankComparator() {

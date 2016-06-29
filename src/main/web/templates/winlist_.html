@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8"/>
+    <title>tenorite</title>
+    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' rel='stylesheet' type='text/css'/>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel='stylesheet' type='text/css'/>
+    <link href='https://fonts.googleapis.com/css?family=Josefin+Sans' rel='stylesheet' type='text/css'/>
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 17px;
+            background-color: #fafafa;
+            padding-top: 100px;
+        }
+
+        .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+            font-weight: bold;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .wrapper {
+            text-align: center;
+            padding-top: 75px;
+            padding-bottom: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">
+                Tenorite FAST
+            </a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#contact">players</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">games <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a th:href="@{/t/{tempo}/games/CLASSIC(tempo=${tempo})}">Classic TetriFAST</a></li>
+                        <li><a th:href="@{/t/{tempo}/games/PURE(tempo=${tempo})}">Pure</a></li>
+                        <li><a th:href="@{/t/{tempo}/games/SNS(tempo=${tempo})}">Sticks &amp; Squares</a></li>
+                        <li><a th:href="@{/t/{tempo}/games/JELLY(tempo=${tempo})}">Jelly</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">winlists <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a th:href="@{/t/{tempo}/winlist/CLASSIC(tempo=${tempo})}">Classic TetriFAST</a></li>
+                        <li><a th:href="@{/t/{tempo}/winlist/PURE(tempo=${tempo})}">Pure</a></li>
+                        <li><a th:href="@{/t/{tempo}/winlist/SNS(tempo=${tempo})}">Sticks &amp; Squares</a></li>
+                        <li><a th:href="@{/t/{tempo}/winlist/JELLY(tempo=${tempo})}">Jelly</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12"><h1>Winlist <small th:text="${gameMode.getTitle(tempo)}">winlist</small></h1></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table table-condensed table-hover">
+                <tr th:each="g : ${winlist}">
+                    <td class="col-sm-3" th:text="${g.name}"></td>
+                    <td class="col-sm-1 right" th:text="${g.score}"></td>
+                    <td class="col-sm-1 right" th:text="${g.timestamp}"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Objects;
 
-public final class GameModeId {
+public final class GameModeId implements Comparable<GameModeId> {
 
     @JsonCreator
     public static GameModeId of(String name) {
@@ -16,6 +16,11 @@ public final class GameModeId {
 
     private GameModeId(String value) {
         this.value = value;
+    }
+
+    @Override
+    public int compareTo(GameModeId o) {
+        return value.compareTo(o.value);
     }
 
     @Override

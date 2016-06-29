@@ -4,9 +4,11 @@ import net.tenorite.game.GameMode;
 import net.tenorite.game.GameModeId;
 import net.tenorite.game.GameRules;
 import net.tenorite.game.listeners.SuddenDeath;
+import org.springframework.stereotype.Component;
 
 import static net.tenorite.game.BlockOccurancy.blockOccurancy;
 
+@Component
 public final class SticksAndSquares extends GameMode {
 
     public static final GameModeId ID = GameModeId.of("SNS");
@@ -25,7 +27,7 @@ public final class SticksAndSquares extends GameMode {
         );
 
     public SticksAndSquares() {
-        super(ID, RULES, (s, c) -> new SuddenDeath(300, 10, 1, s, c));
+        super(ID, t -> "Sticks & Squares", RULES, (s, c) -> new SuddenDeath(300, 10, 1, s, c));
     }
 
 }

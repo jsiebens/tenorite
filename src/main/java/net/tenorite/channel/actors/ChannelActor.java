@@ -190,7 +190,7 @@ class ChannelActor extends AbstractActor {
                 });
             }
 
-            publish(ChannelJoined.of(tempo, gameMode.getGameModeId(), name, slot.name));
+            publish(ChannelJoined.of(tempo, gameMode.getId(), name, slot.name));
 
             slots.put(sender(), slot);
         }
@@ -229,7 +229,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleWinlistUpdated(WinlistUpdated o) {
-        if (o.getGameModeId().equals(gameMode.getGameModeId())) {
+        if (o.getGameModeId().equals(gameMode.getId())) {
             forEachSlot(s -> s.send(WinlistMessage.of(o.getItems().stream().map(e -> e.getType().getLetter() + e.getName() + ";" + e.getScore()).collect(toList()))));
         }
     }

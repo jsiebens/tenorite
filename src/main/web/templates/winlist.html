@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/page">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12"><h1><span>Winlist</span> <small th:text="${gameMode.getTitle(tempo)}">gameMode</small></h1></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-condensed table-hover">
+                    <tr th:each="g : ${winlist}">
+                        <td class="col-sm-3" th:text="${g.name}"></td>
+                        <td class="col-sm-1 right" th:text="${g.score}"></td>
+                        <td class="col-sm-1 right" th:text="${#dates.format(g.timestamp, 'dd MMM yyyy')}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

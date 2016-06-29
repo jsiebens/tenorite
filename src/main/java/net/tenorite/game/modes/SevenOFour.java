@@ -4,6 +4,7 @@ import net.tenorite.game.*;
 import net.tenorite.game.listeners.SuddenDeath;
 import net.tenorite.protocol.Message;
 import net.tenorite.protocol.PlayerWonMessage;
+import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.function.Consumer;
 
 import static net.tenorite.game.PlayingStats.*;
 
+@Component
 public final class SevenOFour extends GameMode {
 
     public static final Comparator<PlayingStats> BY_FOUR_LINE_COMBOS = (o1, o2) -> o1.getNrOfFourLineCombos() - o2.getNrOfFourLineCombos();
@@ -32,7 +34,7 @@ public final class SevenOFour extends GameMode {
     );
 
     public SevenOFour() {
-        super(ID, RULES, (s, c) -> new Listener(c).and(new SuddenDeath(300, 10, 1, s, c)), COMPARATOR);
+        super(ID, t -> "Seven 'o Four", RULES, (s, c) -> new Listener(c).and(new SuddenDeath(300, 10, 1, s, c)), COMPARATOR);
     }
 
     private static final class Listener implements GameListener {

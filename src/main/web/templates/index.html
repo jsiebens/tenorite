@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/default">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="row">
+        <div class="col-md-12 wrapper">
+            <img src="/logo-200.png" width="200px" height="200px"/>
+            <h1>Tenorite TetriNET Server</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2 col-md-offset-4" style="text-align:center">
+            <h4><a href="/t/NORMAL">NORMAL</a></h4>
+        </div>
+        <div class="col-md-2" style="text-align:center">
+            <h4><a href="/t/FAST">FAST</a></h4>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 10px">
+        <div class="col-md-6 col-md-offset-3">
+            <blockquote>
+                <p><i>Gee, Tetris?  Whats that?  Yeah, yeah, so it's been
+                    done 2 billion times before (give or take a few bil),
+                    but this is different!  Yes, all you tetris addicts
+                    out there be prepared for even MORE excitement..
+                    internet tetris!  Now you can play your five best
+                    buddies in one of the most well known games in
+                    existence!</i></p>
+                <p><small><a href="http://gtetrinet.sourceforge.net/tetrinet.txt">St0rmCat</a></small></p>
+            </blockquote>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="text-align:center">
+            <p>Download and install your favorite <a href="http://tetrinet.info/download-clients">TetriNET Client</a></p>
+            <p>Connect to <b th:text="${hostname}">hostname</b></p>
+            <p>Start playing...</p>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

@@ -4,7 +4,9 @@ import net.tenorite.game.GameMode;
 import net.tenorite.game.GameModeId;
 import net.tenorite.game.GameRules;
 import net.tenorite.game.listeners.SuddenDeath;
+import org.springframework.stereotype.Component;
 
+@Component
 public final class Pure extends GameMode {
 
     public static final GameModeId ID = GameModeId.of("PURE");
@@ -17,7 +19,7 @@ public final class Pure extends GameMode {
         );
 
     public Pure() {
-        super(ID, RULES, (s, c) -> new SuddenDeath(300, 10, 1, s, c));
+        super(ID, t -> "Pure", RULES, (s, c) -> new SuddenDeath(300, 10, 1, s, c));
     }
 
 }
