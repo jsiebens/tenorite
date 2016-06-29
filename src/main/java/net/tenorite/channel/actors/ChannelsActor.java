@@ -12,10 +12,7 @@ import net.tenorite.channel.events.ChannelJoined;
 import net.tenorite.channel.events.ChannelLeft;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Tempo;
-import net.tenorite.game.modes.Classic;
-import net.tenorite.game.modes.Jelly;
-import net.tenorite.game.modes.Pure;
-import net.tenorite.game.modes.SticksAndSquares;
+import net.tenorite.game.modes.*;
 import net.tenorite.util.AbstractActor;
 import scala.Option;
 
@@ -46,6 +43,7 @@ public class ChannelsActor extends AbstractActor {
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Pure(), "pure"), noSender()));
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SticksAndSquares(), "sns"), noSender()));
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Jelly(), "jelly"), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SevenOFour(), "7o4"), noSender()));
 
         subscribe(ChannelJoined.class);
         subscribe(ChannelLeft.class);

@@ -86,6 +86,9 @@ public final class GameRankCalculator {
             else if (m.getMessage() instanceof PlayerLeaveMessage) {
                 process((PlayerLeaveMessage) m.getMessage());
             }
+            else if (m.getMessage() instanceof PlayerWonMessage) {
+                process(m.getTimestamp(), (PlayerWonMessage) m.getMessage());
+            }
             else if (m.getMessage() instanceof LvlMessage) {
                 process((LvlMessage) m.getMessage());
             }
@@ -167,6 +170,17 @@ public final class GameRankCalculator {
 
         private void process(PlayerLeaveMessage message) {
             players.remove(message.getSender());
+        }
+
+        private void process(long timestamp, PlayerWonMessage message) {
+            Player winner = players.remove(message.getSender());
+            if (winner != null) {
+                players.values().stream().map(this::stats).sorted(gameMode.rankComparator().reversed()).forEach(ranking::addFirst);
+                players.clear();
+
+                playingTimes.put(winner.getSlot(), timestamp);
+                ranking.addFirst(stats(winner));
+            }
         }
 
         private boolean removeBlockCounts(int sender) {

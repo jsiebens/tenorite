@@ -138,6 +138,11 @@ public final class GameRecorder {
         return loser != null && (slots.isEmpty() || teamCount() <= 1) ? of(finishRecording()) : empty();
     }
 
+    public Game onPlayerWonMessage(PlayerWonMessage playerWonMessage) {
+        messages.add(GameMessage.of(stopWatch.getTime(), playerWonMessage));
+        return finishRecording();
+    }
+
     public Optional<Field> getField(int slot) {
         return ofNullable(fields.get(slot));
     }

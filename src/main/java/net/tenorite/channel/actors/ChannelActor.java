@@ -30,6 +30,7 @@ import java.util.function.Predicate;
 
 import static akka.actor.ActorRef.noSender;
 import static java.lang.String.format;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
@@ -136,6 +137,9 @@ class ChannelActor extends AbstractActor {
         }
         else if (o instanceof PlayerLostMessage) {
             handlePlayerLostMessage((PlayerLostMessage) o);
+        }
+        else if (o instanceof PlayerWonMessage) {
+            handlePlayerWon((PlayerWonMessage) o);
         }
     }
 
@@ -388,6 +392,10 @@ class ChannelActor extends AbstractActor {
                 gameRecorder.onPlayerLostMessage(message).ifPresent(this::endGame);
             }
         });
+    }
+
+    protected void handlePlayerWon(PlayerWonMessage o) {
+        of(gameRecorder.onPlayerWonMessage(o)).ifPresent(this::endGame);
     }
 
     private void endGame(Game game) {

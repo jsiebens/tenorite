@@ -4,11 +4,20 @@ import net.tenorite.core.Special;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
 
+import java.util.Comparator;
 import java.util.Map;
 
 @Value.Immutable
 @ImmutableStyle
 public abstract class PlayingStats {
+
+    public static final Comparator<PlayingStats> BY_LEVEL = (o1, o2) -> o1.getLevel() - o2.getLevel();
+
+    public static final Comparator<PlayingStats> BY_BLOCKS = (o1, o2) -> o1.getNrOfBlocks() - o2.getNrOfBlocks();
+
+    public static final Comparator<PlayingStats> BY_COMBOS = (o1, o2) -> o1.getNrOfCombos() - o2.getNrOfCombos();
+
+    public static final Comparator<PlayingStats> BY_MAX_HEIGTH = (o1, o2) -> o1.getMaxFieldHeight() - o2.getMaxFieldHeight();
 
     public static PlayingStats of(Player player) {
         return new PlayingStatsBuilder().player(player).build();
@@ -128,5 +137,5 @@ public abstract class PlayingStats {
     public int getTotalNrOfSpecialsUsed() {
         return getTotalNrOfSpecialsOnOpponent() + getTotalNrOfSpecialsOnTeamPlayer() + getTotalNrOfSpecialsOnSelf();
     }
-    
+
 }
