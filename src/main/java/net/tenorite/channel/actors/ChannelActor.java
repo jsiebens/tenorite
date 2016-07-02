@@ -270,7 +270,12 @@ class ChannelActor extends AbstractActor {
             if (gameRecorder == null) {
                 ActorRef self = self();
 
-                gameRecorder = gameMode.gameRecorder(tempo, scheduler, m -> self.tell(m, noSender()));
+                gameRecorder = new GameRecorder(
+                    tempo,
+                    gameMode.getId(),
+                    gameMode.getGameRules(),
+                    gameMode.createGameListener(scheduler, m -> self.tell(m, noSender()))
+                );
 
                 GameRules rules = gameRecorder.start(currentPlayers());
 

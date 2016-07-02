@@ -1,9 +1,9 @@
 package net.tenorite.game.modes;
 
+import net.tenorite.core.Tempo;
 import net.tenorite.game.GameMode;
 import net.tenorite.game.GameModeId;
 import net.tenorite.game.GameRules;
-import net.tenorite.game.listeners.SuddenDeath;
 import org.springframework.stereotype.Component;
 
 import static net.tenorite.game.BlockOccurancy.blockOccurancy;
@@ -27,7 +27,17 @@ public final class SticksAndSquares extends GameMode {
         );
 
     public SticksAndSquares() {
-        super(ID, t -> "Sticks & Squares", RULES, (s, c) -> new SuddenDeath(300, 10, 1, s, c));
+        super(ID, RULES);
+    }
+
+    @Override
+    public String getTitle(Tempo tempo) {
+        return "Sticks & Squares";
+    }
+
+    @Override
+    public String getDescription(Tempo tempo) {
+        return "only sticks and squares, no specials";
     }
 
 }

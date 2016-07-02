@@ -1,9 +1,11 @@
 package net.tenorite.game.modes;
 
+import net.tenorite.core.Tempo;
 import net.tenorite.game.*;
 import net.tenorite.game.listeners.SuddenDeath;
 import net.tenorite.protocol.Message;
 import net.tenorite.protocol.PlayerWonMessage;
+import net.tenorite.util.Scheduler;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
@@ -16,7 +18,7 @@ import static net.tenorite.game.PlayingStats.*;
 @Component
 public final class SevenOFour extends GameMode {
 
-    public static final Comparator<PlayingStats> BY_FOUR_LINE_COMBOS = (o1, o2) -> o1.getNrOfFourLineCombos() - o2.getNrOfFourLineCombos();
+    private static final Comparator<PlayingStats> BY_FOUR_LINE_COMBOS = (o1, o2) -> o1.getNrOfFourLineCombos() - o2.getNrOfFourLineCombos();
 
     private static final Comparator<PlayingStats> COMPARATOR =
         BY_FOUR_LINE_COMBOS.reversed() // most four line combos first
@@ -25,16 +27,36 @@ public final class SevenOFour extends GameMode {
             .thenComparing(BY_BLOCKS.reversed()) // most blocks first
             .thenComparing(BY_MAX_HEIGTH); // lowest field first
 
-    public static final GameModeId ID = GameModeId.of("7o4");
+    public static final GameModeId ID = GameModeId.of("SOF");
 
-    public static final GameRules RULES = GameRules.gameRules(b -> b
+    private static final GameRules RULES = GameRules.gameRules(b -> b
         .classicRules(false)
         .specialAdded(0)
         .specialCapacity(0)
     );
 
     public SevenOFour() {
-        super(ID, t -> "Seven 'o Four", RULES, (s, c) -> new Listener(c).and(new SuddenDeath(300, 10, 1, s, c)), COMPARATOR);
+        super(ID, RULES);
+    }
+
+    @Override
+    public String getTitle(Tempo tempo) {
+        return "Seven 'o Four";
+    }
+
+    @Override
+    public String getDescription(Tempo tempo) {
+        return super.getDescription(tempo);
+    }
+
+    @Override
+    public GameListener createGameListener(Scheduler scheduler, Consumer<Message> channel) {
+        return new Listener(channel).and(new SuddenDeath(300, 10, 1, scheduler, channel));
+    }
+
+    @Override
+    public Comparator<PlayingStats> getPlayingStatsComparator() {
+        return COMPARATOR;
     }
 
     private static final class Listener implements GameListener {

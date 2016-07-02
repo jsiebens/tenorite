@@ -1,9 +1,9 @@
 package net.tenorite.game.modes;
 
+import net.tenorite.core.Tempo;
 import net.tenorite.game.GameMode;
 import net.tenorite.game.GameModeId;
 import net.tenorite.game.GameRules;
-import net.tenorite.game.listeners.SuddenDeath;
 import org.springframework.stereotype.Component;
 
 import static net.tenorite.game.BlockOccurancy.blockOccurancy;
@@ -13,7 +13,7 @@ public final class Jelly extends GameMode {
 
     public static final GameModeId ID = GameModeId.of("JELLY");
 
-    public static final GameRules RULES = GameRules
+    private static final GameRules RULES = GameRules
         .gameRules(b -> b
             .classicRules(true)
             .specialAdded(0)
@@ -27,7 +27,17 @@ public final class Jelly extends GameMode {
         );
 
     public Jelly() {
-        super(ID, t -> "Jelly", RULES, (s, c) -> new SuddenDeath(300, 10, 1, s, c));
+        super(ID, RULES);
+    }
+
+    @Override
+    public String getTitle(Tempo tempo) {
+        return "Jelly";
+    }
+
+    @Override
+    public String getDescription(Tempo tempo) {
+        return "just J and L bricks, no specials";
     }
 
 }

@@ -120,7 +120,7 @@ public class GameRankingCalculatorTest {
 
         List<PlayingStats> result = calculator.calculate(gameMode, game);
 
-        int lpl = gameMode.gameRules().getLinesPerLevel();
+        int lpl = gameMode.getGameRules().getLinesPerLevel();
 
         assertThat(result).extracting("nrOfLines").containsExactly(16 * lpl, 17 * lpl);
     }

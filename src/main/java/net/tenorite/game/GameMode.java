@@ -1,13 +1,12 @@
 package net.tenorite.game;
 
 import net.tenorite.core.Tempo;
+import net.tenorite.game.listeners.SuddenDeath;
 import net.tenorite.protocol.Message;
 import net.tenorite.util.Scheduler;
 
 import java.util.Comparator;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static net.tenorite.game.PlayingStats.*;
 
@@ -21,48 +20,35 @@ public abstract class GameMode {
 
     private final GameModeId id;
 
-    private final Function<Tempo, String> title;
-
     private final GameRules gameRules;
 
-    private final BiFunction<Scheduler, Consumer<Message>, GameListener> gameListener;
-
-    private final Comparator<PlayingStats> rankComparator;
-
-    protected GameMode(GameModeId id, Function<Tempo, String> title, GameRules gameRules, BiFunction<Scheduler, Consumer<Message>, GameListener> gameListener) {
-        this(id, title, gameRules, gameListener, DEFAULT_COMPARATOR);
-    }
-
-    protected GameMode(GameModeId id, Function<Tempo, String> title, GameRules gameRules, BiFunction<Scheduler, Consumer<Message>, GameListener> gameListener, Comparator<PlayingStats> rankComparator) {
+    protected GameMode(GameModeId id, GameRules gameRules) {
         this.id = id;
-        this.title = title;
         this.gameRules = gameRules;
-        this.gameListener = gameListener;
-        this.rankComparator = rankComparator;
     }
 
     public final GameModeId getId() {
         return id;
     }
 
-    public final String getTitle(Tempo tempo) {
-        return title.apply(tempo);
-    }
-
-    public final GameRules gameRules() {
+    public final GameRules getGameRules() {
         return gameRules;
     }
 
-    public final GameListener gameListener(Scheduler scheduler, Consumer<Message> channel) {
-        return gameListener.apply(scheduler, channel);
+    public String getTitle(Tempo tempo) {
+        return id.toString();
     }
 
-    public final GameRecorder gameRecorder(Tempo tempo, Scheduler scheduler, Consumer<Message> channel) {
-        return new GameRecorder(tempo, getId(), gameRules(), gameListener(scheduler, channel));
+    public String getDescription(Tempo tempo) {
+        return "";
     }
 
-    public final Comparator<PlayingStats> rankComparator() {
-        return rankComparator;
+    public Comparator<PlayingStats> getPlayingStatsComparator() {
+        return DEFAULT_COMPARATOR;
+    }
+
+    public GameListener createGameListener(Scheduler scheduler, Consumer<Message> channel) {
+        return new SuddenDeath(300, 10, 1, scheduler, channel);
     }
 
 }

@@ -175,7 +175,7 @@ public final class GameRankCalculator {
         private void process(long timestamp, PlayerWonMessage message) {
             Player winner = players.remove(message.getSender());
             if (winner != null) {
-                players.values().stream().map(this::stats).sorted(gameMode.rankComparator().reversed()).forEach(ranking::addFirst);
+                players.values().stream().map(this::stats).sorted(gameMode.getPlayingStatsComparator().reversed()).forEach(ranking::addFirst);
                 players.clear();
 
                 playingTimes.put(winner.getSlot(), timestamp);
@@ -184,7 +184,7 @@ public final class GameRankCalculator {
         }
 
         private boolean removeBlockCounts(int sender) {
-            if (gameMode.gameRules().getClassicRules() || sender == 0) {
+            if (gameMode.getGameRules().getClassicRules() || sender == 0) {
                 if (sender == 0) {
                     players.values().stream().forEach(decr(blocks));
                 }
@@ -225,7 +225,7 @@ public final class GameRankCalculator {
         }
 
         private PlayingStats stats(Player player) {
-            GameRules gameRules = gameMode.gameRules();
+            GameRules gameRules = gameMode.getGameRules();
             int slot = player.getSlot();
 
             return PlayingStats.of(
