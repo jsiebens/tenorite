@@ -1,5 +1,11 @@
 package net.tenorite.game.modes;
 
+import net.tenorite.badges.Badge;
+import net.tenorite.badges.BadgeValidator;
+import net.tenorite.badges.validators.NrOfConsecutiveGamesLost;
+import net.tenorite.badges.validators.NrOfConsecutiveGamesWon;
+import net.tenorite.badges.validators.NrOfGamesPlayed;
+import net.tenorite.badges.validators.NrOfGamesWon;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.*;
 import net.tenorite.game.listeners.SuddenDeath;
@@ -8,9 +14,7 @@ import net.tenorite.protocol.PlayerWonMessage;
 import net.tenorite.util.Scheduler;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static net.tenorite.game.PlayingStats.*;
@@ -57,6 +61,17 @@ public final class SevenOFour extends GameMode {
     @Override
     public Comparator<PlayingStats> getPlayingStatsComparator() {
         return COMPARATOR;
+    }
+
+    @Override
+    public List<BadgeValidator> getBadgeValidators() {
+        return Arrays.asList(
+            new NrOfGamesPlayed(Badge.of(ID, "COMPETITOR"), 10),
+            new NrOfGamesWon(Badge.of(ID, "LIKE_A_PRO"), 10),
+            new NrOfGamesWon(Badge.of(ID, "LIKE_A_KING"), 1000),
+            new NrOfConsecutiveGamesWon(Badge.of(ID, "I_M_ON_FIRE"), 5),
+            new NrOfConsecutiveGamesLost(Badge.of(ID, "JUST_KEEP_TRYING"), 5)
+        );
     }
 
     private static final class Listener implements GameListener {

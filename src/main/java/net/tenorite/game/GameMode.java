@@ -1,13 +1,16 @@
 package net.tenorite.game;
 
+import net.tenorite.badges.BadgeValidator;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.listeners.SuddenDeath;
 import net.tenorite.protocol.Message;
 import net.tenorite.util.Scheduler;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
 
+import static java.util.Collections.emptyList;
 import static net.tenorite.game.PlayingStats.*;
 
 public abstract class GameMode {
@@ -45,6 +48,10 @@ public abstract class GameMode {
 
     public Comparator<PlayingStats> getPlayingStatsComparator() {
         return DEFAULT_COMPARATOR;
+    }
+
+    public List<BadgeValidator> getBadgeValidators() {
+        return emptyList();
     }
 
     public GameListener createGameListener(Scheduler scheduler, Consumer<Message> channel) {
