@@ -7,11 +7,16 @@
 <th:block layout:fragment="content">
     <div class="container">
         <div class="row">
-            <div class="col-md-12"><h1><span>Winlist</span> <small th:text="${gameMode.getTitle(tempo)}">gameMode</small></h1></div>
+            <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small>winlist</small></h1></div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <table class="table table-condensed table-hover">
+                    <tr>
+                        <th class="col-sm-3">name</th>
+                        <th class="col-sm-1 right">score</th>
+                        <th class="col-sm-1 right">date</th>
+                    </tr>
                     <tr th:each="g : ${winlist}">
                         <td class="col-sm-3" th:text="${g.name}"></td>
                         <td class="col-sm-1 right" th:text="${g.score}"></td>
