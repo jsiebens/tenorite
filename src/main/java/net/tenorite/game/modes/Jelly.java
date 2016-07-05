@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 
+import static net.tenorite.badges.BadgeValidators.*;
+import static net.tenorite.badges.BadgeValidators.justKeepTrying;
 import static net.tenorite.game.BlockOccurancy.blockOccurancy;
 
 @Component
@@ -52,11 +54,11 @@ public final class Jelly extends GameMode {
     @Override
     public List<BadgeValidator> getBadgeValidators() {
         return Arrays.asList(
-            new NrOfGamesPlayed(Badge.of(ID, "COMPETITOR"), 10),
-            new NrOfGamesWon(Badge.of(ID, "LIKE_A_PRO"), 10),
-            new NrOfGamesWon(Badge.of(ID, "LIKE_A_KING"), 1000),
-            new NrOfConsecutiveGamesWon(Badge.of(ID, "I_M_ON_FIRE"), 5),
-            new NrOfConsecutiveGamesLost(Badge.of(ID, "JUST_KEEP_TRYING"), 5)
+            competitor(ID),
+            likeAPro(ID),
+            likeAKing(ID),
+            imOnFire(ID),
+            justKeepTrying(ID)
         );
     }
 
