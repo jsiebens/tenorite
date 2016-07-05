@@ -31,24 +31,24 @@ public final class NrOfConsecutiveGamesWon extends BadgeValidator {
         if (!first.getPlayer().isTeamPlayerOf(second.getPlayer())) {
             String name = first.getPlayer().getName();
 
-            long count = badgeOps.getProgress(type, name) + 1;
+            long count = badgeOps.getProgress(badge, name) + 1;
 
             if (count >= target) {
-                Optional<BadgeLevel> opt = badgeOps.getBadgeLevel(name, type);
+                Optional<BadgeLevel> opt = badgeOps.getBadgeLevel(name, badge);
                 long newLevel = opt.map(BadgeLevel::getLevel).orElse(0L) + 1;
 
-                BadgeLevel badge = BadgeLevel.of(name, type, game.getTimestamp(), newLevel, game.getId());
+                BadgeLevel badge = BadgeLevel.of(name, this.badge, game.getTimestamp(), newLevel, game.getId());
 
                 badgeOps.saveBadgeLevel(badge);
-                badgeOps.updateProgress(type, name, count % target);
+                badgeOps.updateProgress(this.badge, name, count % target);
 
                 onBadgeEarned.accept(BadgeEarned.of(badge, opt.isPresent()));
             }
             else {
-                badgeOps.updateProgress(type, name, count);
+                badgeOps.updateProgress(badge, name, count);
             }
 
-            gameFinished.getRanking().stream().skip(1).forEach(p -> badgeOps.updateProgress(type, p.getPlayer().getName(), 0));
+            gameFinished.getRanking().stream().skip(1).forEach(p -> badgeOps.updateProgress(badge, p.getPlayer().getName(), 0));
         }
 
     }

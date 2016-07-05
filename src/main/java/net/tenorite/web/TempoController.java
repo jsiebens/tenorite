@@ -49,7 +49,7 @@ public class TempoController {
     public ModelAndView badges(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String gameModeId) {
         GameMode gameMode = gameModes.get(GameModeId.of(gameModeId));
 
-        List<Badge> badges = gameMode.getBadgeValidators().stream().map(BadgeValidator::getType).collect(toList());
+        List<Badge> badges = gameMode.getBadgeValidators().stream().map(BadgeValidator::getBadge).collect(toList());
 
         return
             new ModelAndView("badges")

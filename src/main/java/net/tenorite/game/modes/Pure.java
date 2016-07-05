@@ -51,8 +51,13 @@ public final class Pure extends GameMode {
             likeAPro(ID),
             likeAKing(ID),
             imOnFire(ID),
-            justKeepTrying(ID)
+            justKeepTrying(ID),
+
+            comboWombo(ID),
+            doubleTrouble(ID),
+            threeIsCompany(ID),
+            fourOClock(ID)
         );
     }
-    
+
 }

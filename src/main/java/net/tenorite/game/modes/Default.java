@@ -4,6 +4,7 @@ import net.tenorite.game.GameMode;
 import net.tenorite.game.GameModeId;
 import net.tenorite.game.GameRules;
 
+@Deprecated
 public final class Default extends GameMode {
 
     public static final GameModeId ID = GameModeId.of("DEFAULT");

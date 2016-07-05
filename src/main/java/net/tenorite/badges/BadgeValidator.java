@@ -7,18 +7,18 @@ import java.util.function.Consumer;
 
 public abstract class BadgeValidator {
 
-    protected final Badge type;
+    protected final Badge badge;
 
-    public BadgeValidator(Badge type) {
-        this.type = type;
+    public BadgeValidator(Badge badge) {
+        this.badge = badge;
     }
 
-    public Badge getType() {
-        return type;
+    public Badge getBadge() {
+        return badge;
     }
 
     public void process(GameFinished gameFinished, BadgeRepository badgeRepository, Consumer<BadgeEarned> onBadgeEarned) {
-        if (gameFinished.getGame().getGameModeId().equals(type.getGameModeId()) && gameFinished.getRanking().size() >= 3) {
+        if (gameFinished.getGame().getGameModeId().equals(badge.getGameModeId()) && gameFinished.getRanking().size() >= 3) {
             doProcess(gameFinished, badgeRepository.badgeOps(gameFinished.getGame().getTempo()), onBadgeEarned);
         }
     }

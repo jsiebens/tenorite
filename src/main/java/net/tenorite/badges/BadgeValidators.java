@@ -1,9 +1,6 @@
 package net.tenorite.badges;
 
-import net.tenorite.badges.validators.NrOfConsecutiveGamesLost;
-import net.tenorite.badges.validators.NrOfConsecutiveGamesWon;
-import net.tenorite.badges.validators.NrOfGamesPlayed;
-import net.tenorite.badges.validators.NrOfGamesWon;
+import net.tenorite.badges.validators.*;
 import net.tenorite.game.GameModeId;
 
 public class BadgeValidators {
@@ -26,6 +23,22 @@ public class BadgeValidators {
 
     public static BadgeValidator justKeepTrying(GameModeId gameModeId) {
         return new NrOfConsecutiveGamesLost(Badge.of(gameModeId, "JUST_KEEP_TRYING"), 5);
+    }
+
+    public static BadgeValidator comboWombo(GameModeId gameModeId) {
+        return new NrOfCombos(Badge.of(gameModeId, "COMBO_WOMBO"));
+    }
+
+    public static BadgeValidator doubleTrouble(GameModeId gameModeId) {
+        return new NrOfTwoLineCombos(Badge.of(gameModeId, "DOUBLE_TROUBLE"));
+    }
+
+    public static BadgeValidator threeIsCompany(GameModeId gameModeId) {
+        return new NrOfThreeLineCombos(Badge.of(gameModeId, "THREE_S_COMPANY"));
+    }
+
+    public static BadgeValidator fourOClock(GameModeId gameModeId) {
+        return new NrOfFourLineCombos(Badge.of(gameModeId, "FOUR_O_CLOCK"));
     }
 
 }

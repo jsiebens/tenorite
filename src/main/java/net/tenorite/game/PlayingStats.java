@@ -6,6 +6,7 @@ import org.immutables.value.Value;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Value.Immutable
 @ImmutableStyle
@@ -21,6 +22,12 @@ public abstract class PlayingStats {
 
     public static PlayingStats of(Player player) {
         return new PlayingStatsBuilder().player(player).build();
+    }
+
+    public static PlayingStats of(Player player, Consumer<PlayingStatsBuilder> consumer) {
+        PlayingStatsBuilder builder = new PlayingStatsBuilder().player(player);
+        consumer.accept(builder);
+        return builder.build();
     }
 
     public static PlayingStats of(Player player, long playingTime, int level, int nrOfLines,
