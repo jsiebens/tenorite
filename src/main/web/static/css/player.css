@@ -1,0 +1,80 @@
+.specials {
+    margin: 10px;
+}
+
+.specials div {
+    padding: 5px 5px 5px 5px;
+}
+
+.offense {
+    font-weight: bold;
+    color: #ff5244;
+}
+
+.defense {
+    font-weight: bold;
+    color: #458030;
+}
+
+.player {
+    float: left;
+    margin: 10px;
+}
+
+.field {
+    width: 168px;
+    height: 308px;
+    background-color: black;
+    padding: 1px;
+    box-sizing: content-box;
+}
+
+.name {
+    padding-top: 5px;
+    text-align: center;
+}
+
+.tile {
+    float: left;
+    width: 12px;
+    height: 12px;
+    border-radius: 1px;
+    box-sizing: content-box;
+
+    margin: 1px;
+}
+
+.tile0 {
+    background-color: #2C3539;
+}
+
+.tile1 {
+    background-color: #324aff;
+}
+
+.tile2 {
+    background-color: #fffc5b;
+}
+
+.tile3 {
+    background-color: #458030;
+}
+
+.tile4 {
+    background-color: #7c4680;
+}
+
+.tile5 {
+    background-color: #ff5244;
+}
+
+.tileS {
+    background-color: antiquewhite;
+    text-align: center;
+    vertical-align: middle;
+    text-transform: uppercase;
+    font-family: 'Tahoma', sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+}
+

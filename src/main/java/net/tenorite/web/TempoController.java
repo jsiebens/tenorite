@@ -6,6 +6,7 @@ import net.tenorite.core.Tempo;
 import net.tenorite.game.GameMode;
 import net.tenorite.game.GameModeId;
 import net.tenorite.game.GameModes;
+import net.tenorite.game.GameRepository;
 import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.WinlistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,13 @@ public class TempoController {
 
     private WinlistRepository winlistRepository;
 
+    private GameRepository gameRepository;
+
     @Autowired
-    public TempoController(GameModes gameModes, WinlistRepository winlistRepository) {
+    public TempoController(GameModes gameModes, WinlistRepository winlistRepository, GameRepository gameRepository) {
         this.gameModes = gameModes;
         this.winlistRepository = winlistRepository;
+        this.gameRepository = gameRepository;
     }
 
     @RequestMapping("/t/{tempo}/m/{mode}/winlist")
@@ -57,6 +61,14 @@ public class TempoController {
                 .addObject("gameModes", gameModes)
                 .addObject("gameMode", gameMode)
                 .addObject("badges", badges);
+    }
+
+    @RequestMapping("/t/{tempo}/g/{id}/replay")
+    public ModelAndView replay(@PathVariable("tempo") Tempo tempo, @PathVariable("id") String gameId) {
+        return
+            new ModelAndView("replay")
+                .addObject("tempo", tempo)
+                .addObject("id", gameId);
     }
 
 }
