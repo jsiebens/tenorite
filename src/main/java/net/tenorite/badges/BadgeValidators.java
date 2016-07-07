@@ -41,6 +41,22 @@ public class BadgeValidators {
         return new NrOfFourLineCombos(Badge.of(gameModeId, "FOUR_O_CLOCK"));
     }
 
+    public static BadgeValidator comboStrike(GameModeId gameModeId) {
+        return new NrOfConsecutiveCombos(Badge.of(gameModeId, "COMBO_STRIKE"), 10, 5);
+    }
+
+    public static BadgeValidator doubleStrike(GameModeId gameModeId) {
+        return new NrOfConsecutiveTwoLineCombos(Badge.of(gameModeId, "DOUBLE_STRIKE"), 5, 5);
+    }
+
+    public static BadgeValidator tripleStrike(GameModeId gameModeId) {
+        return new NrOfConsecutiveThreeLineCombos(Badge.of(gameModeId, "TRIPLE_STRIKE"), 3, 5);
+    }
+
+    public static BadgeValidator quadrupleStrike(GameModeId gameModeId) {
+        return new NrOfConsecutiveFourLineCombos(Badge.of(gameModeId, "QUADRUPLE_STRIKE"), 2, 5);
+    }
+
     public static BadgeValidator eliminator(GameModeId gameModeId) {
         return new NrOfLines(Badge.of(gameModeId, "ELIMINATOR"), 1000);
     }

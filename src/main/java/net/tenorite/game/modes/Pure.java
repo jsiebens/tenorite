@@ -58,6 +58,11 @@ public final class Pure extends GameMode {
             threeIsCompany(ID),
             fourOClock(ID),
 
+            comboStrike(ID),
+            doubleStrike(ID),
+            tripleStrike(ID),
+            quadrupleStrike(ID),
+
             eliminator(ID),
             eradicator(ID),
             dropsInTheBucket(ID),
