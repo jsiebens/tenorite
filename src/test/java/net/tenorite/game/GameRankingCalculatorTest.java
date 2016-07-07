@@ -2,7 +2,7 @@ package net.tenorite.game;
 
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
-import net.tenorite.modes.Classic;
+import net.tenorite.modes.classic.Classic;
 import net.tenorite.modes.Default;
 import net.tenorite.protocol.*;
 import org.junit.Test;

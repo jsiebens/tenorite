@@ -2,7 +2,7 @@ package net.tenorite.winlist.repository;
 
 import net.tenorite.AbstractTenoriteServerTestCase;
 import net.tenorite.core.Tempo;
-import net.tenorite.modes.Classic;
+import net.tenorite.modes.classic.Classic;
 import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.WinlistRepository;
 import org.jongo.Jongo;

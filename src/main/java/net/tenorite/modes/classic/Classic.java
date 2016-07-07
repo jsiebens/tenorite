@@ -1,4 +1,4 @@
-package net.tenorite.modes;
+package net.tenorite.modes.classic;
 
 import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeValidator;
@@ -6,14 +6,13 @@ import net.tenorite.badges.validators.GameWonWithSpecificSpecial;
 import net.tenorite.badges.validators.NrOfSpecialsUsed;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
-import net.tenorite.game.GameMode;
-import net.tenorite.game.GameModeId;
-import net.tenorite.game.GameRules;
+import net.tenorite.game.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Arrays.stream;
 import static net.tenorite.badges.BadgeValidators.*;
 
 @Component
@@ -66,6 +65,7 @@ public final class Classic extends GameMode {
             newtonsLaw(ID),
             shakenNotStirred(ID),
             theTerrorist(ID),
+            handyMan(ID),
 
             pushingToTheTop(ID),
             theCleaningLady(ID),
@@ -75,7 +75,8 @@ public final class Classic extends GameMode {
             thePurifier(ID),
             blackHole(ID),
             tsunami(ID),
-            bombSquad(ID)
+            bombSquad(ID),
+            thePurist(ID)
         );
     }
 
@@ -119,6 +120,10 @@ public final class Classic extends GameMode {
         return new NrOfSpecialsUsed(Badge.of(gameModeId, "THE_TERRORIST"), Special.BLOCKBOMB::equals);
     }
 
+    private static BadgeValidator handyMan(GameModeId gameModeId) {
+        return new HandyMan(Badge.of(gameModeId, "HANDY_MAN"));
+    }
+
     // =====
 
     private static BadgeValidator pushingToTheTop(GameModeId gameModeId) {
@@ -156,5 +161,10 @@ public final class Classic extends GameMode {
     private static BadgeValidator bombSquad(GameModeId gameModeId) {
         return new GameWonWithSpecificSpecial(Badge.of(gameModeId, "BOMB_SQUAD"), Special.BLOCKBOMB::equals);
     }
+
+    private static BadgeValidator thePurist(GameModeId gameModeId) {
+        return new ThePurist(Badge.of(gameModeId, "THE_PURIST"));
+    }
+
 
 }

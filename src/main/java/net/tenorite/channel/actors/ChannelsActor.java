@@ -13,6 +13,7 @@ import net.tenorite.channel.events.ChannelLeft;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Tempo;
 import net.tenorite.modes.*;
+import net.tenorite.modes.classic.Classic;
 import net.tenorite.util.AbstractActor;
 import scala.Option;
 

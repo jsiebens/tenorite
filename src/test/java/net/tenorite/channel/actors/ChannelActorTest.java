@@ -10,7 +10,7 @@ import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.Field;
-import net.tenorite.modes.Classic;
+import net.tenorite.modes.classic.Classic;
 import net.tenorite.modes.Default;
 import net.tenorite.protocol.*;
 import net.tenorite.winlist.WinlistItem;

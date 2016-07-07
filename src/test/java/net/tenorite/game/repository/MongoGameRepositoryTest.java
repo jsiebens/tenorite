@@ -4,7 +4,7 @@ import net.tenorite.AbstractTenoriteServerTestCase;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.*;
-import net.tenorite.modes.Classic;
+import net.tenorite.modes.classic.Classic;
 import net.tenorite.protocol.ClassicStyleAddMessage;
 import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.SpecialBlockMessage;

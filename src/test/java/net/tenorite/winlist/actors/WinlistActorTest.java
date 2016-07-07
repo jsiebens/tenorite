@@ -9,7 +9,7 @@ import net.tenorite.game.Game;
 import net.tenorite.game.Player;
 import net.tenorite.game.PlayingStats;
 import net.tenorite.game.events.GameFinished;
-import net.tenorite.modes.Classic;
+import net.tenorite.modes.classic.Classic;
 import net.tenorite.winlist.WinlistRepositoryStub;
 import net.tenorite.winlist.events.WinlistUpdated;
 import org.junit.Before;
