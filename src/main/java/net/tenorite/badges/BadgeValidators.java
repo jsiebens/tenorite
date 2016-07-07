@@ -1,6 +1,7 @@
 package net.tenorite.badges;
 
 import net.tenorite.badges.validators.*;
+import net.tenorite.core.Special;
 import net.tenorite.game.GameModeId;
 
 public class BadgeValidators {

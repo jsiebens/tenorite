@@ -4,20 +4,21 @@ import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeRepository;
 import net.tenorite.badges.BadgeValidator;
 import net.tenorite.badges.events.BadgeEarned;
+import net.tenorite.core.Special;
 import net.tenorite.game.Game;
 import net.tenorite.game.PlayingStats;
 import net.tenorite.game.events.GameFinished;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
-abstract class AbstractNrOfCombos extends BadgeValidator {
+public final class NrOfSpecialsUsed extends BadgeValidator {
 
-    private final Function<PlayingStats, Integer> nrOfCombos;
+    private final Predicate<Special> specialPredicate;
 
-    AbstractNrOfCombos(Badge type, Function<PlayingStats, Integer> nrOfCombos) {
+    public NrOfSpecialsUsed(Badge type, Predicate<Special> specialPredicate) {
         super(type);
-        this.nrOfCombos = nrOfCombos;
+        this.specialPredicate = specialPredicate;
     }
 
     @Override
@@ -27,7 +28,7 @@ abstract class AbstractNrOfCombos extends BadgeValidator {
 
     private void validateBadge(Game game, PlayingStats playingStats, BadgeRepository.BadgeOps badgeOps, Consumer<BadgeEarned> onBadgeEarned) {
         String name = playingStats.getPlayer().getName();
-        updateBadgeLevel(game, name, badge, nrOfCombos.apply(playingStats), badgeOps, onBadgeEarned);
+        updateBadgeLevel(game, name, badge, playingStats.getTotalNrOfSpecialsUsed(specialPredicate), badgeOps, onBadgeEarned);
     }
 
 }

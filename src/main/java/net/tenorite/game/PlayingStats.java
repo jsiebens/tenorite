@@ -7,6 +7,7 @@ import org.immutables.value.Value;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 @Value.Immutable
 @ImmutableStyle
@@ -145,4 +146,12 @@ public abstract class PlayingStats {
         return getTotalNrOfSpecialsOnOpponent() + getTotalNrOfSpecialsOnTeamPlayer() + getTotalNrOfSpecialsOnSelf();
     }
 
+    public final int getTotalNrOfSpecialsUsed(Predicate<Special> predicate) {
+        int onOpponent = getNrOfSpecialsOnOpponent().entrySet().stream().filter(e -> predicate.test(e.getKey())).mapToInt(Map.Entry::getValue).sum();
+        int onTeamPlayer = getNrOfSpecialsOnTeamPlayer().entrySet().stream().filter(e -> predicate.test(e.getKey())).mapToInt(Map.Entry::getValue).sum();
+        int onSelf = getNrOfSpecialsOnSelf().entrySet().stream().filter(e -> predicate.test(e.getKey())).mapToInt(Map.Entry::getValue).sum();
+
+        return onOpponent + onTeamPlayer + onSelf;
+    }
+    
 }

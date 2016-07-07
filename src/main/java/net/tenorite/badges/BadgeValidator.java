@@ -43,4 +43,19 @@ public abstract class BadgeValidator {
         }
     }
 
+    protected static void updateBadgeLevel(Game game, String name, Badge badge, long count, BadgeRepository.BadgeOps badgeOps, Consumer<BadgeEarned> onBadgeEarned) {
+        if (count != 0) {
+            Optional<BadgeLevel> optBadgeLevel = badgeOps.getBadgeLevel(name, badge);
+            long currentLevel = optBadgeLevel.isPresent() ? optBadgeLevel.get().getLevel() : 0;
+            if (count > currentLevel) {
+                BadgeLevel badgeLevel = BadgeLevel.of(name, badge, game.getTimestamp(), count, game.getId());
+
+                badgeOps.saveBadgeLevel(badgeLevel);
+                badgeOps.updateProgress(badge, name, count);
+
+                onBadgeEarned.accept(BadgeEarned.of(badgeLevel, optBadgeLevel.isPresent()));
+            }
+        }
+    }
+
 }
