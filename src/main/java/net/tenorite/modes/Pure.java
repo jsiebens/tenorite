@@ -1,11 +1,6 @@
 package net.tenorite.modes;
 
-import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeValidator;
-import net.tenorite.badges.validators.NrOfConsecutiveGamesLost;
-import net.tenorite.badges.validators.NrOfConsecutiveGamesWon;
-import net.tenorite.badges.validators.NrOfGamesPlayed;
-import net.tenorite.badges.validators.NrOfGamesWon;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameMode;
 import net.tenorite.game.GameModeId;
@@ -16,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static net.tenorite.badges.BadgeValidators.*;
-import static net.tenorite.badges.BadgeValidators.justKeepTrying;
 
 @Component
 public final class Pure extends GameMode {
@@ -66,7 +60,12 @@ public final class Pure extends GameMode {
             eliminator(ID),
             eradicator(ID),
             dropsInTheBucket(ID),
-            dropItLikeItsHot(ID)
+            dropItLikeItsHot(ID),
+
+            hitchhikersGuideToTheSpecialist(ID),
+            hitchhikersGuideToComboWombo(ID),
+            hitchhikersGuideToEliminator(ID),
+            hitchhikersGuideToVictory(ID)
         );
     }
 

@@ -76,7 +76,12 @@ public final class Classic extends GameMode {
             blackHole(ID),
             tsunami(ID),
             bombSquad(ID),
-            thePurist(ID)
+            thePurist(ID),
+
+            hitchhikersGuideToTheSpecialist(ID),
+            hitchhikersGuideToComboWombo(ID),
+            hitchhikersGuideToEliminator(ID),
+            hitchhikersGuideToVictory(ID)
         );
     }
 

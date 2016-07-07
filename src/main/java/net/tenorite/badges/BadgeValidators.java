@@ -1,8 +1,10 @@
 package net.tenorite.badges;
 
 import net.tenorite.badges.validators.*;
-import net.tenorite.core.Special;
 import net.tenorite.game.GameModeId;
+import net.tenorite.game.PlayingStats;
+
+import java.util.Arrays;
 
 public class BadgeValidators {
 
@@ -72,6 +74,26 @@ public class BadgeValidators {
 
     public static BadgeValidator dropItLikeItsHot(GameModeId gameModeId) {
         return new NrOfBlocks(Badge.of(gameModeId, "DROP_IT_LIKE_ITS_HOT"), 100000);
+    }
+
+    public static BadgeValidator hitchhikersGuideToTheSpecialist(GameModeId gameModeId) {
+        return new HitchhikersGuide(Badge.of(gameModeId, "HITCHHIKERS_GUIDE_TO_THE_SPECIALIST"), PlayingStats::getTotalNrOfSpecialsUsed);
+    }
+
+    public static BadgeValidator hitchhikersGuideToComboWombo(GameModeId gameModeId) {
+        return new HitchhikersGuide(Badge.of(gameModeId, "HITCHHIKERS_GUIDE_TO_COMBO_WOMBO"), PlayingStats::getNrOfCombos);
+    }
+
+    public static BadgeValidator hitchhikersGuideToEliminator(GameModeId gameModeId) {
+        return new HitchhikersGuide(Badge.of(gameModeId, "HITCHHIKERS_GUIDE_TO_ELIMINATOR"), PlayingStats::getNrOfLines);
+    }
+
+    public static BadgeValidator hitchhikersGuideToVictory(GameModeId gameModeId) {
+        return new GameWonWithHitchhikersGuide(Badge.of(gameModeId, "HITCHHIKERS_GUIDE_TO_VICTORY"), Arrays.asList(
+            PlayingStats::getNrOfLines,
+            PlayingStats::getNrOfCombos,
+            PlayingStats::getTotalNrOfSpecialsUsed
+        ));
     }
 
 }
