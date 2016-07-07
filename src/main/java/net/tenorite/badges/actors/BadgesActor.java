@@ -36,7 +36,7 @@ public final class BadgesActor extends AbstractActor {
     }
 
     private Props badge(BadgeValidator validator) {
-        return Props.create(BadgeActor.class, validator, badgeRepository);
+        return Props.create(BadgeActor.class, validator, badgeRepository).withDispatcher("badges-dispatcher");
     }
 
     private static class BadgeActor extends AbstractActor {
