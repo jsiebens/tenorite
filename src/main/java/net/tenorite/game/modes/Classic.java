@@ -2,6 +2,7 @@ package net.tenorite.game.modes;
 
 import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeValidator;
+import net.tenorite.badges.validators.GameWonWithSpecificSpecial;
 import net.tenorite.badges.validators.NrOfSpecialsUsed;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
@@ -64,7 +65,17 @@ public final class Classic extends GameMode {
             noSpecials4U(ID),
             newtonsLaw(ID),
             shakenNotStirred(ID),
-            theTerrorist(ID)
+            theTerrorist(ID),
+
+            pushingToTheTop(ID),
+            theCleaningLady(ID),
+            manhattenProject(ID),
+            punchedCardMachine(ID),
+            switcher(ID),
+            thePurifier(ID),
+            blackHole(ID),
+            tsunami(ID),
+            bombSquad(ID)
         );
     }
 
@@ -106,6 +117,44 @@ public final class Classic extends GameMode {
 
     private static BadgeValidator theTerrorist(GameModeId gameModeId) {
         return new NrOfSpecialsUsed(Badge.of(gameModeId, "THE_TERRORIST"), Special.BLOCKBOMB::equals);
+    }
+
+    // =====
+
+    private static BadgeValidator pushingToTheTop(GameModeId gameModeId) {
+        return new GameWonWithSpecificSpecial(Badge.of(gameModeId, "PUSHING_TO_THE_TOP"), Special.ADDLINE::equals);
+    }
+
+    private static BadgeValidator theCleaningLady(GameModeId gameModeId) {
+        return new GameWonWithSpecificSpecial(Badge.of(gameModeId, "THE_CLEANING_LADY"), Special.CLEARLINE::equals);
+    }
+
+    private static BadgeValidator manhattenProject(GameModeId gameModeId) {
+        return new GameWonWithSpecificSpecial(Badge.of(gameModeId, "MANHATTAN_PROJECT"), Special.NUKEFIELD::equals);
+    }
+
+    private static BadgeValidator punchedCardMachine(GameModeId gameModeId) {
+        return new GameWonWithSpecificSpecial(Badge.of(gameModeId, "PUNCHED_CARD_MACHINE"), Special.RANDOMCLEAR::equals);
+    }
+
+    private static BadgeValidator switcher(GameModeId gameModeId) {
+        return new GameWonWithSpecificSpecial(Badge.of(gameModeId, "SWITCHER"), Special.SWITCHFIELD::equals);
+    }
+
+    private static BadgeValidator thePurifier(GameModeId gameModeId) {
+        return new GameWonWithSpecificSpecial(Badge.of(gameModeId, "THE_PURIFIER"), Special.CLEARSPECIAL::equals);
+    }
+
+    private static BadgeValidator blackHole(GameModeId gameModeId) {
+        return new GameWonWithSpecificSpecial(Badge.of(gameModeId, "BLACK_HOLE"), Special.GRAVITY::equals);
+    }
+
+    private static BadgeValidator tsunami(GameModeId gameModeId) {
+        return new GameWonWithSpecificSpecial(Badge.of(gameModeId, "TSUNAMI"), Special.QUAKEFIELD::equals);
+    }
+
+    private static BadgeValidator bombSquad(GameModeId gameModeId) {
+        return new GameWonWithSpecificSpecial(Badge.of(gameModeId, "BOMB_SQUAD"), Special.BLOCKBOMB::equals);
     }
 
 }
