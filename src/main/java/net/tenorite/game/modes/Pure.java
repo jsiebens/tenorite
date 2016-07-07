@@ -56,7 +56,12 @@ public final class Pure extends GameMode {
             comboWombo(ID),
             doubleTrouble(ID),
             threeIsCompany(ID),
-            fourOClock(ID)
+            fourOClock(ID),
+
+            eliminator(ID),
+            eradicator(ID),
+            dropsInTheBucket(ID),
+            dropItLikeItsHot(ID)
         );
     }
 

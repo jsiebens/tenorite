@@ -27,31 +27,16 @@ public final class NrOfConsecutiveGamesLost extends BadgeValidator {
     @Override
     protected void doProcess(GameFinished ge, BadgeRepository.BadgeOps badgeOps, Consumer<BadgeEarned> onBadgeEarned) {
         Game game = ge.getGame();
-
         List<PlayingStats> reverseRanking = reverseRanking(ge.getRanking());
-        PlayingStats loser = reverseRanking.get(0);
 
+        PlayingStats loser = reverseRanking.get(0);
         String name = loser.getPlayer().getName();
 
         long count = badgeOps.getProgress(badge, name) + 1;
 
-        if (count >= target) {
-            Optional<BadgeLevel> opt = badgeOps.getBadgeLevel(name, badge);
-            long newLevel = opt.map(BadgeLevel::getLevel).orElse(0L) + 1;
-
-            BadgeLevel badge = BadgeLevel.of(name, this.badge, game.getTimestamp(), newLevel, game.getId());
-
-            badgeOps.saveBadgeLevel(badge);
-            badgeOps.updateProgress(this.badge, name, count % target);
-
-            onBadgeEarned.accept(BadgeEarned.of(badge, opt.isPresent()));
-        }
-        else {
-            badgeOps.updateProgress(badge, name, count);
-        }
+        updateBadgeLevelAndProgressWhenTargetIsReached(game, name, badge, count, target, badgeOps, onBadgeEarned);
 
         reverseRanking.stream().skip(1).forEach(p -> badgeOps.updateProgress(badge, p.getPlayer().getName(), 0));
-        
     }
 
     private List<PlayingStats> reverseRanking(List<PlayingStats> stats) {

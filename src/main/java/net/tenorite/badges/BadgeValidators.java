@@ -41,4 +41,20 @@ public class BadgeValidators {
         return new NrOfFourLineCombos(Badge.of(gameModeId, "FOUR_O_CLOCK"));
     }
 
+    public static BadgeValidator eliminator(GameModeId gameModeId) {
+        return new NrOfLines(Badge.of(gameModeId, "ELIMINATOR"), 1000);
+    }
+
+    public static BadgeValidator eradicator(GameModeId gameModeId) {
+        return new NrOfLines(Badge.of(gameModeId, "ERADICATOR"), 100000);
+    }
+
+    public static BadgeValidator dropsInTheBucket(GameModeId gameModeId) {
+        return new NrOfBlocks(Badge.of(gameModeId, "DROPS_IN_THE_BUCKET"), 1000);
+    }
+
+    public static BadgeValidator dropItLikeItsHot(GameModeId gameModeId) {
+        return new NrOfBlocks(Badge.of(gameModeId, "DROP_IT_LIKE_ITS_HOT"), 100000);
+    }
+
 }

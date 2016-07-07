@@ -1,11 +1,6 @@
 package net.tenorite.game.modes;
 
-import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeValidator;
-import net.tenorite.badges.validators.NrOfConsecutiveGamesLost;
-import net.tenorite.badges.validators.NrOfConsecutiveGamesWon;
-import net.tenorite.badges.validators.NrOfGamesPlayed;
-import net.tenorite.badges.validators.NrOfGamesWon;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameMode;
 import net.tenorite.game.GameModeId;
@@ -45,7 +40,12 @@ public final class Classic extends GameMode {
             comboWombo(ID),
             doubleTrouble(ID),
             threeIsCompany(ID),
-            fourOClock(ID)
+            fourOClock(ID),
+
+            eliminator(ID),
+            eradicator(ID),
+            dropsInTheBucket(ID),
+            dropItLikeItsHot(ID)
         );
     }
 

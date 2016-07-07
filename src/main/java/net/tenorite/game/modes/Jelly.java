@@ -58,7 +58,12 @@ public final class Jelly extends GameMode {
             likeAPro(ID),
             likeAKing(ID),
             imOnFire(ID),
-            justKeepTrying(ID)
+            justKeepTrying(ID),
+
+            eliminator(ID),
+            eradicator(ID),
+            dropsInTheBucket(ID),
+            dropItLikeItsHot(ID)
         );
     }
 

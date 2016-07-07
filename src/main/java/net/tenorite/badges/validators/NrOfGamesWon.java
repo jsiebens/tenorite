@@ -30,22 +30,8 @@ public final class NrOfGamesWon extends BadgeValidator {
 
         if (!first.getPlayer().isTeamPlayerOf(second.getPlayer())) {
             String name = first.getPlayer().getName();
-
             long count = badgeOps.getProgress(badge, name) + 1;
-
-            if (count >= target) {
-                Optional<BadgeLevel> opt = badgeOps.getBadgeLevel(name, badge);
-                long newLevel = (count / target) + opt.map(BadgeLevel::getLevel).orElse(0L);
-
-                BadgeLevel badge = BadgeLevel.of(name, this.badge, game.getTimestamp(), newLevel, game.getId());
-                badgeOps.saveBadgeLevel(badge);
-                onBadgeEarned.accept(BadgeEarned.of(badge, opt.isPresent()));
-
-                badgeOps.updateProgress(this.badge, name, count % target);
-            }
-            else {
-                badgeOps.updateProgress(badge, name, count);
-            }
+            updateBadgeLevelAndProgressWhenTargetIsReached(game, name, badge, count, target, badgeOps, onBadgeEarned);
         }
     }
 

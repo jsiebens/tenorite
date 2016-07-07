@@ -1,8 +1,10 @@
 package net.tenorite.badges;
 
 import net.tenorite.badges.events.BadgeEarned;
+import net.tenorite.game.Game;
 import net.tenorite.game.events.GameFinished;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public abstract class BadgeValidator {
@@ -24,5 +26,21 @@ public abstract class BadgeValidator {
     }
 
     protected abstract void doProcess(GameFinished gameFinished, BadgeRepository.BadgeOps badgeOps, Consumer<BadgeEarned> onBadgeEarned);
+
+    protected static void updateBadgeLevelAndProgressWhenTargetIsReached(Game game, String name, Badge badge, long count, int target, BadgeRepository.BadgeOps badgeOps, Consumer<BadgeEarned> onBadgeEarned) {
+        if (count >= target) {
+            Optional<BadgeLevel> opt = badgeOps.getBadgeLevel(name, badge);
+            long newLevel = (count / target) + opt.map(BadgeLevel::getLevel).orElse(0L);
+
+            BadgeLevel badgeLevel = BadgeLevel.of(name, badge, game.getTimestamp(), newLevel, game.getId());
+            badgeOps.saveBadgeLevel(badgeLevel);
+            onBadgeEarned.accept(BadgeEarned.of(badgeLevel, opt.isPresent()));
+
+            badgeOps.updateProgress(badge, name, count % target);
+        }
+        else {
+            badgeOps.updateProgress(badge, name, count);
+        }
+    }
 
 }

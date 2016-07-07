@@ -10,12 +10,12 @@ import net.tenorite.game.events.GameFinished;
 
 import java.util.function.Consumer;
 
-public final class NrOfGamesPlayed extends BadgeValidator {
+public final class NrOfBlocks extends BadgeValidator {
 
     private final int target;
 
-    public NrOfGamesPlayed(Badge badgeType, int target) {
-        super(badgeType);
+    public NrOfBlocks(Badge badge, int target) {
+        super(badge);
         this.target = target;
     }
 
@@ -24,9 +24,9 @@ public final class NrOfGamesPlayed extends BadgeValidator {
         gameFinished.getRanking().forEach(p -> validateBadge(gameFinished.getGame(), p, badgeOps, onBadgeEarned));
     }
 
-    private void validateBadge(Game game, PlayingStats p, BadgeRepository.BadgeOps badgeOps, Consumer<BadgeEarned> onBadgeEarned) {
-        String name = p.getPlayer().getName();
-        long count = badgeOps.getProgress(badge, name) + 1;
+    private void validateBadge(Game game, PlayingStats playingStats, BadgeRepository.BadgeOps badgeOps, Consumer<BadgeEarned> onBadgeEarned) {
+        String name = playingStats.getPlayer().getName();
+        long count = badgeOps.getProgress(badge, name) + playingStats.getNrOfBlocks();
         updateBadgeLevelAndProgressWhenTargetIsReached(game, name, badge, count, target, badgeOps, onBadgeEarned);
     }
 
