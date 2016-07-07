@@ -14,7 +14,7 @@ import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.channel.events.SlotReserved;
 import net.tenorite.clients.MessageSink;
 import net.tenorite.core.Tempo;
-import net.tenorite.game.modes.Classic;
+import net.tenorite.modes.Classic;
 import net.tenorite.protocol.Inbound;
 import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.Message;

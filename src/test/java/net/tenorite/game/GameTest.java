@@ -5,7 +5,7 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
-import net.tenorite.game.modes.Classic;
+import net.tenorite.modes.Classic;
 import net.tenorite.protocol.ClassicStyleAddMessage;
 import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.SpecialBlockMessage;

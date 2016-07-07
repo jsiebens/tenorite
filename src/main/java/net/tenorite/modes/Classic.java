@@ -1,4 +1,4 @@
-package net.tenorite.game.modes;
+package net.tenorite.modes;
 
 import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeValidator;

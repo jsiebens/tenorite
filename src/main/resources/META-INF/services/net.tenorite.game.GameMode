@@ -1,6 +1,6 @@
-net.tenorite.game.modes.Default
-net.tenorite.game.modes.Classic
-net.tenorite.game.modes.Pure
-net.tenorite.game.modes.SticksAndSquares
-net.tenorite.game.modes.Jelly
-net.tenorite.game.modes.SevenOFour
+net.tenorite.modes.Default
+net.tenorite.modes.Classic
+net.tenorite.modes.Pure
+net.tenorite.modes.SticksAndSquares
+net.tenorite.modes.Jelly
+net.tenorite.modes.SevenOFour
