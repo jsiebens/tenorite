@@ -166,6 +166,15 @@ public class MessageParserTest {
     }
 
     @Test
+    public void testParsePlayerLeaveMessage() {
+        Optional<PlayerLeaveMessage> result = MessageParser.parse("playerleave 3").map(m -> (PlayerLeaveMessage) m);
+
+        assertThat(result).hasValueSatisfying(m -> {
+            assertThat(m.getSender()).isEqualTo(3);
+        });
+    }
+
+    @Test
     public void testParseUnknownMessage() {
         Optional<Message> result = MessageParser.parse("unknown 1 x yz");
         assertThat(result).isEmpty();
