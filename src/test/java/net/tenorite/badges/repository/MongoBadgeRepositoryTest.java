@@ -30,7 +30,7 @@ public class MongoBadgeRepositoryTest extends AbstractTenoriteServerTestCase {
 
     @Before
     public void clear() {
-        stream(Tempo.values()).forEach(t -> MongoBadgeRepository.dataCollection(jongo, t).drop());
+        stream(Tempo.values()).forEach(t -> MongoBadgeRepository.progressCollection(jongo, t).drop());
         stream(Tempo.values()).forEach(t -> MongoBadgeRepository.badgeCollection(jongo, t).drop());
     }
 

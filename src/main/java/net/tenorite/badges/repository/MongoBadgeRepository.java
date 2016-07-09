@@ -25,7 +25,7 @@ public class MongoBadgeRepository implements BadgeRepository {
 
     private Map<Tempo, MongoCollection> badgeCollections = new EnumMap<>(Tempo.class);
 
-    private Map<Tempo, MongoCollection> dataCollections = new EnumMap<>(Tempo.class);
+    private Map<Tempo, MongoCollection> progressCollections = new EnumMap<>(Tempo.class);
 
     public MongoBadgeRepository(Jongo jongo) {
         this.jongo = jongo;
@@ -34,7 +34,7 @@ public class MongoBadgeRepository implements BadgeRepository {
     @Override
     public BadgeOps badgeOps(Tempo tempo) {
         MongoCollection badges = badgeCollections.computeIfAbsent(tempo, t -> badgeCollection(jongo, t));
-        MongoCollection data = dataCollections.computeIfAbsent(tempo, t -> dataCollection(jongo, t));
+        MongoCollection data = progressCollections.computeIfAbsent(tempo, t -> progressCollection(jongo, t));
         return new MongoBadgeOps(badges, data);
     }
 
@@ -122,8 +122,8 @@ public class MongoBadgeRepository implements BadgeRepository {
         return jongo.getCollection(tempo + ":player:badges");
     }
 
-    static MongoCollection dataCollection(Jongo jongo, Tempo tempo) {
-        return jongo.getCollection(tempo + ":badges:data");
+    static MongoCollection progressCollection(Jongo jongo, Tempo tempo) {
+        return jongo.getCollection(tempo + "::player:badges:progress");
     }
 
 }
