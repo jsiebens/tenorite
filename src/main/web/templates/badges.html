@@ -17,7 +17,9 @@
                         <th>description</th>
                     </tr>
                     <tr th:each="b : ${badges}">
-                        <td class="col-sm-1" th:text="${b.title}"></td>
+                        <td class="col-sm-1">
+                            <a th:href="@{/t/{tempo}/m/{mode}/badges/{type}(tempo=${tempo},mode=${gameMode.id},type=${b.badgeType})}" th:text="${b.title}"></a>
+                        </td>
                         <td class="col-sm-3" th:text="${b.description}"></td>
                     </tr>
                 </table>

@@ -1,7 +1,6 @@
 package net.tenorite.web;
 
-import net.tenorite.badges.Badge;
-import net.tenorite.badges.BadgeValidator;
+import net.tenorite.badges.*;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameMode;
 import net.tenorite.game.GameModeId;
@@ -26,13 +25,13 @@ public class TempoController {
 
     private WinlistRepository winlistRepository;
 
-    private GameRepository gameRepository;
+    private BadgeRepository badgeRepository;
 
     @Autowired
-    public TempoController(GameModes gameModes, WinlistRepository winlistRepository, GameRepository gameRepository) {
+    public TempoController(GameModes gameModes, WinlistRepository winlistRepository, BadgeRepository badgeRepository) {
         this.gameModes = gameModes;
         this.winlistRepository = winlistRepository;
-        this.gameRepository = gameRepository;
+        this.badgeRepository = badgeRepository;
     }
 
     @RequestMapping("/t/{tempo}/m/{mode}/winlist")
@@ -61,6 +60,25 @@ public class TempoController {
                 .addObject("gameModes", gameModes)
                 .addObject("gameMode", gameMode)
                 .addObject("badges", badges);
+    }
+
+    @RequestMapping("/t/{tempo}/m/{mode}/badges/{type}")
+    public ModelAndView badge(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("type") String type) {
+        GameModeId gameModeId = GameModeId.of(mode);
+        BadgeType badgeType = BadgeType.of(type);
+
+        GameMode gameMode = gameModes.get(GameModeId.of(mode));
+        Badge badge = Badge.of(gameModeId, badgeType);
+
+        List<BadgeLevel> badgeLevels = badgeRepository.badgeOps(tempo).badgeLevels(badge);
+
+        return
+            new ModelAndView("badge")
+                .addObject("tempo", tempo)
+                .addObject("gameModes", gameModes)
+                .addObject("gameMode", gameMode)
+                .addObject("badge", badge)
+                .addObject("badgeLevels", badgeLevels);
     }
 
     @RequestMapping("/t/{tempo}/g/{id}/replay")

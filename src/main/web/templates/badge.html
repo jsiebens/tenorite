@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/page">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small>badge</small></h1></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h2>
+                    <th:block th:text="${badge.title}"></th:block>
+                    <br/>
+                    <small th:text="${badge.description}"></small>
+                </h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <table class="table table-condensed table-hover">
+                    <tr>
+                        <th class="col-sm-1" >player</th>
+                        <th class="col-sm-3 right">level</th>
+                        <th class="col-sm-1 right">date</th>
+                    </tr>
+                    <tr th:each="b : ${badgeLevels}">
+                        <td th:text="${b.name}"></td>
+                        <td class="right" th:text="${b.level}"></td>
+                        <td class="right time" th:attr="data-timestamp=${b.timestamp}" th:text="${#dates.format(b.timestamp, 'dd MMM yyyy')}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>
