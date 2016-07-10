@@ -7,10 +7,21 @@
 <th:block layout:fragment="content">
     <div class="container">
         <div class="row">
-            <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small>winlist</small></h1></div>
+            <div class="col-md-12">
+                <div class="btn-group pull-right" role="group">
+                    <a th:each="g : ${gameModes}"
+                       class="btn btn-default"
+                       th:classappend="${g.id.equals(gameMode.id) ? 'active' : ''}"
+                       th:href="@{/t/{tempo}/m/{mode}/winlist(tempo=${tempo},mode=${g.id})}"
+                       th:text="${g.getTitle(tempo)}"></a>
+                </div>
+            </div>
         </div>
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small>badges</small></h1></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 <table class="table table-condensed table-hover">
                     <tr>
                         <th class="col-sm-3">name</th>

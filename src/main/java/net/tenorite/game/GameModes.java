@@ -1,5 +1,7 @@
 package net.tenorite.game;
 
+import net.tenorite.core.NotAvailableException;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +19,7 @@ public class GameModes implements Iterable<GameMode> {
     }
 
     public GameMode get(GameModeId id) {
-        return ofNullable(modes.get(id)).orElseThrow(() -> new IllegalArgumentException(id.toString()));
+        return ofNullable(modes.get(id)).orElseThrow(NotAvailableException::new);
     }
 
     @Override

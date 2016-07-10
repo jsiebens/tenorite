@@ -7,19 +7,25 @@
 <th:block layout:fragment="content">
     <div class="container">
         <div class="row">
-            <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small>badge</small></h1></div>
-        </div>
-        <div class="row">
             <div class="col-md-12">
-                <h2>
-                    <th:block th:text="${badge.title}"></th:block>
-                    <br/>
-                    <small th:text="${badge.description}"></small>
-                </h2>
+                <div class="btn-group pull-right" role="group">
+                    <a th:if="${prev}" class="btn btn-default" th:href="@{/t/{tempo}/m/{mode}/badges/{type}(tempo=${tempo},mode=${gameMode.id},type=${prev.badgeType})}"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> <span th:text="${prev.title}"></span></a>
+                    <a th:if="${next}" class="btn btn-default" th:href="@{/t/{tempo}/m/{mode}/badges/{type}(tempo=${tempo},mode=${gameMode.id},type=${next.badgeType})}"><span th:text="${next.title}"></span> <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></a>
+                </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small th:text="${badge.title}">>badge</small></h1></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <blockquote>
+                <p th:text="${badge.description}"></p>
+                </blockquote>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 <table class="table table-condensed table-hover">
                     <tr>
                         <th class="col-sm-1" >player</th>

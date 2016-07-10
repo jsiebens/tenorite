@@ -1,11 +1,11 @@
 package net.tenorite.web;
 
 import net.tenorite.badges.*;
+import net.tenorite.core.NotAvailableException;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameMode;
 import net.tenorite.game.GameModeId;
 import net.tenorite.game.GameModes;
-import net.tenorite.game.GameRepository;
 import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.WinlistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,16 +69,38 @@ public class TempoController {
 
         GameMode gameMode = gameModes.get(GameModeId.of(mode));
         Badge badge = Badge.of(gameModeId, badgeType);
+        List<Badge> badges = gameMode.getBadges();
 
-        List<BadgeLevel> badgeLevels = badgeRepository.badgeOps(tempo).badgeLevels(badge);
+        int i = badges.indexOf(badge);
 
-        return
-            new ModelAndView("badge")
-                .addObject("tempo", tempo)
-                .addObject("gameModes", gameModes)
-                .addObject("gameMode", gameMode)
-                .addObject("badge", badge)
-                .addObject("badgeLevels", badgeLevels);
+        if (i == -1) {
+            throw new NotAvailableException();
+        }
+        else {
+            Badge prev = null;
+            Badge next = null;
+
+            if (i != 0) {
+                prev = badges.get(i - 1);
+            }
+
+            if (i != badges.size() - 1) {
+                next = badges.get(i + 1);
+            }
+
+            List<BadgeLevel> badgeLevels = badgeRepository.badgeOps(tempo).badgeLevels(badge);
+
+            return
+                new ModelAndView("badge")
+                    .addObject("tempo", tempo)
+                    .addObject("gameModes", gameModes)
+                    .addObject("gameMode", gameMode)
+                    .addObject("badge", badge)
+                    .addObject("prev", prev)
+                    .addObject("next", next)
+                    .addObject("badgeLevels", badgeLevels);
+        }
+
     }
 
     @RequestMapping("/t/{tempo}/g/{id}/replay")
@@ -87,6 +109,14 @@ public class TempoController {
             new ModelAndView("replay")
                 .addObject("tempo", tempo)
                 .addObject("id", gameId);
+    }
+
+    @RequestMapping("/t/{tempo}/p")
+    public ModelAndView player(@PathVariable("tempo") Tempo tempo) {
+        return
+            new ModelAndView("player")
+                .addObject("tempo", tempo)
+                .addObject("gameModes", gameModes);
     }
 
 }

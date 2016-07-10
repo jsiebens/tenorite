@@ -1,5 +1,6 @@
 package net.tenorite.game;
 
+import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeValidator;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.listeners.SuddenDeath;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static net.tenorite.game.PlayingStats.*;
 
 public abstract class GameMode {
@@ -52,6 +54,10 @@ public abstract class GameMode {
 
     public List<BadgeValidator> getBadgeValidators() {
         return emptyList();
+    }
+
+    public final List<Badge> getBadges() {
+        return getBadgeValidators().stream().map(BadgeValidator::getBadge).collect(toList());
     }
 
     public GameListener createGameListener(Scheduler scheduler, Consumer<Message> channel) {

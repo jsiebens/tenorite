@@ -17,7 +17,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" th:href="@{/t/{tempo}(tempo=${tempo})}">
-                Tenorite FAST
+                Tenorite <span th:text="${tempo.name()}"></span>
             </a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
