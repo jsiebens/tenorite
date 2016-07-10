@@ -89,7 +89,7 @@ public class MongoBadgeRepositoryTest extends AbstractTenoriteServerTestCase {
         badgeRepository.badgeOps(Tempo.FAST).saveBadgeLevel(badgeA);
         badgeRepository.badgeOps(Tempo.FAST).saveBadgeLevel(badgeB);
 
-        Map<Badge, BadgeLevel> badges = badgeRepository.badgeOps(Tempo.FAST).badgeLevels("john");
+        Map<Badge, BadgeLevel> badges = badgeRepository.badgeOps(Tempo.FAST).badgeLevels(GameModeId.of("CLASSIC"), "john");
 
         assertThat(badges).containsOnly(entry(typeA, badgeA), entry(typeB, badgeB));
     }

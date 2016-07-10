@@ -33,7 +33,7 @@ public class BadgeRepositoryStub implements BadgeRepository, BadgeRepository.Bad
     }
 
     @Override
-    public Map<Badge, BadgeLevel> badgeLevels(String name) {
+    public Map<Badge, BadgeLevel> badgeLevels(GameModeId gameModeId, String name) {
         return badges.getOrDefault(name, Collections.emptyMap());
     }
 

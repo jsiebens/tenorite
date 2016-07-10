@@ -1,6 +1,7 @@
 package net.tenorite.badges;
 
 import net.tenorite.core.Tempo;
+import net.tenorite.game.GameModeId;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ public interface BadgeRepository {
 
         void saveBadgeLevel(BadgeLevel badgeLevel);
 
-        Map<Badge, BadgeLevel> badgeLevels(String name);
+        Map<Badge, BadgeLevel> badgeLevels(GameModeId gameModeId, String name);
 
         List<BadgeLevel> badgeLevels(Badge badge);
 

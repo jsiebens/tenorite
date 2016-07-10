@@ -29,7 +29,7 @@
                     </tr>
                     <tr th:each="b : ${badges}">
                         <td class="col-sm-1">
-                            <a th:href="@{/t/{tempo}/m/{mode}/badges/{type}(tempo=${tempo},mode=${gameMode.id},type=${b.badgeType})}" th:text="${b.title}"></a>
+                            <a style="display: block" th:href="@{/t/{tempo}/m/{mode}/badges/{type}(tempo=${tempo},mode=${gameMode.id},type=${b.badgeType})}" th:text="${b.title}"></a>
                         </td>
                         <td class="col-sm-3" th:text="${b.description}"></td>
                     </tr>

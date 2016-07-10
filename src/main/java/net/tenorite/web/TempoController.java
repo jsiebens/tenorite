@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -111,12 +112,21 @@ public class TempoController {
                 .addObject("id", gameId);
     }
 
-    @RequestMapping("/t/{tempo}/p")
-    public ModelAndView player(@PathVariable("tempo") Tempo tempo) {
+    @RequestMapping("/t/{tempo}/m/{mode}/p/{name}")
+    public ModelAndView player(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("name") String name) {
+        GameMode gameMode = gameModes.get(GameModeId.of(mode));
+
+        List<Badge> badges = gameMode.getBadges();
+        Map<Badge, BadgeLevel> badgeLevels = badgeRepository.badgeOps(tempo).badgeLevels(gameMode.getId(), name);
+
         return
             new ModelAndView("player")
                 .addObject("tempo", tempo)
-                .addObject("gameModes", gameModes);
+                .addObject("name", name)
+                .addObject("gameMode", gameMode)
+                .addObject("gameModes", gameModes)
+                .addObject("badges", badges)
+                .addObject("badgeLevels", badgeLevels);
     }
 
 }

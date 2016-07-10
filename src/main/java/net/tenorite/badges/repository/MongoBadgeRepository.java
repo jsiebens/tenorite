@@ -4,6 +4,7 @@ import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeLevel;
 import net.tenorite.badges.BadgeRepository;
 import net.tenorite.core.Tempo;
+import net.tenorite.game.GameModeId;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.jongo.MongoCursor;
@@ -91,8 +92,8 @@ public class MongoBadgeRepository implements BadgeRepository {
         }
 
         @Override
-        public Map<Badge, BadgeLevel> badgeLevels(String name) {
-            MongoCursor<BadgeLevel> cursor = badges.find("{name:#}", name).as(BadgeLevel.class);
+        public Map<Badge, BadgeLevel> badgeLevels(GameModeId gameModeId, String name) {
+            MongoCursor<BadgeLevel> cursor = badges.find("{gameModeId:#, name:#}", gameModeId, name).as(BadgeLevel.class);
             return stream(cursor.spliterator(), false).collect(Collectors.toMap(bl -> Badge.of(bl.getGameModeId(), bl.getBadgeType()), Function.identity()));
         }
 

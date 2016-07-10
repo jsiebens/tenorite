@@ -28,12 +28,17 @@
             <div class="col-md-12">
                 <table class="table table-condensed table-hover">
                     <tr>
-                        <th class="col-sm-1" >player</th>
-                        <th class="col-sm-3 right">level</th>
+                        <th class="col-sm-4" >player</th>
+                        <th class="col-sm-1 right">level</th>
                         <th class="col-sm-1 right">date</th>
                     </tr>
                     <tr th:each="b : ${badgeLevels}">
-                        <td th:text="${b.name}"></td>
+                        <td>
+                            <a style="display: block"
+                               th:text="${b.name}"
+                               th:href="@{/t/{tempo}/m/{mode}/p/{name}(tempo=${tempo},mode=${gameMode.id},name=${b.name})}">
+                            </a>
+                        </td>
                         <td class="right" th:text="${b.level}"></td>
                         <td class="right time" th:attr="data-timestamp=${b.timestamp}" th:text="${#dates.format(b.timestamp, 'dd MMM yyyy')}"></td>
                     </tr>

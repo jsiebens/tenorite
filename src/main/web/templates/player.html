@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/page">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="btn-group pull-right" role="group">
+                    <a th:each="g : ${gameModes}"
+                       class="btn btn-default"
+                       th:classappend="${g.id.equals(gameMode.id) ? 'active' : ''}"
+                       th:href="@{/t/{tempo}/m/{mode}/p/{name}(tempo=${tempo},mode=${g.id},name=${name})}"
+                       th:text="${g.getTitle(tempo)}"></a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12"><h1 th:text="${name}"></h1></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12"><h2><span th:text="${gameMode.getTitle(tempo)}">player</span> <small>badges</small></h2></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-condensed table-hover">
+                    <tr>
+                        <th class="col-md-4">name</th>
+                        <th class="col-md-1 right">level</th>
+                        <th class="col-md-1 right">date</th>
+                    </tr>
+                    <tr th:each="b : ${badges}">
+                        <td>
+                            <a style="display: block"
+                               data-toggle="tooltip"
+                               data-placement="bottom"
+                               th:title="${b.description}"
+                               th:text="${b.title}"
+                               th:href="@{/t/{tempo}/m/{mode}/badges/{type}(tempo=${tempo},mode=${gameMode.id},type=${b.badgeType})}">
+                            </a>
+                        </td>
+                        <td class="right">
+                            <span th:if="${badgeLevels.containsKey(b)}" th:text="${badgeLevels.get(b).level}"></span>
+                            <span th:if="${!badgeLevels.containsKey(b)}">-</span>
+                        </td>
+                        <td class="right">
+                            <span class="time" th:if="${badgeLevels.containsKey(b)}"  th:attr="data-timestamp=${badgeLevels.get(b).timestamp}" th:text="${#dates.format(badgeLevels.get(b).timestamp, 'dd MMM yyyy')}"></span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+    </script>
+</th:block>
+
+</body>
+</html>
