@@ -28,6 +28,10 @@ public class BadgeValidators {
         return new NrOfConsecutiveGamesLost(Badge.of(gameModeId, "JUST_KEEP_TRYING"), 5);
     }
 
+    public static BadgeValidator fastAndFurious(GameModeId gameModeId) {
+        return new GameWonAt10Bpm(Badge.of(gameModeId, "FAST_AND_FURIOUS"));
+    }
+
     public static BadgeValidator comboWombo(GameModeId gameModeId) {
         return new NrOfCombos(Badge.of(gameModeId, "COMBO_WOMBO"));
     }

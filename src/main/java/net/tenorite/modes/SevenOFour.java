@@ -67,6 +67,7 @@ public final class SevenOFour extends GameMode {
             likeAKing(ID),
             imOnFire(ID),
             justKeepTrying(ID),
+            fastAndFurious(ID),
 
             eliminator(ID),
             eradicator(ID),

@@ -53,6 +53,7 @@ public final class SticksAndSquares extends GameMode {
             likeAKing(ID),
             imOnFire(ID),
             justKeepTrying(ID),
+            fastAndFurious(ID),
 
             eliminator(ID),
             eradicator(ID),

@@ -39,6 +39,7 @@ public final class Classic extends GameMode {
             likeAKing(ID),
             imOnFire(ID),
             justKeepTrying(ID),
+            fastAndFurious(ID),
 
             comboWombo(ID),
             doubleTrouble(ID),
