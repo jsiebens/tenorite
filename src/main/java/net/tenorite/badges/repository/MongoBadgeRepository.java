@@ -124,7 +124,7 @@ public class MongoBadgeRepository implements BadgeRepository {
     }
 
     static MongoCollection progressCollection(Jongo jongo, Tempo tempo) {
-        return jongo.getCollection(tempo + "::player:badges:progress");
+        return jongo.getCollection(tempo + ":player:badges:progress");
     }
 
 }
