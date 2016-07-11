@@ -82,7 +82,12 @@ public final class Classic extends GameMode {
             hitchhikersGuideToTheSpecialist(ID),
             hitchhikersGuideToComboWombo(ID),
             hitchhikersGuideToEliminator(ID),
-            hitchhikersGuideToVictory(ID)
+            hitchhikersGuideToVictory(ID),
+
+            tooEasyForMe(ID),
+            nuclearLaunch(ID),
+            grandTheft(ID),
+            closeCall(ID)
         );
     }
 
@@ -172,5 +177,22 @@ public final class Classic extends GameMode {
         return new ThePurist(Badge.of(gameModeId, "THE_PURIST"));
     }
 
+    // ====
+
+    private static BadgeValidator tooEasyForMe(GameModeId gameModeId) {
+        return new TooEasyForMe(Badge.of(gameModeId, "TOO_EASY_FOR_ME"));
+    }
+
+    private static BadgeValidator nuclearLaunch(GameModeId gameModeId) {
+        return new NuclearLaunch(Badge.of(gameModeId, "NUCLEAR_LAUNCH"));
+    }
+
+    private static BadgeValidator grandTheft(GameModeId gameModeId) {
+        return new GrandTheft(Badge.of(gameModeId, "GRAND_THEFT"));
+    }
+
+    private static BadgeValidator closeCall(GameModeId gameModeId) {
+        return new CloseCall(Badge.of(gameModeId, "CLOSE_CALL"));
+    }
 
 }

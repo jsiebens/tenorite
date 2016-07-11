@@ -101,6 +101,31 @@ public final class Field {
         return 0;
     }
 
+    public int getNrOfSpecials() {
+        int count = 0;
+        for (int i = HEIGHT - 1; i >= 0; i--) {
+            for (int j = 0; j < WIDTH; j++) {
+                if (Character.isLetter(field[j][i])) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public int getNrOfBlocks(Special special) {
+        char target = special.getLetter();
+        int count = 0;
+        for (int i = HEIGHT - 1; i >= 0; i--) {
+            for (int j = 0; j < WIDTH; j++) {
+                if (field[j][i] == target) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     char getBlock(int x, int y) {
         return field[x][y];
     }
