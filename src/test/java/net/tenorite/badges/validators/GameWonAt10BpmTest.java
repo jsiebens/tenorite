@@ -1,6 +1,7 @@
 package net.tenorite.badges.validators;
 
 import net.tenorite.badges.BadgeLevel;
+import net.tenorite.badges.events.BadgeEarned;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.Game;
 import net.tenorite.game.Player;
@@ -24,16 +25,14 @@ public class GameWonAt10BpmTest extends AbstractValidatorTestCase {
         PlayingStats player2 = PlayingStats.of(Player.of(2, "jane", null));
         PlayingStats player3 = PlayingStats.of(Player.of(3, "nick", null));
 
-        Game game = Game.of("id", 0, 100, Tempo.NORMAL, GAME_MODE_ID, emptyList(), emptyList());
+        Game game = Game.of("id", 111, 100, Tempo.NORMAL, GAME_MODE_ID, emptyList(), emptyList());
         GameFinished gameFinished = GameFinished.of(game, asList(player1, player2, player3));
 
         validator.process(gameFinished, badgeRepository, published::add);
 
-        assertThat(published).extracting("upgrade").containsExactly(false);
-        assertThat(published).extracting("badge.name").containsExactly("john");
-        assertThat(published).extracting("badge.gameModeId").containsExactly(GAME_MODE_ID);
-        assertThat(published).extracting("badge.badgeType").containsExactly(BADGE_TYPE);
-        assertThat(published).extracting("badge.level").containsExactly(5L);
+        BadgeLevel expected = BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 111, 5, "id");
+
+        assertThat(published).containsExactly(BadgeEarned.of(expected, false));
 
         assertThat(badgeRepository.getBadgeLevel("john", BADGE).isPresent()).isTrue();
         assertThat(badgeRepository.getBadgeLevel("jane", BADGE).isPresent()).isFalse();
@@ -44,7 +43,7 @@ public class GameWonAt10BpmTest extends AbstractValidatorTestCase {
 
     @Test
     public void testUpgradeBadge() {
-        badgeRepository.saveBadgeLevel(BadgeLevel.of("john", BADGE, 1000, 2, "gameId"));
+        badgeRepository.saveBadgeLevel(BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 1000, 2, "gameId"));
         badgeRepository.updateProgress(BADGE, "john", 2);
 
         PlayingStats player1 = PlayingStats.of(Player.of(1, "john", null), b -> b
@@ -53,16 +52,14 @@ public class GameWonAt10BpmTest extends AbstractValidatorTestCase {
         PlayingStats player2 = PlayingStats.of(Player.of(2, "jane", null));
         PlayingStats player3 = PlayingStats.of(Player.of(3, "nick", null));
 
-        Game game = Game.of("id", 0, 100, Tempo.NORMAL, GAME_MODE_ID, emptyList(), emptyList());
+        Game game = Game.of("id", 111, 100, Tempo.NORMAL, GAME_MODE_ID, emptyList(), emptyList());
         GameFinished gameFinished = GameFinished.of(game, asList(player1, player2, player3));
 
         validator.process(gameFinished, badgeRepository, published::add);
 
-        assertThat(published).extracting("upgrade").containsExactly(true);
-        assertThat(published).extracting("badge.name").containsExactly("john");
-        assertThat(published).extracting("badge.gameModeId").containsExactly(GAME_MODE_ID);
-        assertThat(published).extracting("badge.badgeType").containsExactly(BADGE_TYPE);
-        assertThat(published).extracting("badge.level").containsExactly(5L);
+        BadgeLevel expected = BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 111, 5, "id");
+
+        assertThat(published).containsExactly(BadgeEarned.of(expected, true));
 
         assertThat(badgeRepository.getBadgeLevel("john", BADGE).isPresent()).isTrue();
         assertThat(badgeRepository.getBadgeLevel("jane", BADGE).isPresent()).isFalse();

@@ -1,6 +1,7 @@
 package net.tenorite.badges;
 
 import net.tenorite.badges.events.BadgeEarned;
+import net.tenorite.core.Tempo;
 import net.tenorite.game.Game;
 import net.tenorite.game.events.GameFinished;
 
@@ -32,7 +33,7 @@ public abstract class BadgeValidator {
             Optional<BadgeLevel> opt = badgeOps.getBadgeLevel(name, badge);
             long newLevel = (count / target) + opt.map(BadgeLevel::getLevel).orElse(0L);
 
-            BadgeLevel badgeLevel = BadgeLevel.of(name, badge, game.getTimestamp(), newLevel, game.getId());
+            BadgeLevel badgeLevel = BadgeLevel.of(game.getTempo(), badge, name, game.getTimestamp(), newLevel, game.getId());
             badgeOps.saveBadgeLevel(badgeLevel);
             onBadgeEarned.accept(BadgeEarned.of(badgeLevel, opt.isPresent()));
 
@@ -48,7 +49,7 @@ public abstract class BadgeValidator {
             Optional<BadgeLevel> optBadgeLevel = badgeOps.getBadgeLevel(name, badge);
             long currentLevel = optBadgeLevel.isPresent() ? optBadgeLevel.get().getLevel() : 0;
             if (count > currentLevel) {
-                BadgeLevel badgeLevel = BadgeLevel.of(name, badge, game.getTimestamp(), count, game.getId());
+                BadgeLevel badgeLevel = BadgeLevel.of(game.getTempo(), badge, name, game.getTimestamp(), count, game.getId());
 
                 badgeOps.saveBadgeLevel(badgeLevel);
                 badgeOps.updateProgress(badge, name, count);

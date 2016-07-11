@@ -37,7 +37,7 @@ public class MongoBadgeRepositoryTest extends AbstractTenoriteServerTestCase {
     @Test
     public void testSaveAndGetBadge() {
         Badge type = Badge.of(GameModeId.of("CLASSIC"), "lorem");
-        BadgeLevel badge = BadgeLevel.of("john", type, 100, 1, "gameA");
+        BadgeLevel badge = BadgeLevel.of(Tempo.NORMAL, type, "john", 100, 1, "gameA");
 
         badgeRepository.badgeOps(Tempo.FAST).saveBadgeLevel(badge);
         Optional<BadgeLevel> actualBadge = badgeRepository.badgeOps(Tempo.FAST).getBadgeLevel("john", type);
@@ -48,7 +48,7 @@ public class MongoBadgeRepositoryTest extends AbstractTenoriteServerTestCase {
     @Test
     public void testUpdateLevelAndGetBadge() {
         Badge type = Badge.of(GameModeId.of("CLASSIC"), "lorem");
-        BadgeLevel badge = BadgeLevel.of("john", type, 100, 1, "gameA");
+        BadgeLevel badge = BadgeLevel.of(Tempo.NORMAL, type, "john", 100, 1, "gameA");
 
         badgeRepository.badgeOps(Tempo.FAST).saveBadgeLevel(new BadgeLevelBuilder().from(badge).level(5).build());
         badgeRepository.badgeOps(Tempo.FAST).saveBadgeLevel(new BadgeLevelBuilder().from(badge).level(10).build());
@@ -63,8 +63,8 @@ public class MongoBadgeRepositoryTest extends AbstractTenoriteServerTestCase {
         Badge typeA = Badge.of(GameModeId.of("CLASSIC"), "lorem");
         Badge typeB = Badge.of(GameModeId.of("CLASSIC"), "ipsum");
 
-        BadgeLevel badgeA = BadgeLevel.of("john", typeA, 100, 1, "gameA");
-        BadgeLevel badgeB = BadgeLevel.of("john", typeB, 100, 1, "gameB");
+        BadgeLevel badgeA = BadgeLevel.of(Tempo.FAST, typeA, "john", 100, 1, "gameA");
+        BadgeLevel badgeB = BadgeLevel.of(Tempo.FAST, typeB, "john", 100, 1, "gameB");
 
         badgeRepository.badgeOps(Tempo.FAST).saveBadgeLevel(new BadgeLevelBuilder().from(badgeA).level(5).build());
         badgeRepository.badgeOps(Tempo.FAST).saveBadgeLevel(new BadgeLevelBuilder().from(badgeA).level(10).build());
@@ -83,8 +83,8 @@ public class MongoBadgeRepositoryTest extends AbstractTenoriteServerTestCase {
         Badge typeA = Badge.of(GameModeId.of("CLASSIC"), "lorem");
         Badge typeB = Badge.of(GameModeId.of("CLASSIC"), "ipsum");
 
-        BadgeLevel badgeA = BadgeLevel.of("john", typeA, 100, 1, "gameA");
-        BadgeLevel badgeB = BadgeLevel.of("john", typeB, 100, 1, "gameB");
+        BadgeLevel badgeA = BadgeLevel.of(Tempo.FAST, typeA, "john", 100, 1, "gameA");
+        BadgeLevel badgeB = BadgeLevel.of(Tempo.FAST, typeB, "john", 100, 1, "gameB");
 
         badgeRepository.badgeOps(Tempo.FAST).saveBadgeLevel(badgeA);
         badgeRepository.badgeOps(Tempo.FAST).saveBadgeLevel(badgeB);

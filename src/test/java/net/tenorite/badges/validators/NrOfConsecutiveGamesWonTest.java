@@ -76,16 +76,13 @@ public class NrOfConsecutiveGamesWonTest {
 
         validator.process(gameFinished, badgeRepository, e -> published.add(e));
 
+        BadgeLevel expected = BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 0, 1, "id");
+
+        assertThat(published).containsExactly(BadgeEarned.of(expected, false));
+
         assertThat(badgeRepository.getBadgeLevel("john", BADGE).isPresent()).isTrue();
         assertThat(badgeRepository.getBadgeLevel("jane", BADGE).isPresent()).isFalse();
         assertThat(badgeRepository.getBadgeLevel("nick", BADGE).isPresent()).isFalse();
-
-        assertThat(published).extracting("upgrade").containsExactly(false);
-        assertThat(published).extracting("badge.name").containsExactly("john");
-        assertThat(published).extracting("badge.gameModeId").containsExactly(GAME_MODE_ID);
-        assertThat(published).extracting("badge.badgeType").containsExactly(BADGE_TYPE);
-        assertThat(published).extracting("badge.level").containsExactly(1L);
-
         assertThat(badgeRepository.getProgress(BADGE, "john")).isEqualTo(0);
         assertThat(badgeRepository.getProgress(BADGE, "jane")).isEqualTo(0);
         assertThat(badgeRepository.getProgress(BADGE, "nick")).isEqualTo(0);
@@ -93,7 +90,7 @@ public class NrOfConsecutiveGamesWonTest {
 
     @Test
     public void testUpgradeBadge() {
-        badgeRepository.saveBadgeLevel(BadgeLevel.of("john", BADGE, 1000, 4, "gameId"));
+        badgeRepository.saveBadgeLevel(BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 1000, 4, "gameId"));
         badgeRepository.updateProgress(BADGE, "john", 4);
         badgeRepository.updateProgress(BADGE, "jane", 1);
         badgeRepository.updateProgress(BADGE, "nick", 2);
@@ -107,14 +104,12 @@ public class NrOfConsecutiveGamesWonTest {
 
         validator.process(gameFinished, badgeRepository, e -> published.add(e));
 
+
+        BadgeLevel expected = BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 0, 5, "id");
+
+        assertThat(published).containsExactly(BadgeEarned.of(expected, true));
+
         assertThat(badgeRepository.getBadgeLevel("john", BADGE).isPresent()).isTrue();
-
-        assertThat(published).extracting("upgrade").containsExactly(true);
-        assertThat(published).extracting("badge.name").containsExactly("john");
-        assertThat(published).extracting("badge.gameModeId").containsExactly(GAME_MODE_ID);
-        assertThat(published).extracting("badge.badgeType").containsExactly(BADGE_TYPE);
-        assertThat(published).extracting("badge.level").containsExactly(5L);
-
         assertThat(badgeRepository.getProgress(BADGE, "john")).isEqualTo(0);
         assertThat(badgeRepository.getProgress(BADGE, "jane")).isEqualTo(0);
         assertThat(badgeRepository.getProgress(BADGE, "nick")).isEqualTo(0);

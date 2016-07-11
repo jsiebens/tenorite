@@ -1,6 +1,7 @@
 package net.tenorite.badges.validators;
 
 import net.tenorite.badges.BadgeLevel;
+import net.tenorite.badges.events.BadgeEarned;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.Game;
@@ -31,11 +32,9 @@ public class NrOfSpecialsUsedTest extends AbstractValidatorTestCase {
 
         validator.process(gameFinished, badgeRepository, published::add);
 
-        assertThat(published).extracting("upgrade").containsExactly(false);
-        assertThat(published).extracting("badge.name").containsExactly("john");
-        assertThat(published).extracting("badge.gameModeId").containsExactly(GAME_MODE_ID);
-        assertThat(published).extracting("badge.badgeType").containsExactly(BADGE_TYPE);
-        assertThat(published).extracting("badge.level").containsExactly(14L);
+        BadgeLevel expected = BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 0, 14, "id");
+
+        assertThat(published).containsExactly(BadgeEarned.of(expected, false));
 
         assertThat(badgeRepository.getBadgeLevel("john", BADGE).isPresent()).isTrue();
         assertThat(badgeRepository.getBadgeLevel("jane", BADGE).isPresent()).isFalse();
@@ -46,7 +45,7 @@ public class NrOfSpecialsUsedTest extends AbstractValidatorTestCase {
 
     @Test
     public void testUpgradeBadge() {
-        badgeRepository.saveBadgeLevel(BadgeLevel.of("john", BADGE, 1000, 11, "gameId"));
+        badgeRepository.saveBadgeLevel(BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 1000, 11, "gameId"));
 
         PlayingStats player1 = PlayingStats.of(Player.of(1, "john", null), b -> b
             .putNrOfSpecialsOnOpponent(Special.RANDOMCLEAR, 5)
@@ -60,11 +59,9 @@ public class NrOfSpecialsUsedTest extends AbstractValidatorTestCase {
 
         validator.process(gameFinished, badgeRepository, published::add);
 
-        assertThat(published).extracting("upgrade").containsExactly(true);
-        assertThat(published).extracting("badge.name").containsExactly("john");
-        assertThat(published).extracting("badge.gameModeId").containsExactly(GAME_MODE_ID);
-        assertThat(published).extracting("badge.badgeType").containsExactly(BADGE_TYPE);
-        assertThat(published).extracting("badge.level").containsExactly(14L);
+        BadgeLevel expected = BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 0, 14, "id");
+
+        assertThat(published).containsExactly(BadgeEarned.of(expected, true));
 
         assertThat(badgeRepository.getBadgeLevel("john", BADGE).isPresent()).isTrue();
         assertThat(badgeRepository.getBadgeLevel("jane", BADGE).isPresent()).isFalse();
