@@ -4,6 +4,10 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.Terminated;
+import net.tenorite.badges.Badge;
+import net.tenorite.badges.BadgeLevel;
+import net.tenorite.badges.events.BadgeEarned;
+import net.tenorite.badges.protocol.BadgeEarnedPlineMessage;
 import net.tenorite.channel.commands.ConfirmSlot;
 import net.tenorite.channel.commands.LeaveChannel;
 import net.tenorite.channel.commands.ReserveSlot;
@@ -69,6 +73,7 @@ class ChannelActor extends AbstractActor {
     @Override
     public void preStart() throws Exception {
         subscribe(WinlistUpdated.class);
+        subscribe(BadgeEarned.class);
     }
 
     @Override
@@ -95,6 +100,9 @@ class ChannelActor extends AbstractActor {
         }
         else if (o instanceof WinlistUpdated) {
             handleWinlistUpdated((WinlistUpdated) o);
+        }
+        else if (o instanceof BadgeEarned) {
+            handleBadgeEarned((BadgeEarned) o);
         }
     }
 
@@ -231,6 +239,15 @@ class ChannelActor extends AbstractActor {
     private void handleWinlistUpdated(WinlistUpdated o) {
         if (o.getGameModeId().equals(gameMode.getId())) {
             forEachSlot(s -> s.send(WinlistMessage.of(o.getItems().stream().map(e -> e.getType().getLetter() + e.getName() + ";" + e.getScore()).collect(toList()))));
+        }
+    }
+
+    private void handleBadgeEarned(BadgeEarned badgeEarned) {
+        BadgeLevel level = badgeEarned.getBadge();
+        if (tempo.equals(level.getTempo()) && gameMode.getId().equals(level.getGameModeId()) && findSlot(level.getName()).isPresent()) {
+            Badge badge = Badge.of(level.getGameModeId(), level.getBadgeType());
+            BadgeEarnedPlineMessage message = BadgeEarnedPlineMessage.of(level.getName(), badge.getTitle(), level.getLevel(), badgeEarned.isUpgrade());
+            forEachSlot(s -> s.send(message));
         }
     }
 
@@ -452,6 +469,10 @@ class ChannelActor extends AbstractActor {
 
     private Optional<Slot> findSlot(int slot) {
         return slots.values().stream().filter(p -> p.nr == slot).findFirst();
+    }
+
+    private Optional<Slot> findSlot(String name) {
+        return slots.values().stream().filter(p -> p.name.equals(name)).findFirst();
     }
 
     private List<Player> currentPlayers() {

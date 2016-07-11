@@ -3,6 +3,10 @@ package net.tenorite.channel.actors;
 import akka.actor.ActorRef;
 import akka.testkit.JavaTestKit;
 import net.tenorite.AbstractActorTestCase;
+import net.tenorite.badges.Badge;
+import net.tenorite.badges.BadgeLevel;
+import net.tenorite.badges.events.BadgeEarned;
+import net.tenorite.badges.protocol.BadgeEarnedPlineMessage;
 import net.tenorite.channel.commands.ConfirmSlot;
 import net.tenorite.channel.commands.LeaveChannel;
 import net.tenorite.channel.commands.ReserveSlot;
@@ -10,8 +14,9 @@ import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.Field;
-import net.tenorite.modes.classic.Classic;
 import net.tenorite.modes.Default;
+import net.tenorite.modes.Pure;
+import net.tenorite.modes.classic.Classic;
 import net.tenorite.protocol.*;
 import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.events.WinlistUpdated;
@@ -22,13 +27,11 @@ import static java.util.Arrays.asList;
 
 public class ChannelActorTest extends AbstractActorTestCase {
 
-    private final static Tempo TEMPO = Tempo.NORMAL;
-
     @Test
     public void testPlayerShouldReceiveWelcomeMessageWhenJoiningAChannel() {
         JavaTestKit player1 = newTestKit(accept(PlineMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "azerty"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "azerty"));
 
         joinChannel(player1, "John", channelActor);
 
@@ -45,7 +48,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(PlineActMessage.class));
         JavaTestKit player3 = newTestKit(accept(PlineActMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "azerty"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "azerty"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -64,7 +67,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(GmsgMessage.class));
         JavaTestKit player3 = newTestKit(accept(GmsgMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "azerty"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "azerty"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -83,7 +86,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player1 = newTestKit(accept(GmsgMessage.class));
         JavaTestKit player2 = newTestKit(accept(GmsgMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "azerty"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "azerty"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -100,7 +103,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(LvlMessage.class));
         JavaTestKit player3 = newTestKit(accept(LvlMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "azerty"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "azerty"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -119,7 +122,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player1 = newTestKit(accept(LvlMessage.class));
         JavaTestKit player2 = newTestKit(accept(LvlMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "azerty"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "azerty"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -137,7 +140,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player1 = newTestKit(accept(NewGameMessage.class).or(accept(GamePausedMessage.class)).or(accept(GameRunningMessage.class)).or(accept(EndGameMessage.class)));
         JavaTestKit player2 = newTestKit(accept(NewGameMessage.class).or(accept(GamePausedMessage.class)).or(accept(GameRunningMessage.class)).or(accept(EndGameMessage.class)));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "a", channelActor);
         joinChannel(player2, "b", channelActor);
@@ -157,7 +160,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(PlayerLostMessage.class).or(accept(EndGameMessage.class).or(accept(PlayerWonMessage.class))));
         JavaTestKit player3 = newTestKit(accept(PlayerLostMessage.class).or(accept(EndGameMessage.class).or(accept(PlayerWonMessage.class))));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "a", channelActor);
         joinChannel(player2, "b", channelActor);
@@ -178,7 +181,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(PlayerJoinMessage.class));
         JavaTestKit player3 = newTestKit(accept(PlayerJoinMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "a", channelActor);
         joinChannel(player2, "b", channelActor);
@@ -195,7 +198,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit();
         JavaTestKit player3 = newTestKit(accept(PlayerJoinMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "a", channelActor);
         joinChannel(player2, "b", channelActor);
@@ -209,7 +212,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player1 = newTestKit(accept(PlayerNumMessage.class));
         JavaTestKit player2 = newTestKit(accept(PlayerNumMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "a", channelActor);
         joinChannel(player2, "b", channelActor);
@@ -223,7 +226,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player1 = newTestKit(accept(IngameMessage.class).or(accept(GameRunningMessage.class)));
         JavaTestKit player2 = newTestKit(accept(IngameMessage.class).or(accept(GameRunningMessage.class)));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
 
@@ -239,7 +242,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player1 = newTestKit(accept(IngameMessage.class).or(accept(GamePausedMessage.class)));
         JavaTestKit player2 = newTestKit(accept(IngameMessage.class).or(accept(GamePausedMessage.class)));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
 
@@ -261,7 +264,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player6 = newTestKit();
         JavaTestKit player7 = newTestKit(accept(SlotReservationFailed.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "a", channelActor);
         joinChannel(player2, "b", channelActor);
@@ -281,7 +284,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(PlayerLeaveMessage.class));
         JavaTestKit player3 = newTestKit(accept(PlayerLeaveMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -300,7 +303,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(PlayerLeaveMessage.class));
         JavaTestKit player3 = newTestKit(accept(PlayerLeaveMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -318,7 +321,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(TeamMessage.class));
         JavaTestKit player3 = newTestKit(accept(TeamMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -336,7 +339,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player1 = newTestKit(accept(TeamMessage.class));
         JavaTestKit player2 = newTestKit(accept(TeamMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -353,7 +356,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(TeamMessage.class));
         JavaTestKit player3 = newTestKit(accept(TeamMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -375,7 +378,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(FieldMessage.class));
         JavaTestKit player3 = newTestKit(accept(FieldMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -396,7 +399,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player1 = newTestKit(accept(FieldMessage.class));
         JavaTestKit player2 = newTestKit(accept(FieldMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -415,7 +418,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(FieldMessage.class));
         JavaTestKit player3 = newTestKit(accept(FieldMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -437,7 +440,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(SpecialBlockMessage.class).or(accept(ClassicStyleAddMessage.class)));
         JavaTestKit player3 = newTestKit(accept(SpecialBlockMessage.class).or(accept(ClassicStyleAddMessage.class)));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -457,7 +460,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player1 = newTestKit(accept(SpecialBlockMessage.class).or(accept(ClassicStyleAddMessage.class)));
         JavaTestKit player2 = newTestKit(accept(SpecialBlockMessage.class).or(accept(ClassicStyleAddMessage.class)));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
@@ -474,13 +477,13 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit(accept(WinlistMessage.class));
         JavaTestKit player3 = newTestKit(accept(WinlistMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
         joinChannel(player3, "nick", channelActor);
 
-        channelActor.tell(WinlistUpdated.of(TEMPO, Classic.ID, asList(WinlistItem.of(WinlistItem.Type.PLAYER, "a", 1, 1000), WinlistItem.of(WinlistItem.Type.TEAM, "b", 2, 2000))), noSender());
+        channelActor.tell(WinlistUpdated.of(Tempo.NORMAL, Classic.ID, asList(WinlistItem.of(WinlistItem.Type.PLAYER, "a", 1, 1000), WinlistItem.of(WinlistItem.Type.TEAM, "b", 2, 2000))), noSender());
 
         player1.expectMsgAllOf(WinlistMessage.of(asList("pa;1", "tb;2")));
         player2.expectMsgAllOf(WinlistMessage.of(asList("pa;1", "tb;2")));
@@ -491,11 +494,85 @@ public class ChannelActorTest extends AbstractActorTestCase {
     public void testWinlistUpdatedFromOtherGameModesAreIgnored() {
         JavaTestKit player1 = newTestKit(accept(WinlistMessage.class));
 
-        ActorRef channelActor = system.actorOf(ChannelActor.props(TEMPO, new Classic(), "channel"));
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
 
         joinChannel(player1, "john", channelActor);
 
-        channelActor.tell(WinlistUpdated.of(TEMPO, Default.ID, asList(WinlistItem.of(WinlistItem.Type.PLAYER, "a", 1, 1000), WinlistItem.of(WinlistItem.Type.TEAM, "b", 2, 2000))), noSender());
+        channelActor.tell(WinlistUpdated.of(Tempo.NORMAL, Default.ID, asList(WinlistItem.of(WinlistItem.Type.PLAYER, "a", 1, 1000), WinlistItem.of(WinlistItem.Type.TEAM, "b", 2, 2000))), noSender());
+
+        player1.expectNoMsg();
+    }
+
+    @Test
+    public void testPlayerReceivesMessageWhenPlayerHasEarnedABadge() {
+        JavaTestKit player1 = newTestKit(accept(BadgeEarnedPlineMessage.class));
+        JavaTestKit player2 = newTestKit(accept(BadgeEarnedPlineMessage.class));
+        JavaTestKit player3 = newTestKit(accept(BadgeEarnedPlineMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+        joinChannel(player3, "nick", channelActor);
+
+        Badge badge = Badge.of(Classic.ID, "JUNIT");
+        BadgeLevel level = BadgeLevel.of(Tempo.NORMAL, badge, "john", 1000, 5, "gameId");
+
+        channelActor.tell(BadgeEarned.of(level, false), noSender());
+        channelActor.tell(BadgeEarned.of(level, true), noSender());
+
+        Message message1 = BadgeEarnedPlineMessage.of("john", badge.getTitle(), 5, false);
+        Message message2 = BadgeEarnedPlineMessage.of("john", badge.getTitle(), 5, true);
+
+        player1.expectMsgAllOf(message1, message2);
+        player2.expectMsgAllOf(message1, message2);
+        player3.expectMsgAllOf(message1, message2);
+    }
+
+    @Test
+    public void testBadgeEarnedEventsFromOtherGameModesAreIgnored() {
+        JavaTestKit player1 = newTestKit(accept(WinlistMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
+
+        joinChannel(player1, "john", channelActor);
+
+        Badge badge = Badge.of(Pure.ID, "JUNIT");
+        BadgeLevel level = BadgeLevel.of(Tempo.NORMAL, badge, "john", 1000, 5, "gameId");
+
+        channelActor.tell(BadgeEarned.of(level, false), noSender());
+
+        player1.expectNoMsg();
+    }
+
+    @Test
+    public void testBadgeEarnedEventsFromOtherTempoAreIgnored() {
+        JavaTestKit player1 = newTestKit(accept(WinlistMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
+
+        joinChannel(player1, "john", channelActor);
+
+        Badge badge = Badge.of(Classic.ID, "JUNIT");
+        BadgeLevel level = BadgeLevel.of(Tempo.FAST, badge, "john", 1000, 5, "gameId");
+
+        channelActor.tell(BadgeEarned.of(level, false), noSender());
+
+        player1.expectNoMsg();
+    }
+
+    @Test
+    public void testBadgeEarnedEventsFromOtherPlayersAreIgnored() {
+        JavaTestKit player1 = newTestKit(accept(WinlistMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
+
+        joinChannel(player1, "john", channelActor);
+
+        Badge badge = Badge.of(Classic.ID, "JUNIT");
+        BadgeLevel level = BadgeLevel.of(Tempo.NORMAL, badge, "nick", 1000, 5, "gameId");
+
+        channelActor.tell(BadgeEarned.of(level, false), noSender());
 
         player1.expectNoMsg();
     }

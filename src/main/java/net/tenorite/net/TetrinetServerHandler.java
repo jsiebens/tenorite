@@ -4,13 +4,12 @@ import akka.actor.ActorRef;
 import akka.actor.PoisonPill;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import net.tenorite.clients.MessageSink;
 import net.tenorite.clients.ClientRegistrationException;
 import net.tenorite.clients.ClientsRegistry;
+import net.tenorite.clients.MessageSink;
 import net.tenorite.core.Tempo;
 import net.tenorite.protocol.Inbound;
 import net.tenorite.protocol.Message;
-import net.tenorite.protocol.PlineMessage;
 import net.tenorite.util.Style;
 
 import java.util.ArrayDeque;
@@ -112,11 +111,12 @@ final class TetrinetServerHandler extends SimpleChannelInboundHandler<String> {
 
             @Override
             public void write(Message message) {
-                if (message instanceof PlineMessage) {
-                    ctx.writeAndFlush(Style.apply(message.raw(tempo)));
+                String raw = message.raw(tempo);
+                if (raw.startsWith("pline ")) {
+                    ctx.writeAndFlush(Style.apply(raw));
                 }
                 else {
-                    ctx.writeAndFlush(message.raw(tempo));
+                    ctx.writeAndFlush(raw);
                 }
             }
 
