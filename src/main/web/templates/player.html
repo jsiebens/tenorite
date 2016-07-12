@@ -12,7 +12,7 @@
                     <a th:each="g : ${gameModes}"
                        class="btn btn-default"
                        th:classappend="${g.id.equals(gameMode.id) ? 'active' : ''}"
-                       th:href="@{/t/{tempo}/m/{mode}/p/{name}(tempo=${tempo},mode=${g.id},name=${name})}"
+                       th:href="@{/t/{tempo}/m/{mode}/players/{name}(tempo=${tempo},mode=${g.id},name=${name})}"
                        th:text="${g.getTitle(tempo)}"></a>
                 </div>
             </div>

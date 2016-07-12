@@ -144,7 +144,7 @@ public class TempoController {
         }
     }
 
-    @RequestMapping("/t/{tempo}/m/{mode}/p/{name}")
+    @RequestMapping("/t/{tempo}/m/{mode}/players/{name}")
     public ModelAndView player(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("name") String name) {
         GameMode gameMode = gameModes.get(GameModeId.of(mode));
 

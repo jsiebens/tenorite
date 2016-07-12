@@ -36,7 +36,7 @@
                         <td>
                             <a style="display: block"
                                th:text="${b.name}"
-                               th:href="@{/t/{tempo}/m/{mode}/p/{name}(tempo=${tempo},mode=${gameMode.id},name=${b.name})}">
+                               th:href="@{/t/{tempo}/m/{mode}/players/{name}(tempo=${tempo},mode=${gameMode.id},name=${b.name})}">
                             </a>
                         </td>
                         <td class="right" th:text="${b.level}"></td>

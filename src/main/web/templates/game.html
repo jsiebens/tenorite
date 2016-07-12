@@ -25,7 +25,9 @@
                     </tr>
                     <tr th:each="p,itrStat : ${ranking}">
                         <td th:text="${itrStat.index + 1}"></td>
-                        <td th:text="${p.player.name}"></td>
+                        <td>
+                            <a th:href="@{/t/{tempo}/m/{mode}/players/{name}(tempo=${tempo},mode=${gameMode.id},name=${p.player.name})}" th:text="${p.player.name}"></a>
+                        </td>
                         <td class="right" th:text="${p.nrOfBlocks}"></td>
                         <td class="right" th:text="${p.nrOfLines}"></td>
                         <td class="right" th:text="${p.nrOfTwoLineCombos}"></td>

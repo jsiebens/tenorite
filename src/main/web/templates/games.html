@@ -32,7 +32,7 @@
                         <td><span class="time" th:attr="data-timestamp=${g.timestamp}" th:text="${#dates.format(g.timestamp, 'dd MMM yyyy')}"></span></td>
                         <td>
                             <th:block th:each="p : ${g.players}" >
-                                <span th:text="${p.name}"></span>
+                                <a th:href="@{/t/{tempo}/m/{mode}/players/{name}(tempo=${tempo},mode=${gameMode.id},name=${p.name})}" th:text="${p.name}"></a>
                             </th:block>
                         </td>
                         <td class="right">
