@@ -96,7 +96,7 @@ function onSocket(socket) {
         }
 
         if (message[0] === 'endgame') {
-            $('#specials').append('<div><b>Game ended!</b><div>');
+            $('#specials').prepend('<div><b>Game ended!</b><div>');
         }
     };
 
@@ -114,6 +114,7 @@ function onSocket(socket) {
 
 function replay(tempo, id) {
     $('#playButton').addClass('disabled');
+    $('#specials').html('');
 
     onSocket(new SockJS('/ws/replay?tempo=' + tempo + '&id=' + id));
 }
