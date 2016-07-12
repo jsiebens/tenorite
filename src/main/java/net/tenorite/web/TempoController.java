@@ -4,8 +4,11 @@ import net.tenorite.badges.*;
 import net.tenorite.core.NotAvailableException;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.*;
+import net.tenorite.stats.PlayerStats;
+import net.tenorite.stats.PlayerStatsRepository;
 import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.WinlistRepository;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
 
@@ -29,12 +33,15 @@ public class TempoController {
 
     private BadgeRepository badgeRepository;
 
+    private PlayerStatsRepository playerStatsRepository;
+
     @Autowired
-    public TempoController(GameModes gameModes, WinlistRepository winlistRepository, GameRepository gameRepository, BadgeRepository badgeRepository) {
+    public TempoController(GameModes gameModes, WinlistRepository winlistRepository, GameRepository gameRepository, BadgeRepository badgeRepository, PlayerStatsRepository playerStatsRepository) {
         this.gameModes = gameModes;
         this.winlistRepository = winlistRepository;
         this.gameRepository = gameRepository;
         this.badgeRepository = badgeRepository;
+        this.playerStatsRepository = playerStatsRepository;
     }
 
     @RequestMapping("/t/{tempo}/m/{mode}/winlist")
@@ -148,8 +155,10 @@ public class TempoController {
     public ModelAndView player(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("name") String name) {
         GameMode gameMode = gameModes.get(GameModeId.of(mode));
 
-        List<Badge> badges = gameMode.getBadges();
+        PlayerStats playerStats = playerStatsRepository.playerStatsOps(tempo).playerStats(gameMode.getId(), name).orElseGet(() -> PlayerStats.of(gameMode.getId(), name));
         Map<Badge, BadgeLevel> badgeLevels = badgeRepository.badgeOps(tempo).badgeLevels(gameMode.getId(), name);
+
+        Function<Long, String> x = m -> DurationFormatUtils.formatDurationWords(m, true, false);
 
         return
             new ModelAndView("player")
@@ -157,8 +166,11 @@ public class TempoController {
                 .addObject("name", name)
                 .addObject("gameMode", gameMode)
                 .addObject("gameModes", gameModes)
-                .addObject("badges", badges)
-                .addObject("badgeLevels", badgeLevels);
+                .addObject("stats", playerStats)
+                .addObject("badges", gameMode.getBadges())
+                .addObject("badgeLevels", badgeLevels)
+                .addObject("durationFormatter", x)
+            ;
     }
 
 }

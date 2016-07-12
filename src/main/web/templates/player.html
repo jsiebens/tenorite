@@ -21,6 +21,31 @@
             <div class="col-md-12"><h1 th:text="${name}"></h1></div>
         </div>
         <div class="row">
+            <div class="col-md-12">
+                <h2><span th:text="${gameMode.getTitle(tempo)}">player</span> <small>stats</small></h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-condensed table-hover">
+                    <tr><td>Games played</td><td class="right" th:text="${stats.gamesPlayed}"></td></tr>
+                    <tr><td>Games won</td><td class="right" th:text="${stats.gamesWon}"></td></tr>
+                    <tr><td>Total time played</td><td class="right" th:text="${durationFormatter.apply(stats.timePlayed)}"></td></tr>
+                    <tr><td>Total blocks dropped</td><td class="right" th:text="${stats.nrOfBlocks}"></td></tr>
+                    <tr><td>Total lines cleared</td><td class="right" th:text="${stats.nrOfLines}"></td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-condensed table-hover">
+                    <tr><td>Total 2 line combos</td><td class="right" th:text="${stats.nrOfTwoLineCombos}"></td></tr>
+                    <tr><td>Total 3 line combos</td><td class="right" th:text="${stats.nrOfThreeLineCombos}"></td></tr>
+                    <tr><td>Total 4 line combos</td><td class="right" th:text="${stats.nrOfFourLineCombos}"></td></tr>
+                    <tr><td>Total specials used</td><td class="right" th:text="${stats.totalNrOfSpecialsUsed}"></td></tr>
+                    <tr><td>Total specials received</td><td class="right" th:text="${stats.totalNrOfSpecialsReceived}"></td></tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-12"><h2><span th:text="${gameMode.getTitle(tempo)}">player</span> <small>badges</small></h2></div>
         </div>
         <div class="row">
