@@ -46,6 +46,8 @@ public class MessageParser {
                 return valueOf(split[1]) == 0 ? of(ResumeGameMessage.of(valueOf(split[2]))) : of(PauseGameMessage.of(valueOf(split[2])));
             case "playerlost":
                 return of(PlayerLostMessage.of(valueOf(split[1])));
+            case "playerwon":
+                return of(PlayerWonMessage.of(valueOf(split[1])));
             case "playerleave":
                 return of(PlayerLeaveMessage.of(valueOf(split[1])));
             default:
