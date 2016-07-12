@@ -60,7 +60,7 @@ public class MongoGameRepositoryTest extends AbstractTenoriteServerTestCase {
             .mapToObj(i -> Game.of("id" + i, i, 10, Tempo.NORMAL, Classic.ID, Collections.emptyList(), Collections.emptyList()))
             .forEach(g -> gameRepository.gameOps(Tempo.NORMAL).saveGame(g));
 
-        List<Game> games = gameRepository.gameOps(Tempo.NORMAL).recentGames();
+        List<Game> games = gameRepository.gameOps(Tempo.NORMAL).recentGames(Classic.ID);
         assertThat(games).hasSize(10);
         assertThat(games).extracting("id")
             .containsExactly(

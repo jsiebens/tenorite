@@ -2,6 +2,7 @@ package net.tenorite.game.repository;
 
 import net.tenorite.core.Tempo;
 import net.tenorite.game.Game;
+import net.tenorite.game.GameModeId;
 import net.tenorite.game.GameRepository;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
@@ -49,8 +50,8 @@ public class MongoGameRepository implements GameRepository {
         }
 
         @Override
-        public List<Game> recentGames() {
-            MongoCursor<Game> cursor = collection.find("{}").sort("{timestamp:-1}").limit(10).projection("{messages:0}").as(Game.class);
+        public List<Game> recentGames(GameModeId gameModeId) {
+            MongoCursor<Game> cursor = collection.find("{gameModeId:#}", gameModeId).sort("{timestamp:-1}").limit(10).projection("{messages:0}").as(Game.class);
             return stream(cursor.spliterator(), false).collect(toList());
         }
 

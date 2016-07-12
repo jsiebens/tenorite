@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/page">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="btn-group pull-right" role="group">
+                    <a th:each="g : ${gameModes}"
+                       class="btn btn-default"
+                       th:classappend="${g.id.equals(gameMode.id) ? 'active' : ''}"
+                       th:href="@{/t/{tempo}/m/{mode}/games(tempo=${tempo},mode=${g.id})}"
+                       th:text="${g.getTitle(tempo)}"></a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small>recent games</small></h1></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-condensed table-hover">
+                    <tr>
+                        <th class="col-md-1">date</th>
+                        <th class="col-md-3">players</th>
+                        <th class="col-md-1"></th>
+                    </tr>
+                    <tr th:each="g : ${games}">
+                        <td><span class="time" th:attr="data-timestamp=${g.timestamp}" th:text="${#dates.format(g.timestamp, 'dd MMM yyyy')}"></span></td>
+                        <td>
+                            <th:block th:each="p : ${g.players}" >
+                                <span th:text="${p.name}"></span>
+                            </th:block>
+                        </td>
+                        <td class="right">
+                            <a th:href="@{/t/{tempo}/m/{mode}/games/{id}(tempo=${tempo},mode=${gameMode.id},id=${g.id})}">
+                                details
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

@@ -21,8 +21,6 @@ function onSocket(socket) {
     var players = {};
 
     socket.onmessage = function (a) {
-        console.log(a.data);
-
         var message = a.data.split(/ +/);
 
         if (message[0] === 'f') {
@@ -79,10 +77,10 @@ function onSocket(socket) {
             }
 
             if (line) {
-                $('#specials').append(line);
+                $('#specials').prepend(line);
 
                 if ($('#specials div').length > 10) {
-                    $("#specials div:first-child").remove()
+                    $("#specials div:last-child").remove()
                 }
             }
         }
@@ -98,18 +96,24 @@ function onSocket(socket) {
         }
 
         if (message[0] === 'endgame') {
-            $('#specials').append('<span><b>Game ended!</b><span>');
+            $('#specials').append('<div><b>Game ended!</b><div>');
         }
     };
 
     socket.onclose = function () {
+        $('#playButton').removeClass('disabled');
+
         console.log("Closed socket.");
     };
     socket.onerror = function () {
+        $('#playButton').removeClass('disabled');
+
         console.log("Error during transfer.");
     };
 }
 
 function replay(tempo, id) {
+    $('#playButton').addClass('disabled');
+
     onSocket(new SockJS('/ws/replay?tempo=' + tempo + '&id=' + id));
 }

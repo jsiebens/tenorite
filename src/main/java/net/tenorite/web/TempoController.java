@@ -3,9 +3,7 @@ package net.tenorite.web;
 import net.tenorite.badges.*;
 import net.tenorite.core.NotAvailableException;
 import net.tenorite.core.Tempo;
-import net.tenorite.game.GameMode;
-import net.tenorite.game.GameModeId;
-import net.tenorite.game.GameModes;
+import net.tenorite.game.*;
 import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.WinlistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -26,12 +25,15 @@ public class TempoController {
 
     private WinlistRepository winlistRepository;
 
+    private GameRepository gameRepository;
+
     private BadgeRepository badgeRepository;
 
     @Autowired
-    public TempoController(GameModes gameModes, WinlistRepository winlistRepository, BadgeRepository badgeRepository) {
+    public TempoController(GameModes gameModes, WinlistRepository winlistRepository, GameRepository gameRepository, BadgeRepository badgeRepository) {
         this.gameModes = gameModes;
         this.winlistRepository = winlistRepository;
+        this.gameRepository = gameRepository;
         this.badgeRepository = badgeRepository;
     }
 
@@ -104,12 +106,42 @@ public class TempoController {
 
     }
 
-    @RequestMapping("/t/{tempo}/g/{id}/replay")
-    public ModelAndView replay(@PathVariable("tempo") Tempo tempo, @PathVariable("id") String gameId) {
+    @RequestMapping("/t/{tempo}/m/{mode}/games")
+    public ModelAndView recentGames(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode) {
+        GameMode gameMode = gameModes.get(GameModeId.of(mode));
+
+        List<Game> games = gameRepository.gameOps(tempo).recentGames(gameMode.getId());
+
         return
-            new ModelAndView("replay")
+            new ModelAndView("games")
                 .addObject("tempo", tempo)
-                .addObject("id", gameId);
+                .addObject("gameMode", gameMode)
+                .addObject("gameModes", gameModes)
+                .addObject("games", games);
+    }
+
+    @RequestMapping("/t/{tempo}/m/{mode}/games/{id}")
+    public ModelAndView replay(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("id") String gameId) {
+        GameMode gameMode = gameModes.get(GameModeId.of(mode));
+
+        Optional<Game> optGame = gameRepository.gameOps(tempo).loadGame(gameId);
+
+        if (optGame.isPresent()) {
+            Game game = optGame.get();
+            List<PlayingStats> ranking = new GameRankCalculator().calculate(gameMode, game);
+
+            return
+                new ModelAndView("game")
+                    .addObject("tempo", tempo)
+                    .addObject("gameMode", gameMode)
+                    .addObject("gameModes", gameModes)
+                    .addObject("ranking", ranking)
+                    .addObject("game", optGame.get())
+                    .addObject("id", gameId);
+        }
+        else {
+            throw new NotAvailableException();
+        }
     }
 
     @RequestMapping("/t/{tempo}/m/{mode}/p/{name}")

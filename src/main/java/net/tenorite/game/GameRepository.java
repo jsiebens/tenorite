@@ -15,7 +15,7 @@ public interface GameRepository {
 
         Optional<Game> loadGame(String id);
 
-        List<Game> recentGames();
+        List<Game> recentGames(GameModeId gameModeId);
 
     }
 
