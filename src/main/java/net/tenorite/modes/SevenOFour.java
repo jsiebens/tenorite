@@ -46,7 +46,7 @@ public final class SevenOFour extends GameMode {
 
     @Override
     public String getDescription(Tempo tempo) {
-        return super.getDescription(tempo);
+        return "7 Four Line Combos to win!";
     }
 
     @Override
