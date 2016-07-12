@@ -8,10 +8,15 @@ import net.tenorite.clients.commands.RegisterClient;
 import net.tenorite.clients.events.ClientRegistered;
 import net.tenorite.clients.events.ClientRegistrationFailed;
 import net.tenorite.core.Tempo;
+import net.tenorite.game.GameModes;
 import net.tenorite.protocol.Message;
 import org.junit.Test;
 
+import java.util.Collections;
+
 public class ClientsActorTest extends AbstractActorTestCase {
+
+    private GameModes gameModes = new GameModes(Collections.emptyList());
 
     @Test
     public void testClientsActorShouldBlockInvalidNickName() {
@@ -19,7 +24,7 @@ public class ClientsActorTest extends AbstractActorTestCase {
         JavaTestKit clientA = newTestKit();
         JavaTestKit clientB = newTestKit();
 
-        ActorRef clients = system.actorOf(ClientsActor.props(channels.getRef()));
+        ActorRef clients = system.actorOf(ClientsActor.props(gameModes, channels.getRef()));
 
         clients.tell(RegisterClient.of(Tempo.NORMAL, "x", noop()), clientA.getRef());
         clients.tell(RegisterClient.of(Tempo.NORMAL, "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", noop()), clientB.getRef());
@@ -34,7 +39,7 @@ public class ClientsActorTest extends AbstractActorTestCase {
         JavaTestKit clientA = newTestKit();
         JavaTestKit clientB = newTestKit();
 
-        ActorRef clients = system.actorOf(ClientsActor.props(channels.getRef()));
+        ActorRef clients = system.actorOf(ClientsActor.props(gameModes, channels.getRef()));
 
         clients.tell(RegisterClient.of(Tempo.NORMAL, "junit", noop()), clientA.getRef());
         clients.tell(RegisterClient.of(Tempo.NORMAL, "junit", noop()), clientB.getRef());

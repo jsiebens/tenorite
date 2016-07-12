@@ -6,19 +6,23 @@ import akka.actor.SupervisorStrategy;
 import net.tenorite.clients.commands.RegisterClient;
 import net.tenorite.clients.events.ClientRegistered;
 import net.tenorite.clients.events.ClientRegistrationFailed;
+import net.tenorite.game.GameModes;
 import net.tenorite.util.AbstractActor;
 import org.springframework.util.DigestUtils;
 import scala.Option;
 
 public final class ClientsActor extends AbstractActor {
 
-    public static Props props(ActorRef channels) {
-        return Props.create(ClientsActor.class, channels);
+    public static Props props(GameModes gameModes, ActorRef channels) {
+        return Props.create(ClientsActor.class, gameModes, channels);
     }
+
+    private final GameModes gameModes;
 
     private final ActorRef channels;
 
-    public ClientsActor(ActorRef channels) {
+    public ClientsActor(GameModes gameModes, ActorRef channels) {
+        this.gameModes = gameModes;
         this.channels = channels;
     }
 
@@ -45,7 +49,7 @@ public final class ClientsActor extends AbstractActor {
             replyWith(ClientRegistrationFailed.nameAlreadyInUse());
         }
         else {
-            ActorRef client = context().actorOf(ClientActor.props(rc.getTempo(), rc.getName(), rc.getChannel(), channels), key);
+            ActorRef client = context().actorOf(ClientActor.props(rc.getTempo(), rc.getName(), rc.getChannel(), gameModes, channels), key);
             replyWith(ClientRegistered.of(client));
         }
     }

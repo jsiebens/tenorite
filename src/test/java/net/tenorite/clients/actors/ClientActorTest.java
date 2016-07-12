@@ -14,6 +14,8 @@ import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.channel.events.SlotReserved;
 import net.tenorite.clients.MessageSink;
 import net.tenorite.core.Tempo;
+import net.tenorite.game.GameModes;
+import net.tenorite.modes.Jelly;
 import net.tenorite.modes.classic.Classic;
 import net.tenorite.protocol.Inbound;
 import net.tenorite.protocol.LvlMessage;
@@ -21,6 +23,7 @@ import net.tenorite.protocol.Message;
 import net.tenorite.protocol.PlineMessage;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -29,6 +32,8 @@ import static akka.actor.ActorRef.noSender;
 import static java.util.Arrays.asList;
 
 public class ClientActorTest extends AbstractActorTestCase {
+
+    private GameModes gameModes = new GameModes(Collections.emptyList());
 
     private static final Set<PlineMessage> WELCOME_MESSAGES = new HashSet<>(asList(
         PlineMessage.of(""),
@@ -45,7 +50,7 @@ public class ClientActorTest extends AbstractActorTestCase {
         JavaTestKit channels = newTestKit();
         JavaTestKit output = newTestKit(accept(LvlMessage.class).or(accept(PlineMessage.class).and(ignoreWelcomeMessages())));
 
-        ActorRef client = system.actorOf(ClientActor.props(Tempo.NORMAL, "junit", stub(output), channels.getRef()));
+        ActorRef client = system.actorOf(ClientActor.props(Tempo.NORMAL, "junit", stub(output), gameModes, channels.getRef()));
 
         client.tell(PlineMessage.of("hello world"), noSender());
         client.tell(LvlMessage.of(1, 11), noSender());
@@ -59,7 +64,7 @@ public class ClientActorTest extends AbstractActorTestCase {
         JavaTestKit channels = newTestKit();
         JavaTestKit output = newTestKit();
 
-        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), channels.getRef()));
+        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channels.getRef()));
 
         client.tell(Inbound.of("pline 1 /join channel"), noSender());
 
@@ -71,7 +76,7 @@ public class ClientActorTest extends AbstractActorTestCase {
         JavaTestKit channels = newTestKit();
         JavaTestKit output = newTestKit();
 
-        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), channels.getRef()));
+        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channels.getRef()));
 
         client.tell(Inbound.of("pline 1 /list"), noSender());
 
@@ -83,7 +88,7 @@ public class ClientActorTest extends AbstractActorTestCase {
         JavaTestKit channels = newTestKit();
         JavaTestKit output = newTestKit(accept(PlineMessage.class).and(ignoreWelcomeMessages()));
 
-        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), channels.getRef()));
+        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channels.getRef()));
 
         client.tell(SlotReservationFailed.channelIsFull(), noSender());
 
@@ -96,7 +101,7 @@ public class ClientActorTest extends AbstractActorTestCase {
         JavaTestKit channels = newTestKit();
         JavaTestKit output = newTestKit(accept(PlineMessage.class).and(ignoreWelcomeMessages()));
 
-        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), channels.getRef()));
+        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channels.getRef()));
 
         client.tell(SlotReservationFailed.channelNotAvailable(), noSender());
 
@@ -112,7 +117,7 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         JavaTestKit output = newTestKit(accept(PlineMessage.class).and(ignoreWelcomeMessages()));
 
-        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), channels.getRef()));
+        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channels.getRef()));
 
         client.tell(SlotReserved.instance(), channelA.getRef());
         client.tell(SlotReserved.instance(), channelB.getRef());
@@ -126,20 +131,23 @@ public class ClientActorTest extends AbstractActorTestCase {
 
     @Test
     public void testChannels() {
+        Classic classic = new Classic();
+        Jelly jelly = new Jelly();
+
+        GameModes gameModes = new GameModes(asList(classic, jelly));
         JavaTestKit channelsKit = newTestKit();
 
         JavaTestKit output = newTestKit(accept(PlineMessage.class).and(ignoreWelcomeMessages()));
 
-        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), channelsKit.getRef()));
+        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channelsKit.getRef()));
 
-        Channels channels = Channels.of(Channel.of(Classic.ID, "channel:A"), Channel.of(Classic.ID, "channel:B"), Channel.of(Classic.ID, "channel:C"));
+        Channels channels = Channels.of(Channel.of(Classic.ID, "a"), Channel.of(Jelly.ID, "b"));
 
         client.tell(channels, noSender());
 
         output.expectMsgAllOf(
-            PlineMessage.of("   channel:A<gray> - CLASSIC</gray>  <blue>(0/6)</blue>"),
-            PlineMessage.of("   channel:B<gray> - CLASSIC</gray>  <blue>(0/6)</blue>"),
-            PlineMessage.of("   channel:C<gray> - CLASSIC</gray>  <blue>(0/6)</blue>"),
+            PlineMessage.of("   a  <blue>(0/6)</blue>"),
+            PlineMessage.of("   b<gray> - " + jelly.getDescription(Tempo.FAST) + "</gray>  <blue>(0/6)</blue>"),
             PlineMessage.of("<gray>(type /join <name>)</gray>")
         );
     }

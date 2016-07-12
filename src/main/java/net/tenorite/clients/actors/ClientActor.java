@@ -12,6 +12,8 @@ import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.channel.events.SlotReserved;
 import net.tenorite.clients.MessageSink;
 import net.tenorite.core.Tempo;
+import net.tenorite.game.GameMode;
+import net.tenorite.game.GameModes;
 import net.tenorite.protocol.*;
 import net.tenorite.util.AbstractActor;
 import org.springframework.util.StringUtils;
@@ -26,21 +28,24 @@ import static java.util.Optional.ofNullable;
 
 final class ClientActor extends AbstractActor {
 
-    static Props props(Tempo tempo, String name, MessageSink sink, ActorRef channels) {
-        return Props.create(ClientActor.class, tempo, name, sink, channels);
+    static Props props(Tempo tempo, String name, MessageSink sink, GameModes gameModes, ActorRef channels) {
+        return Props.create(ClientActor.class, tempo, name, sink, gameModes, channels);
     }
 
     private final Tempo tempo;
 
     private final MessageSink sink;
 
-    private final Commands commands;
+    private final GameModes gameModes;
 
     private ActorRef channel;
 
-    public ClientActor(Tempo tempo, String name, MessageSink sink, ActorRef channels) {
+    private final Commands commands;
+
+    public ClientActor(Tempo tempo, String name, MessageSink sink, GameModes gameModes, ActorRef channels) {
         this.tempo = tempo;
         this.sink = sink;
+        this.gameModes = gameModes;
 
         this.commands = new Commands()
             .register("/join", (i, s) -> channels.tell(ReserveSlot.of(tempo, s, name), self()))
@@ -117,12 +122,13 @@ final class ClientActor extends AbstractActor {
             .stream()
             .sorted((a, b) -> a.getName().compareTo(b.getName()))
             .forEach(c -> {
-                String gameMode = ofNullable(c.getGameModeId().toString()).filter(StringUtils::hasText).map(s -> "<gray> - " + s + "</gray> ").orElse(" ");
+                GameMode gameMode = gameModes.get(c.getGameModeId());
+                String description = ofNullable(gameMode.getDescription(tempo)).filter(StringUtils::hasText).map(s -> "<gray> - " + s + "</gray> ").orElse(" ");
                 if (c.getNrOfPlayers() < 6) {
-                    write(PlineMessage.of(format("   %s%s <blue>(%s/%s)</blue>", c.getName(), gameMode, c.getNrOfPlayers(), 6)));
+                    write(PlineMessage.of(format("   %s%s <blue>(%s/%s)</blue>", c.getName(), description, c.getNrOfPlayers(), 6)));
                 }
                 else {
-                    write(PlineMessage.of(format("   %s%s <red>(FULL)</red>", c.getName(), gameMode)));
+                    write(PlineMessage.of(format("   %s%s <red>(FULL)</red>", c.getName(), description)));
                 }
             });
 

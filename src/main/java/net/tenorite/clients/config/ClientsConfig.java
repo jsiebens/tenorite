@@ -9,6 +9,7 @@ import net.tenorite.clients.actors.ClientsActor;
 import net.tenorite.clients.commands.RegisterClient;
 import net.tenorite.clients.events.ClientRegistered;
 import net.tenorite.clients.events.ClientRegistrationFailed;
+import net.tenorite.game.GameModes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,9 @@ import java.util.concurrent.CompletionStage;
 public class ClientsConfig {
 
     @Autowired
+    private GameModes gameModes;
+
+    @Autowired
     private ActorSystem actorSystem;
 
     @Autowired
@@ -31,7 +35,7 @@ public class ClientsConfig {
 
     @Bean(name = "clients")
     public ActorRef clients() {
-        return actorSystem.actorOf(ClientsActor.props(channels));
+        return actorSystem.actorOf(ClientsActor.props(gameModes, channels));
     }
 
     @Bean
