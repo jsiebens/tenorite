@@ -375,21 +375,37 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleFieldMessage(FieldMessage field) {
-        findSlot(sender(), field.getSender()).ifPresent(player -> {
+        if (field.isServerMessage()) {
             if (gameRecorder != null) {
                 gameRecorder.onFieldMessage(field);
-                forEachSlot(op -> op.nr != player.nr, op -> op.send(field));
+                forEachSlot(s -> s.send(field));
             }
-        });
+        }
+        else {
+            findSlot(sender(), field.getSender()).ifPresent(player -> {
+                if (gameRecorder != null) {
+                    gameRecorder.onFieldMessage(field);
+                    forEachSlot(op -> op.nr != player.nr, op -> op.send(field));
+                }
+            });
+        }
     }
 
     private void handleSpecialBlockMessage(SpecialBlockMessage message) {
-        findSlot(sender(), message.getSender()).ifPresent(player -> {
+        if (message.isServerMessage()) {
             if (gameRecorder != null) {
                 gameRecorder.onSpecialBlockMessage(message);
-                forEachSlot(op -> op.nr != player.nr, op -> op.send(message));
+                forEachSlot(op -> op.nr != message.getSender(), op -> op.send(message));
             }
-        });
+        }
+        else {
+            findSlot(sender(), message.getSender()).ifPresent(player -> {
+                if (gameRecorder != null) {
+                    gameRecorder.onSpecialBlockMessage(message);
+                    forEachSlot(op -> op.nr != player.nr, op -> op.send(message));
+                }
+            });
+        }
     }
 
     private void handleClassicStyleAddMessage(ClassicStyleAddMessage message) {

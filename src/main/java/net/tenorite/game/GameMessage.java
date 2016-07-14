@@ -14,8 +14,8 @@ import org.immutables.value.Value;
 public abstract class GameMessage {
 
     @JsonCreator
-    public static GameMessage of(@JsonProperty("timestamp") long timestamp, @JsonProperty("message") String rawMessage) {
-        return of(timestamp, MessageParser.parse(rawMessage).orElseThrow(IllegalStateException::new));
+    public static GameMessage of(@JsonProperty("timestamp") long timestamp, @JsonProperty("message") String message, @JsonProperty("server") boolean server) {
+        return of(timestamp, MessageParser.parse(message, server).orElseThrow(IllegalStateException::new));
     }
 
     public static GameMessage of(long timestamp, Message message) {
@@ -28,8 +28,13 @@ public abstract class GameMessage {
     public abstract Message getMessage();
 
     @JsonProperty("message")
-    private String raw() {
+    private String message() {
         return getMessage().raw(Tempo.NORMAL);
+    }
+
+    @JsonProperty("server")
+    private boolean server() {
+        return getMessage().isServerMessage();
     }
 
 }

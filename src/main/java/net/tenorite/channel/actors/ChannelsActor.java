@@ -45,6 +45,7 @@ public class ChannelsActor extends AbstractActor {
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SticksAndSquares(), "sns"), noSender()));
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Jelly(), "jelly"), noSender()));
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SevenOFour(), "7o4"), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new BreakOut(), "breakout"), noSender()));
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new GBomb(), "gbomb"), noSender()));
 
         subscribe(ChannelJoined.class);

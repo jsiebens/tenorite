@@ -12,6 +12,10 @@ import static java.util.Optional.of;
 public class MessageParser {
 
     public static Optional<Message> parse(String raw) {
+        return parse(raw, false);
+    }
+
+    public static Optional<Message> parse(String raw, boolean serverMessage) {
         String[] split = raw.trim().split("\\s+");
         switch (split[0]) {
             case "pline":
@@ -25,13 +29,13 @@ public class MessageParser {
             case "lvl":
                 return of(LvlMessage.of(valueOf(split[1]), valueOf(split[2])));
             case "f":
-                return of(FieldMessage.of(valueOf(split[1]), raw.substring("f".length() + 3).trim()));
+                return of(FieldMessage.of(valueOf(split[1]), raw.substring("f".length() + 3).trim(), serverMessage));
             case "sb":
                 Integer target = valueOf(split[1]);
                 Integer sender = valueOf(split[3]);
                 String special = split[2];
                 if (special.length() == 1) {
-                    return Special.valueOf(special.charAt(0)).map(s -> SpecialBlockMessage.of(sender, s, target));
+                    return Special.valueOf(special.charAt(0)).map(s -> SpecialBlockMessage.of(sender, s, target, serverMessage));
                 }
                 else if (Objects.equals(special, "cs1") || Objects.equals(special, "cs2") || Objects.equals(special, "cs4")) {
                     int lines = Integer.valueOf(special.substring(2));

@@ -294,6 +294,28 @@ public class GameRankingCalculatorTest {
     }
 
     @Test
+    public void testGameRecorderShouldIgnoreFieldMessageSentByServer() {
+        Player playerA = Player.of(1, "nick", null);
+        Player playerB = Player.of(2, "john", null);
+
+        Game game = newGame(Default.ID, b -> b
+            .addPlayers(playerA, playerB)
+            .addMessages(
+                GameMessage.of(100, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(200, FieldMessage.of(1, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H", true)),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H", false)),
+                GameMessage.of(300, FieldMessage.of(1, "$3G3H4H5H", true)),
+                GameMessage.of(600, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
+
+        assertThat(result).extracting("nrOfBlocks").containsExactly(2, 0);
+    }
+
+    @Test
     public void testCalculatorShouldNotDecreaseBlockCountOfTeamPlayersWhenPlayerSentAClassicSpecial() {
         Player playerA = Player.of(1, "nick", "doe");
         Player playerB = Player.of(2, "john", "doe");
@@ -400,6 +422,78 @@ public class GameRankingCalculatorTest {
             entry(Special.QUAKEFIELD, 1),
             entry(Special.BLOCKBOMB, 0)
         );
+    }
+
+    @Test
+    public void testCalculatorShouldIgnoreSpecialsSentByServer() {
+        Player playerA = Player.of(1, "john", "doe");
+        Player playerB = Player.of(2, "nick", "");
+        Player playerC = Player.of(3, "jane", "doe");
+
+        Game game = newGame(Classic.ID, b -> b
+            .addPlayers(playerA, playerB, playerC)
+            .addMessages(
+                GameMessage.of(100, FieldMessage.of(2, "$3G3H4H5H")),
+                GameMessage.of(200, FieldMessage.of(2, "$3G3H4H5H")),
+                GameMessage.of(300, FieldMessage.of(2, "$3G3H4H5H")),
+                GameMessage.of(100, SpecialBlockMessage.of(1, Special.ADDLINE, 2, true)),
+                GameMessage.of(200, SpecialBlockMessage.of(1, Special.ADDLINE, 2, true)),
+                GameMessage.of(600, PlayerLostMessage.of(3)),
+                GameMessage.of(600, PlayerLostMessage.of(2))
+            )
+        );
+
+        List<PlayingStats> result = calculator.calculate(new Classic(), game);
+
+        assertThat(result.get(0).getNrOfSpecialsOnOpponent()).containsOnly(
+            entry(Special.ADDLINE, 0),
+            entry(Special.CLEARLINE, 0),
+            entry(Special.NUKEFIELD, 0),
+            entry(Special.RANDOMCLEAR, 0),
+            entry(Special.SWITCHFIELD, 0),
+            entry(Special.CLEARSPECIAL, 0),
+            entry(Special.GRAVITY, 0),
+            entry(Special.QUAKEFIELD, 0),
+            entry(Special.BLOCKBOMB, 0)
+        );
+
+        assertThat(result.get(0).getNrOfSpecialsOnTeamPlayer()).containsOnly(
+            entry(Special.ADDLINE, 0),
+            entry(Special.CLEARLINE, 0),
+            entry(Special.NUKEFIELD, 0),
+            entry(Special.RANDOMCLEAR, 0),
+            entry(Special.SWITCHFIELD, 0),
+            entry(Special.CLEARSPECIAL, 0),
+            entry(Special.GRAVITY, 0),
+            entry(Special.QUAKEFIELD, 0),
+            entry(Special.BLOCKBOMB, 0)
+        );
+
+        assertThat(result.get(0).getNrOfSpecialsOnSelf()).containsOnly(
+            entry(Special.ADDLINE, 0),
+            entry(Special.CLEARLINE, 0),
+            entry(Special.NUKEFIELD, 0),
+            entry(Special.RANDOMCLEAR, 0),
+            entry(Special.SWITCHFIELD, 0),
+            entry(Special.CLEARSPECIAL, 0),
+            entry(Special.GRAVITY, 0),
+            entry(Special.QUAKEFIELD, 0),
+            entry(Special.BLOCKBOMB, 0)
+        );
+
+        assertThat(result.get(1).getNrOfSpecialsReceived()).containsOnly(
+            entry(Special.ADDLINE, 0),
+            entry(Special.CLEARLINE, 0),
+            entry(Special.NUKEFIELD, 0),
+            entry(Special.RANDOMCLEAR, 0),
+            entry(Special.SWITCHFIELD, 0),
+            entry(Special.CLEARSPECIAL, 0),
+            entry(Special.GRAVITY, 0),
+            entry(Special.QUAKEFIELD, 0),
+            entry(Special.BLOCKBOMB, 0)
+        );
+
+        assertThat(result.get(1).getNrOfBlocks()).isEqualTo(0);
     }
 
     private String createField(int maxHeight) {

@@ -117,7 +117,7 @@ public final class GameRecorder {
         if (sender != null) {
             Field field = fields.computeIfPresent(sender.getSlot(), updateWith(fieldMessage.getUpdate()));
             listener.onFieldUpdate(sender, field);
-            recordMessage(stopWatch.getTime(), FieldMessage.of(sender.getSlot(), field.getFieldString()));
+            recordMessage(stopWatch.getTime(), FieldMessage.of(sender.getSlot(), field.getFieldString(), fieldMessage.isServerMessage()));
         }
     }
 

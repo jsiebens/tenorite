@@ -137,35 +137,39 @@ public final class GameRankCalculator {
 
             ofNullable(players.get(target)).ifPresent(decr(blocks));
 
-            if (target == sender) {
-                ofNullable(players.get(sender)).ifPresent(incrSpecialOnSelf(special));
-            }
-            else {
-                Optional<Player> optTargetPlayer = ofNullable(players.get(target));
-                Optional<Player> optSenderPlayer = ofNullable(players.get(sender));
+            if (!message.isServerMessage()) {
+                if (target == sender) {
+                    ofNullable(players.get(sender)).ifPresent(incrSpecialOnSelf(special));
+                }
+                else {
+                    Optional<Player> optTargetPlayer = ofNullable(players.get(target));
+                    Optional<Player> optSenderPlayer = ofNullable(players.get(sender));
 
-                if (optSenderPlayer.isPresent() && optTargetPlayer.isPresent()) {
-                    Player senderPlayer = optSenderPlayer.get();
-                    Player targetPlayer = optTargetPlayer.get();
+                    if (optSenderPlayer.isPresent() && optTargetPlayer.isPresent()) {
+                        Player senderPlayer = optSenderPlayer.get();
+                        Player targetPlayer = optTargetPlayer.get();
 
-                    if (senderPlayer.isTeamPlayerOf(targetPlayer)) {
-                        incrSpecialOnTeamPlayer(special).accept(senderPlayer);
+                        if (senderPlayer.isTeamPlayerOf(targetPlayer)) {
+                            incrSpecialOnTeamPlayer(special).accept(senderPlayer);
+                        }
+                        else {
+                            incrSpecialOnOpponent(special).accept(senderPlayer);
+                        }
+
+                        incrSpecialReceived(special).accept(targetPlayer);
                     }
-                    else {
-                        incrSpecialOnOpponent(special).accept(senderPlayer);
-                    }
-
-                    incrSpecialReceived(special).accept(targetPlayer);
                 }
             }
         }
 
         private void process(FieldMessage message) {
-            int slot = message.getSender();
-            int currentHeight = Field.of(message.getUpdate()).getHighest();
-            lastFieldHeights.put(slot, currentHeight);
-            maxFieldHeights.compute(slot, (k, v) -> max(v, currentHeight));
-            blocks.compute(slot, (i, c) -> c + 1);
+            if (!message.isServerMessage()) {
+                int slot = message.getSender();
+                int currentHeight = Field.of(message.getUpdate()).getHighest();
+                lastFieldHeights.put(slot, currentHeight);
+                maxFieldHeights.compute(slot, (k, v) -> max(v, currentHeight));
+                blocks.compute(slot, (i, c) -> c + 1);
+            }
         }
 
         private void process(PlayerLeaveMessage message) {

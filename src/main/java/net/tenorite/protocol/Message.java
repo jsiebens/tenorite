@@ -6,4 +6,8 @@ public interface Message {
 
     String raw(Tempo tempo);
 
+    default boolean isServerMessage() {
+        return false;
+    }
+
 }
