@@ -504,6 +504,19 @@ public class ChannelActorTest extends AbstractActorTestCase {
     }
 
     @Test
+    public void testWinlistUpdatedFromOtherTempoAreIgnored() {
+        JavaTestKit player1 = newTestKit(accept(WinlistMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.FAST, new Classic(), "channel"));
+
+        joinChannel(player1, "john", channelActor);
+
+        channelActor.tell(WinlistUpdated.of(Tempo.NORMAL, Classic.ID, asList(WinlistItem.of(WinlistItem.Type.PLAYER, "a", 1, 1000), WinlistItem.of(WinlistItem.Type.TEAM, "b", 2, 2000))), noSender());
+
+        player1.expectNoMsg();
+    }
+
+    @Test
     public void testPlayerReceivesMessageWhenPlayerHasEarnedABadge() {
         JavaTestKit player1 = newTestKit(accept(BadgeEarnedPlineMessage.class));
         JavaTestKit player2 = newTestKit(accept(BadgeEarnedPlineMessage.class));

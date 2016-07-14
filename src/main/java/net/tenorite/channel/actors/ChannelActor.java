@@ -236,9 +236,9 @@ class ChannelActor extends AbstractActor {
         });
     }
 
-    private void handleWinlistUpdated(WinlistUpdated o) {
-        if (o.getGameModeId().equals(gameMode.getId())) {
-            forEachSlot(s -> s.send(WinlistMessage.of(o.getItems().stream().map(e -> e.getType().getLetter() + e.getName() + ";" + e.getScore()).collect(toList()))));
+    private void handleWinlistUpdated(WinlistUpdated winlistUpdated) {
+        if (tempo.equals(winlistUpdated.getTempo()) && winlistUpdated.getGameModeId().equals(gameMode.getId())) {
+            forEachSlot(s -> s.send(WinlistMessage.of(winlistUpdated.getItems().stream().map(e -> e.getType().getLetter() + e.getName() + ";" + e.getScore()).collect(toList()))));
         }
     }
 
