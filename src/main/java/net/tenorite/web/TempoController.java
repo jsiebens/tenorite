@@ -5,6 +5,8 @@ import net.tenorite.badges.*;
 import net.tenorite.core.NotAvailableException;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.*;
+import net.tenorite.protocol.ClassicStyleAddMessage;
+import net.tenorite.protocol.SpecialBlockMessage;
 import net.tenorite.stats.PlayerStats;
 import net.tenorite.stats.PlayerStatsRepository;
 import net.tenorite.winlist.WinlistItem;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 
@@ -131,6 +134,18 @@ public class TempoController {
                 .addObject("games", games);
     }
 
+    private Predicate<GameMessage> includeForReplay(GameMode mode) {
+        boolean classicRules = mode.getGameRules().getClassicRules();
+        return m -> {
+            if (m.getMessage() instanceof ClassicStyleAddMessage) {
+                return classicRules;
+            }
+            else {
+                return !(m.getMessage() instanceof SpecialBlockMessage) || !m.getMessage().isServerMessage();
+            }
+        };
+    }
+
     @RequestMapping("/t/{tempo}/m/{mode}/games/{id}")
     public ModelAndView replay(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("id") String gameId) {
         GameMode gameMode = gameModes.get(GameModeId.of(mode));
@@ -143,7 +158,7 @@ public class TempoController {
 
             Map<String, Object> data = new HashMap<>();
             data.put("players", game.getPlayers());
-            data.put("messages", game.getMessages());
+            data.put("messages", game.getMessages().stream().filter(includeForReplay(gameMode)).collect(toList()));
             Map map = objectMapper.convertValue(data, Map.class);
 
             return
