@@ -252,13 +252,13 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handlePline(PlineMessage pline) {
-        findSlot(pline.getSender()).ifPresent(s ->
+        findSlot(sender(), pline.getSender()).ifPresent(s ->
             forEachSlot(p -> p.nr != s.nr, p -> p.send(pline))
         );
     }
 
     private void handlePlineAct(PlineActMessage plineAct) {
-        findSlot(plineAct.getSender()).ifPresent(s ->
+        findSlot(sender(), plineAct.getSender()).ifPresent(s ->
             forEachSlot(p -> p.nr != s.nr, p -> p.send(plineAct))
         );
     }
@@ -270,7 +270,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleTeam(TeamMessage o) {
-        findSlot(o.getSender()).ifPresent(s ->
+        findSlot(sender(), o.getSender()).ifPresent(s ->
             forEachSlot(p -> {
                 if (p.nr == o.getSender()) {
                     p.team = o.getTeam();
@@ -283,7 +283,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleStartGame(StartGameMessage start) {
-        findSlot(start.getSender()).ifPresent(moderator -> {
+        findSlot(sender(), start.getSender()).ifPresent(moderator -> {
             if (gameRecorder == null) {
                 ActorRef self = self();
 
@@ -311,7 +311,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleStopGame(StopGameMessage stop) {
-        findSlot(stop.getSender()).ifPresent(moderator -> {
+        findSlot(sender(), stop.getSender()).ifPresent(moderator -> {
             if (gameRecorder != null) {
                 gameRecorder.stop();
 
@@ -332,7 +332,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handlePauseGame(PauseGameMessage pause) {
-        findSlot(pause.getSender()).ifPresent(moderator -> {
+        findSlot(sender(), pause.getSender()).ifPresent(moderator -> {
             if (gameRecorder != null && gameRecorder.pause()) {
                 Message message = PlineMessage.of("<i>game paused by <b>" + moderator.name + "</b></i>");
                 Message paused = GamePausedMessage.of();
@@ -349,7 +349,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleResumeGame(ResumeGameMessage pause) {
-        findSlot(pause.getSender()).ifPresent(moderator -> {
+        findSlot(sender(), pause.getSender()).ifPresent(moderator -> {
             if (gameRecorder != null && gameRecorder.resume()) {
                 Message message = PlineMessage.of("<i>game resumed by <b>" + moderator.name + "</b></i>");
                 Message running = GameRunningMessage.of();
@@ -366,7 +366,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleLvlMessage(LvlMessage lvl) {
-        findSlot(lvl.getSender()).ifPresent(player -> {
+        findSlot(sender(), lvl.getSender()).ifPresent(player -> {
             if (gameRecorder != null) {
                 gameRecorder.onLvlMessage(lvl);
                 forEachSlot(op -> op.send(lvl));
@@ -375,7 +375,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleFieldMessage(FieldMessage field) {
-        findSlot(field.getSender()).ifPresent(player -> {
+        findSlot(sender(), field.getSender()).ifPresent(player -> {
             if (gameRecorder != null) {
                 gameRecorder.onFieldMessage(field);
                 forEachSlot(op -> op.nr != player.nr, op -> op.send(field));
@@ -384,7 +384,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handleSpecialBlockMessage(SpecialBlockMessage message) {
-        findSlot(message.getSender()).ifPresent(player -> {
+        findSlot(sender(), message.getSender()).ifPresent(player -> {
             if (gameRecorder != null) {
                 gameRecorder.onSpecialBlockMessage(message);
                 forEachSlot(op -> op.nr != player.nr, op -> op.send(message));
@@ -399,7 +399,7 @@ class ChannelActor extends AbstractActor {
             }
         }
         else {
-            findSlot(message.getSender()).ifPresent(player -> {
+            findSlot(sender(), message.getSender()).ifPresent(player -> {
                 if (gameRecorder != null && gameRecorder.onClassicStyleAddMessage(message)) {
                     forEachSlot(op -> op.nr != player.nr, op -> op.send(message));
                 }
@@ -408,7 +408,7 @@ class ChannelActor extends AbstractActor {
     }
 
     private void handlePlayerLostMessage(PlayerLostMessage message) {
-        findSlot(message.getSender()).ifPresent(loser -> {
+        findSlot(sender(), message.getSender()).ifPresent(loser -> {
             if (gameRecorder != null) {
                 forEachSlot(s -> s.send(message));
                 gameRecorder.onPlayerLostMessage(message).ifPresent(this::endGame);
@@ -416,7 +416,7 @@ class ChannelActor extends AbstractActor {
         });
     }
 
-    protected void handlePlayerWon(PlayerWonMessage o) {
+    private void handlePlayerWon(PlayerWonMessage o) {
         of(gameRecorder.onPlayerWonMessage(o)).ifPresent(this::endGame);
     }
 
@@ -460,15 +460,15 @@ class ChannelActor extends AbstractActor {
     // =================================================================================================================
 
     private void forEachSlot(Consumer<Slot> playerConsumer) {
-        slots.values().stream().forEach(playerConsumer);
+        slots.values().forEach(playerConsumer);
     }
 
     private void forEachSlot(Predicate<Slot> predicate, Consumer<Slot> playerConsumer) {
         slots.values().stream().filter(predicate).forEach(playerConsumer);
     }
 
-    private Optional<Slot> findSlot(int slot) {
-        return slots.values().stream().filter(p -> p.nr == slot).findFirst();
+    private Optional<Slot> findSlot(ActorRef sender, int slot) {
+        return ofNullable(slots.get(sender)).filter(p -> p.nr == slot);
     }
 
     private Optional<Slot> findSlot(String name) {

@@ -410,6 +410,26 @@ public class ChannelActorTest extends AbstractActorTestCase {
     }
 
     @Test
+    public void testFieldMessagesAreIgnoredWhenGameMessageIsSentWithIncorrectSlot() {
+        Field field = Field.randomCompletedField();
+
+        JavaTestKit player1 = newTestKit(accept(FieldMessage.class));
+        JavaTestKit player2 = newTestKit(accept(FieldMessage.class));
+        JavaTestKit player3 = newTestKit(accept(FieldMessage.class));
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new Classic(), "channel"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+        joinChannel(player3, "nick", channelActor);
+
+        channelActor.tell(StartGameMessage.of(1), player1.getRef());
+        channelActor.tell(FieldMessage.of(3, field.getFieldString()), player1.getRef());
+
+        player2.expectNoMsg();
+    }
+
+    @Test
     public void testPlayerReceivesFieldWhenJoiningGameInProgress() {
         String field1 = Field.randomCompletedField().getFieldString();
         String field2 = Field.randomCompletedField().getFieldString();
