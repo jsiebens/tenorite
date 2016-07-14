@@ -42,9 +42,9 @@
         <div class="row">
             <div class="col-md-12">
                 <hr/>
-                <a id="playButton" class="btn btn-default btn-sm" href="javascript:play();">
+                <buton id="playButton" class="btn btn-default btn-sm" onclick="javascript:play();">
                     <span class="glyphicon glyphicon-play"></span> play
-                </a>
+                </buton>
             </div>
         </div>
         <div class="row">
@@ -81,17 +81,13 @@
         </div>
     </div>
 
-    <script src="//cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js"></script>
-    <script src="/js/player.js"></script>
+    <script src="/js/gameplayer.js"></script>
 
     <script th:inline="javascript">
-        var map = [[${game}]];
-
-        var tempo = [[${tempo.name()}]];
-        var id = [[${id}]];
+        var player = new GamePlayer([[${data}]]);
 
         function play(){
-            replay(tempo, id);
+            player.play();
         }
     </script>
 

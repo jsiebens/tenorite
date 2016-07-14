@@ -1,27 +1,33 @@
-function updateField(slot, update) {
-    var field = $('<div/>');
+function GamePlayer(data) {
+    var players = {};
+    var gameMessages = data.messages;
 
-    var arrValues = update.split('');
-    $.each(arrValues, function (intIndex, objValue) {
-        var tile = $('<div></div>').addClass('tile');
-
-        if (objValue >= '0' && objValue <= '9') {
-            tile.addClass('tile' + objValue);
-        } else {
-            tile.addClass('tileS').text(objValue);
-        }
-
-        field.append(tile);
+    $.each(data.players, function (i, player) {
+        $('#name' + player.slot).html(player.name);
+        players[player.slot] = player.name;
     });
 
-    $('#field' + slot).html(field);
-}
+    function updateField(slot, update) {
+        var field = $('<div/>');
 
-function onSocket(socket) {
-    var players = {};
+        var arrValues = update.split('');
+        $.each(arrValues, function (intIndex, objValue) {
+            var tile = $('<div></div>').addClass('tile');
 
-    socket.onmessage = function (a) {
-        var message = a.data.split(/ +/);
+            if (objValue >= '0' && objValue <= '9') {
+                tile.addClass('tile' + objValue);
+            } else {
+                tile.addClass('tileS').text(objValue);
+            }
+
+            field.append(tile);
+        });
+
+        $('#field' + slot).html(field);
+    }
+
+    function handleMessage(m) {
+        var message = m.message.split(/ +/);
 
         if (message[0] === 'f') {
             updateField(message[1], message[2]);
@@ -94,27 +100,36 @@ function onSocket(socket) {
             $('#name' + message[1]).html('');
             $('#field' + message[1]).html('');
         }
+    }
 
-        if (message[0] === 'endgame') {
-            $('#specials').prepend('<div><b>Game ended!</b><div>');
+    function GameRunner(data) {
+        var messages = data.slice();
+
+        function process(current) {
+            handleMessage(current);
+            var next = messages.shift();
+            if (next) {
+                setTimeout(function () {
+                    process(next);
+                }, next.timestamp - current.timestamp)
+            } else {
+                $('#playButton').removeClass('disabled');
+                $('#specials').prepend('<div><b>Game ended!</b><div>');
+            }
         }
+
+        this.start = function () {
+            $('#playButton').addClass('disabled');
+            process(messages.shift())
+        };
+
+    }
+
+    var runner = null;
+
+    this.play = function () {
+        runner = new GameRunner(gameMessages);
+        runner.start();
     };
 
-    socket.onclose = function () {
-        $('#playButton').removeClass('disabled');
-
-        console.log("Closed socket.");
-    };
-    socket.onerror = function () {
-        $('#playButton').removeClass('disabled');
-
-        console.log("Error during transfer.");
-    };
-}
-
-function replay(tempo, id) {
-    $('#playButton').addClass('disabled');
-    $('#specials').html('');
-
-    onSocket(new SockJS('/ws/replay?tempo=' + tempo + '&id=' + id));
 }

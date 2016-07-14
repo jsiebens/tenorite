@@ -1,5 +1,6 @@
 package net.tenorite.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.tenorite.badges.*;
 import net.tenorite.core.NotAvailableException;
 import net.tenorite.core.Tempo;
@@ -13,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,12 +39,13 @@ public class TempoController {
     private PlayerStatsRepository playerStatsRepository;
 
     @Autowired
-    public TempoController(GameModes gameModes, WinlistRepository winlistRepository, GameRepository gameRepository, BadgeRepository badgeRepository, PlayerStatsRepository playerStatsRepository) {
+    public TempoController(GameModes gameModes, WinlistRepository winlistRepository, GameRepository gameRepository, BadgeRepository badgeRepository, PlayerStatsRepository playerStatsRepository, ObjectMapper objectMapper) {
         this.gameModes = gameModes;
         this.winlistRepository = winlistRepository;
         this.gameRepository = gameRepository;
         this.badgeRepository = badgeRepository;
         this.playerStatsRepository = playerStatsRepository;
+        this.objectMapper = objectMapper;
     }
 
     @RequestMapping("/t/{tempo}/m/{mode}/winlist")
@@ -137,6 +141,11 @@ public class TempoController {
             Game game = optGame.get();
             List<PlayingStats> ranking = new GameRankCalculator().calculate(gameMode, game);
 
+            Map<String, Object> data = new HashMap<>();
+            data.put("players", game.getPlayers());
+            data.put("messages", game.getMessages());
+            Map map = objectMapper.convertValue(data, Map.class);
+
             return
                 new ModelAndView("game")
                     .addObject("tempo", tempo)
@@ -144,7 +153,32 @@ public class TempoController {
                     .addObject("gameModes", gameModes)
                     .addObject("ranking", ranking)
                     .addObject("game", optGame.get())
+                    .addObject("data", map)
                     .addObject("id", gameId);
+        }
+        else {
+            throw new NotAvailableException();
+        }
+    }
+
+    private final ObjectMapper objectMapper;
+
+    @ResponseBody
+    @RequestMapping("/t/{tempo}/m/{mode}/games/{id}/messages.json")
+    public Object gameMessages(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("id") String gameId) {
+        GameMode gameMode = gameModes.get(GameModeId.of(mode));
+
+        Optional<Game> optGame = gameRepository.gameOps(tempo).loadGame(gameId);
+
+        if (optGame.isPresent()) {
+            Map<String, Object> data = new HashMap<>();
+            Game game = optGame.get();
+
+            List<GameMessage> messages = game.getMessages();
+            data.put("players", game.getPlayers());
+            data.put("messages", messages);
+
+            return data;
         }
         else {
             throw new NotAvailableException();
