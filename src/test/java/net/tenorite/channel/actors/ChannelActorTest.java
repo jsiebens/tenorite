@@ -14,7 +14,7 @@ import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.Field;
-import net.tenorite.modes.Default;
+import net.tenorite.util.Default;
 import net.tenorite.modes.Pure;
 import net.tenorite.modes.classic.Classic;
 import net.tenorite.protocol.*;
