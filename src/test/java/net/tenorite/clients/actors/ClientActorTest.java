@@ -146,7 +146,7 @@ public class ClientActorTest extends AbstractActorTestCase {
         client.tell(channels, noSender());
 
         output.expectMsgAllOf(
-            PlineMessage.of("   a  <blue>(0/6)</blue>"),
+            PlineMessage.of("   a<gray> - " + classic.getDescription(Tempo.FAST) + "</gray>  <blue>(0/6)</blue>"),
             PlineMessage.of("   b<gray> - " + jelly.getDescription(Tempo.FAST) + "</gray>  <blue>(0/6)</blue>"),
             PlineMessage.of("<gray>(type /join <name>)</gray>")
         );
