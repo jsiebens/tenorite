@@ -1,9 +1,6 @@
 package net.tenorite.channel.actors;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
-import akka.actor.Terminated;
+import akka.actor.*;
 import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeLevel;
 import net.tenorite.badges.events.BadgeEarned;
@@ -81,6 +78,11 @@ class ChannelActor extends AbstractActor {
     @Override
     public void postStop() throws Exception {
         ofNullable(gameRecorder).ifPresent(GameRecorder::stop);
+
+        forEachSlot(s -> {
+            s.send(PlineMessage.of("<red><b>WOOPS!</b> Something went wrong, please try again later</red>"));
+            s.stop();
+        });
     }
 
     @Override
@@ -537,6 +539,10 @@ class ChannelActor extends AbstractActor {
 
         void send(Message m) {
             actor.tell(m, noSender());
+        }
+
+        void stop() {
+            actor.tell(PoisonPill.getInstance(), noSender());
         }
 
         Player player() {

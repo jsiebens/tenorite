@@ -14,10 +14,11 @@ import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.Field;
-import net.tenorite.util.Default;
 import net.tenorite.modes.Pure;
 import net.tenorite.modes.classic.Classic;
 import net.tenorite.protocol.*;
+import net.tenorite.util.ChaosMonkey;
+import net.tenorite.util.Default;
 import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.events.WinlistUpdated;
 import org.junit.Test;
@@ -608,6 +609,35 @@ public class ChannelActorTest extends AbstractActorTestCase {
         channelActor.tell(BadgeEarned.of(level, false), noSender());
 
         player1.expectNoMsg();
+    }
+
+    @Test
+    public void testClientsAreStoppedWhenSomethingGoesWrong() {
+        JavaTestKit player1 = newTestKit();
+        JavaTestKit player2 = newTestKit();
+        JavaTestKit player3 = newTestKit();
+
+        JavaTestKit probe1 = newTestKit();
+        probe1.watch(player1.getRef());
+
+        JavaTestKit probe2 = newTestKit();
+        probe2.watch(player2.getRef());
+
+        JavaTestKit probe3 = newTestKit();
+        probe3.watch(player3.getRef());
+
+        ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new ChaosMonkey(), "channel"));
+
+        joinChannel(player1, "john", channelActor);
+        joinChannel(player2, "jane", channelActor);
+        joinChannel(player3, "nick", channelActor);
+
+        channelActor.tell(StartGameMessage.of(1), player1.getRef());
+        channelActor.tell(SpecialBlockMessage.of(1, Special.ADDLINE, 2), player1.getRef());
+
+        probe1.expectTerminated(player1.getRef());
+        probe2.expectTerminated(player2.getRef());
+        probe3.expectTerminated(player3.getRef());
     }
 
     private void joinChannel(JavaTestKit player, String name, ActorRef channel) {
