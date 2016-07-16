@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.HashMap;
@@ -31,15 +30,17 @@ import static java.util.stream.Collectors.toList;
 @Controller
 public class TempoController {
 
-    private GameModes gameModes;
+    private final GameModes gameModes;
 
-    private WinlistRepository winlistRepository;
+    private final WinlistRepository winlistRepository;
 
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
 
-    private BadgeRepository badgeRepository;
+    private final BadgeRepository badgeRepository;
 
-    private PlayerStatsRepository playerStatsRepository;
+    private final PlayerStatsRepository playerStatsRepository;
+
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public TempoController(GameModes gameModes, WinlistRepository winlistRepository, GameRepository gameRepository, BadgeRepository badgeRepository, PlayerStatsRepository playerStatsRepository, ObjectMapper objectMapper) {
@@ -170,30 +171,6 @@ public class TempoController {
                     .addObject("game", optGame.get())
                     .addObject("data", map)
                     .addObject("id", gameId);
-        }
-        else {
-            throw new NotAvailableException();
-        }
-    }
-
-    private final ObjectMapper objectMapper;
-
-    @ResponseBody
-    @RequestMapping("/t/{tempo}/m/{mode}/games/{id}/messages.json")
-    public Object gameMessages(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("id") String gameId) {
-        GameMode gameMode = gameModes.get(GameModeId.of(mode));
-
-        Optional<Game> optGame = gameRepository.gameOps(tempo).loadGame(gameId);
-
-        if (optGame.isPresent()) {
-            Map<String, Object> data = new HashMap<>();
-            Game game = optGame.get();
-
-            List<GameMessage> messages = game.getMessages();
-            data.put("players", game.getPlayers());
-            data.put("messages", messages);
-
-            return data;
         }
         else {
             throw new NotAvailableException();
