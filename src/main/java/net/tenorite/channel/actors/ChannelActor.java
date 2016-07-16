@@ -8,8 +8,10 @@ import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeLevel;
 import net.tenorite.badges.events.BadgeEarned;
 import net.tenorite.badges.protocol.BadgeEarnedPlineMessage;
+import net.tenorite.channel.Channel;
 import net.tenorite.channel.commands.ConfirmSlot;
 import net.tenorite.channel.commands.LeaveChannel;
+import net.tenorite.channel.commands.ListChannels;
 import net.tenorite.channel.commands.ReserveSlot;
 import net.tenorite.channel.events.ChannelJoined;
 import net.tenorite.channel.events.ChannelLeft;
@@ -103,6 +105,9 @@ class ChannelActor extends AbstractActor {
         }
         else if (o instanceof BadgeEarned) {
             handleBadgeEarned((BadgeEarned) o);
+        }
+        else if (o instanceof ListChannels) {
+            replyWith(Channel.of(gameMode.getId(), name, slots.size()));
         }
     }
 

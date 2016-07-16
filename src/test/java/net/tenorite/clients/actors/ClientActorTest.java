@@ -141,13 +141,13 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channelsKit.getRef()));
 
-        Channels channels = Channels.of(Channel.of(Classic.ID, "a"), Channel.of(Jelly.ID, "b"));
+        Channels channels = Channels.of(Channel.of(Classic.ID, "a", 2), Channel.of(Jelly.ID, "b", 6));
 
         client.tell(channels, noSender());
 
         output.expectMsgAllOf(
-            PlineMessage.of("   a<gray> - " + classic.getDescription(Tempo.FAST) + "</gray>  <blue>(0/6)</blue>"),
-            PlineMessage.of("   b<gray> - " + jelly.getDescription(Tempo.FAST) + "</gray>  <blue>(0/6)</blue>"),
+            PlineMessage.of("   a<gray> - " + classic.getDescription(Tempo.FAST) + "</gray>  <blue>(2/6)</blue>"),
+            PlineMessage.of("   b<gray> - " + jelly.getDescription(Tempo.FAST) + "</gray>  <red>(FULL)</red>"),
             PlineMessage.of("<gray>(type /join <name>)</gray>")
         );
     }

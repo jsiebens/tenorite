@@ -3,26 +3,28 @@ package net.tenorite.channel.actors;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import net.tenorite.channel.Channel;
-import net.tenorite.channel.ChannelBuilder;
 import net.tenorite.channel.Channels;
 import net.tenorite.channel.commands.CreateChannel;
 import net.tenorite.channel.commands.ListChannels;
 import net.tenorite.channel.commands.ReserveSlot;
-import net.tenorite.channel.events.ChannelJoined;
-import net.tenorite.channel.events.ChannelLeft;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Tempo;
 import net.tenorite.modes.*;
 import net.tenorite.modes.classic.Classic;
 import net.tenorite.util.AbstractActor;
 import scala.Option;
+import scala.concurrent.ExecutionContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static akka.actor.ActorRef.noSender;
+import static akka.dispatch.Futures.sequence;
+import static akka.pattern.Patterns.ask;
 import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.range;
+import static java.util.stream.StreamSupport.stream;
 
 public class ChannelsActor extends AbstractActor {
 
@@ -47,9 +49,6 @@ public class ChannelsActor extends AbstractActor {
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SevenOFour(), "7o4"), noSender()));
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new BreakOut(), "breakout"), noSender()));
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new GBomb(), "gbomb"), noSender()));
-
-        subscribe(ChannelJoined.class);
-        subscribe(ChannelLeft.class);
     }
 
     @Override
@@ -66,19 +65,9 @@ public class ChannelsActor extends AbstractActor {
             ListChannels lc = (ListChannels) o;
             actors.get(lc.getTempo()).forward(o, context());
         }
-        else if (o instanceof ChannelJoined) {
-            ChannelJoined cj = (ChannelJoined) o;
-            actors.get(cj.getTempo()).forward(o, context());
-        }
-        else if (o instanceof ChannelLeft) {
-            ChannelLeft cj = (ChannelLeft) o;
-            actors.get(cj.getTempo()).forward(o, context());
-        }
     }
 
     private static class ChannelsPerModeActor extends AbstractActor {
-
-        private final Map<String, Channel> channels = new HashMap<>();
 
         @Override
         public void onReceive(Object o) throws Exception {
@@ -89,13 +78,7 @@ public class ChannelsActor extends AbstractActor {
                 handleReserveSlot((ReserveSlot) o);
             }
             else if (o instanceof ListChannels) {
-                handleListChannels();
-            }
-            else if (o instanceof ChannelJoined) {
-                handleChannelJoined((ChannelJoined) o);
-            }
-            else if (o instanceof ChannelLeft) {
-                handleChannelLeft((ChannelLeft) o);
+                handleListChannels((ListChannels) o);
             }
         }
 
@@ -110,22 +93,24 @@ public class ChannelsActor extends AbstractActor {
             }
         }
 
-        private void handleListChannels() {
-            replyWith(Channels.of(channels.values()));
-        }
+        private void handleListChannels(ListChannels listChannels) {
+            ActorRef sender = sender();
+            ActorRef self = self();
 
-        private void handleChannelJoined(ChannelJoined o) {
-            channels.computeIfPresent(o.getChannel(), (n, c) -> new ChannelBuilder().from(c).nrOfPlayers(c.getNrOfPlayers() + 1).build());
-        }
+            ExecutionContext ec = context().dispatcher();
+            Iterable<ActorRef> children = getContext().getChildren();
 
-        private void handleChannelLeft(ChannelLeft o) {
-            channels.computeIfPresent(o.getChannel(), (n, c) -> new ChannelBuilder().from(c).nrOfPlayers(c.getNrOfPlayers() - 1).build());
+            sequence(
+                stream(children.spliterator(), false)
+                    .map(c -> ask(c, listChannels, 20).map(mapper(o -> (Channel) o), ec))
+                    .collect(Collectors.toList()),
+                ec
+            ).onSuccess(onSuccess(i -> sender.tell(Channels.of(i), self)), ec);
         }
 
         private void createChannel(CreateChannel c) {
             if (context().child(c.getName()).isEmpty()) {
                 context().actorOf(ChannelActor.props(c.getTempo(), c.getGameMode(), c.getName()), c.getName());
-                channels.put(c.getName(), Channel.of(c.getGameMode().getId(), c.getName()));
             }
         }
     }

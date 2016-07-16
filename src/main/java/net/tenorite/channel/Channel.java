@@ -8,8 +8,8 @@ import org.immutables.value.Value;
 @ImmutableStyle
 public abstract class Channel {
 
-    public static Channel of(GameModeId gameModeId, String name) {
-        return new ChannelBuilder().gameModeId(gameModeId).name(name).nrOfPlayers(0).build();
+    public static Channel of(GameModeId gameModeId, String name, int nrOfPlayers) {
+        return new ChannelBuilder().gameModeId(gameModeId).name(name).nrOfPlayers(nrOfPlayers).build();
     }
 
     public abstract GameModeId getGameModeId();
