@@ -23,7 +23,6 @@ import static akka.actor.ActorRef.noSender;
 import static akka.dispatch.Futures.sequence;
 import static akka.pattern.Patterns.ask;
 import static java.util.Arrays.stream;
-import static java.util.stream.IntStream.range;
 import static java.util.stream.StreamSupport.stream;
 
 public class ChannelsActor extends AbstractActor {
@@ -40,9 +39,7 @@ public class ChannelsActor extends AbstractActor {
         actors.put(Tempo.NORMAL, context().actorOf(Props.create(ChannelsPerModeActor.class), Tempo.NORMAL.name()));
         actors.put(Tempo.FAST, context().actorOf(Props.create(ChannelsPerModeActor.class), Tempo.FAST.name()));
 
-        range(1, 6).mapToObj(i -> "tetrinet:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.NORMAL, new Classic(), m), noSender()));
-        range(1, 6).mapToObj(i -> "tetrifast:" + i).forEach(m -> self().tell(CreateChannel.of(Tempo.FAST, new Classic(), m), noSender()));
-
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Classic(), "classic"), noSender()));
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Pure(), "pure"), noSender()));
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SticksAndSquares(), "sns"), noSender()));
         stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Jelly(), "jelly"), noSender()));
