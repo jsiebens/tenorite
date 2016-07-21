@@ -3,16 +3,12 @@ package net.tenorite.clients.actors;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import net.tenorite.channel.Channels;
-import net.tenorite.channel.commands.ConfirmSlot;
-import net.tenorite.channel.commands.LeaveChannel;
-import net.tenorite.channel.commands.ListChannels;
-import net.tenorite.channel.commands.ReserveSlot;
-import net.tenorite.channel.events.ChannelLeft;
-import net.tenorite.channel.events.SlotReservationFailed;
-import net.tenorite.channel.events.SlotReserved;
+import net.tenorite.channel.commands.*;
+import net.tenorite.channel.events.*;
 import net.tenorite.clients.MessageSink;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameMode;
+import net.tenorite.game.GameModeId;
 import net.tenorite.game.GameModes;
 import net.tenorite.protocol.*;
 import net.tenorite.util.AbstractActor;
@@ -21,6 +17,7 @@ import org.springframework.util.StringUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import static java.lang.String.format;
@@ -34,9 +31,13 @@ final class ClientActor extends AbstractActor {
 
     private final Tempo tempo;
 
+    private final String name;
+
     private final MessageSink sink;
 
     private final GameModes gameModes;
+
+    private final ActorRef channels;
 
     private ActorRef channel;
 
@@ -44,13 +45,36 @@ final class ClientActor extends AbstractActor {
 
     public ClientActor(Tempo tempo, String name, MessageSink sink, GameModes gameModes, ActorRef channels) {
         this.tempo = tempo;
+        this.name = name;
         this.sink = sink;
         this.gameModes = gameModes;
+        this.channels = channels;
 
         this.commands = new Commands()
-            .register("/join", (i, s) -> channels.tell(ReserveSlot.of(tempo, s, name), self()))
+            .register("/join", (i, s) -> joinChannel(s))
             .register("/list", (i, s) -> channels.tell(ListChannels.of(tempo), self()))
+            .register("/create", (i, s) -> createChannel(s))
             .register("/exit", (i, s) -> context().stop(self()));
+    }
+
+    private void joinChannel(String channel) {
+        channels.tell(ReserveSlot.of(tempo, channel, name), self());
+    }
+
+    private void createChannel(String s) {
+        String[] split = s.split("\\s+");
+        if (split.length != 2) {
+            write(PlineMessage.of("<red>invalid number of arguments</red>"));
+        }
+        else {
+            Optional<GameMode> gameMode = gameModes.find(GameModeId.of(split[0]));
+            if (gameMode.isPresent()) {
+                channels.tell(CreateChannel.of(tempo, gameMode.get(), split[1], true), self());
+            }
+            else {
+                write(PlineMessage.of("<red>invalid game mode</red>"));
+            }
+        }
     }
 
     @Override
@@ -79,6 +103,21 @@ final class ClientActor extends AbstractActor {
         }
         else if (o instanceof Message) {
             write((Message) o);
+        }
+        else if (o instanceof ChannelCreated) {
+            ChannelCreated cc = (ChannelCreated) o;
+            joinChannel(cc.getName());
+        }
+        else if (o instanceof ChannelCreationFailed) {
+            ChannelCreationFailed ccf = (ChannelCreationFailed) o;
+            switch (ccf.getType()) {
+                case INVALID_NAME:
+                    write(PlineMessage.of("<red>invalid channel name</red>"));
+                    break;
+                case NAME_ALREADY_IN_USE:
+                    write(PlineMessage.of("<red>channel name already in use</red>"));
+                    break;
+            }
         }
         else if (o instanceof SlotReserved) {
             if (channel != null) {
@@ -122,7 +161,7 @@ final class ClientActor extends AbstractActor {
             .stream()
             .sorted((a, b) -> a.getName().compareTo(b.getName()))
             .forEach(c -> {
-                GameMode gameMode = gameModes.get(c.getGameModeId());
+                GameMode gameMode = gameModes.find(c.getGameModeId()).orElseThrow(IllegalStateException::new);
                 String description = ofNullable(gameMode.getDescription(tempo)).filter(StringUtils::hasText).map(s -> "<gray> - " + s + "</gray> ").orElse(" ");
                 if (c.getNrOfPlayers() < 6) {
                     write(PlineMessage.of(format("   %s%s <blue>(%s/%s)</blue>", c.getName(), description, c.getNrOfPlayers(), 6)));

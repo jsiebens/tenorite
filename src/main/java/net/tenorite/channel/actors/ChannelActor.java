@@ -40,8 +40,10 @@ import static java.util.stream.IntStream.range;
 
 class ChannelActor extends AbstractActor {
 
-    static Props props(Tempo tempo, GameMode gameMode, String name) {
-        return Props.create(ChannelActor.class, tempo, gameMode, name);
+    private static final FiniteDuration CLOSE_TIMEOUT = FiniteDuration.apply(10, TimeUnit.MINUTES);
+
+    static Props props(Tempo tempo, GameMode gameMode, String name, boolean ephemeral) {
+        return Props.create(ChannelActor.class, tempo, gameMode, name, ephemeral);
     }
 
     private static final GameRankCalculator RANK_CALCULATOR = new GameRankCalculator();
@@ -58,14 +60,19 @@ class ChannelActor extends AbstractActor {
 
     private final String name;
 
+    private final boolean ephemeral;
+
     private final Scheduler scheduler;
 
     private GameRecorder gameRecorder;
 
-    public ChannelActor(Tempo tempo, GameMode gameMode, String name) {
+    private Cancellable scheduledClose;
+
+    public ChannelActor(Tempo tempo, GameMode gameMode, String name, boolean ephemeral) {
         this.tempo = tempo;
         this.gameMode = gameMode;
         this.name = name;
+        this.ephemeral = ephemeral;
         this.scheduler = new AkkaScheduler(context().system());
     }
 
@@ -110,6 +117,24 @@ class ChannelActor extends AbstractActor {
         }
         else if (o instanceof ListChannels) {
             replyWith(Channel.of(gameMode.getId(), name, slots.size()));
+        }
+
+        if (ephemeral && slots.isEmpty() && pending.isEmpty()) {
+            if (scheduledClose == null) {
+                scheduledClose = getContext().system().scheduler().scheduleOnce(
+                    CLOSE_TIMEOUT,
+                    self(),
+                    PoisonPill.getInstance(),
+                    context().dispatcher(),
+                    noSender()
+                );
+            }
+        }
+        else {
+            if (scheduledClose != null) {
+                scheduledClose.cancel();
+                scheduledClose = null;
+            }
         }
     }
 

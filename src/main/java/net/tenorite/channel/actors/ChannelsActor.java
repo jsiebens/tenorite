@@ -7,6 +7,8 @@ import net.tenorite.channel.Channels;
 import net.tenorite.channel.commands.CreateChannel;
 import net.tenorite.channel.commands.ListChannels;
 import net.tenorite.channel.commands.ReserveSlot;
+import net.tenorite.channel.events.ChannelCreated;
+import net.tenorite.channel.events.ChannelCreationFailed;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Tempo;
 import net.tenorite.modes.*;
@@ -17,6 +19,7 @@ import scala.concurrent.ExecutionContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static akka.actor.ActorRef.noSender;
@@ -39,13 +42,13 @@ public class ChannelsActor extends AbstractActor {
         actors.put(Tempo.NORMAL, context().actorOf(Props.create(ChannelsPerModeActor.class), Tempo.NORMAL.name()));
         actors.put(Tempo.FAST, context().actorOf(Props.create(ChannelsPerModeActor.class), Tempo.FAST.name()));
 
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Classic(), "classic"), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Pure(), "pure"), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SticksAndSquares(), "sns"), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Jelly(), "jelly"), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SevenOFour(), "7o4"), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new BreakOut(), "breakout"), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new GBomb(), "gbomb"), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Classic(), "classic", false), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Pure(), "pure", false), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SticksAndSquares(), "sns", false), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Jelly(), "jelly", false), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SevenOFour(), "7o4", false), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new BreakOut(), "breakout", false), noSender()));
+        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new GBomb(), "gbomb", false), noSender()));
     }
 
     @Override
@@ -107,9 +110,23 @@ public class ChannelsActor extends AbstractActor {
 
         private void createChannel(CreateChannel c) {
             if (context().child(c.getName()).isEmpty()) {
-                context().actorOf(ChannelActor.props(c.getTempo(), c.getGameMode(), c.getName()), c.getName());
+                if (isValid(c.getName())) {
+                    context().actorOf(ChannelActor.props(c.getTempo(), c.getGameMode(), c.getName(), c.isEphemeral()), c.getName());
+                    replyWith(ChannelCreated.of(c.getTempo(), c.getGameMode().getId(), c.getName()));
+                }
+                else {
+                    replyWith(ChannelCreationFailed.invalidName());
+                }
+            }
+            else {
+                replyWith(ChannelCreationFailed.nameAlreadyInUse());
             }
         }
+
+        private boolean isValid(String name) {
+            return name.length() >= 2 && name.length() <= 25 && Pattern.matches("[a-z0-9:_-]+", name);
+        }
+
     }
 
 }

@@ -2,10 +2,7 @@ package net.tenorite.game;
 
 import net.tenorite.core.NotAvailableException;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
@@ -18,6 +15,11 @@ public class GameModes implements Iterable<GameMode> {
         this.modes = new TreeMap<>(modes.stream().collect(Collectors.toMap(GameMode::getId, gameMode -> gameMode)));
     }
 
+    public Optional<GameMode> find(GameModeId id) {
+        return ofNullable(modes.get(id));
+    }
+
+    @Deprecated
     public GameMode get(GameModeId id) {
         return ofNullable(modes.get(id)).orElseThrow(NotAvailableException::new);
     }

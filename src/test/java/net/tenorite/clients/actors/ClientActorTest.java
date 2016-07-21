@@ -5,10 +5,7 @@ import akka.testkit.JavaTestKit;
 import net.tenorite.AbstractActorTestCase;
 import net.tenorite.channel.Channel;
 import net.tenorite.channel.Channels;
-import net.tenorite.channel.commands.ConfirmSlot;
-import net.tenorite.channel.commands.LeaveChannel;
-import net.tenorite.channel.commands.ListChannels;
-import net.tenorite.channel.commands.ReserveSlot;
+import net.tenorite.channel.commands.*;
 import net.tenorite.channel.events.ChannelLeft;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.channel.events.SlotReserved;
@@ -150,6 +147,59 @@ public class ClientActorTest extends AbstractActorTestCase {
             PlineMessage.of("   b<gray> - " + jelly.getDescription(Tempo.FAST) + "</gray>  <red>(FULL)</red>"),
             PlineMessage.of("<gray>(type /join <name>)</gray>")
         );
+    }
+
+    @Test
+    public void testCreateChannel() {
+        Classic classic = new Classic();
+        Jelly jelly = new Jelly();
+
+        GameModes gameModes = new GameModes(asList(classic, jelly));
+        JavaTestKit channels = newTestKit(accept(CreateChannel.class));
+
+        JavaTestKit output = newTestKit(accept(PlineMessage.class).and(ignoreWelcomeMessages()));
+
+        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channels.getRef()));
+
+        client.tell(Inbound.of("pline 1 /create CLASSIC junit"), noSender());
+
+        channels.expectMsgAllOf(CreateChannel.of(Tempo.FAST, classic, "junit", true));
+    }
+
+    @Test
+    public void testCreateChannelWithInvalidArguments() {
+        Classic classic = new Classic();
+        Jelly jelly = new Jelly();
+
+        GameModes gameModes = new GameModes(asList(classic, jelly));
+        JavaTestKit channels = newTestKit(accept(CreateChannel.class));
+
+        JavaTestKit output = newTestKit(accept(PlineMessage.class).and(ignoreWelcomeMessages()));
+
+        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channels.getRef()));
+
+        client.tell(Inbound.of("pline 1 /create CLASSIC junit invalid"), noSender());
+
+        output.expectMsgAllOf(PlineMessage.of("<red>invalid number of arguments</red>"));
+        channels.expectNoMsg();
+    }
+
+    @Test
+    public void testCreateChannelWithInvalidGameMode() {
+        Classic classic = new Classic();
+        Jelly jelly = new Jelly();
+
+        GameModes gameModes = new GameModes(asList(classic, jelly));
+        JavaTestKit channels = newTestKit(accept(CreateChannel.class));
+
+        JavaTestKit output = newTestKit(accept(PlineMessage.class).and(ignoreWelcomeMessages()));
+
+        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channels.getRef()));
+
+        client.tell(Inbound.of("pline 1 /create UNKNOWN junit"), noSender());
+
+        output.expectMsgAllOf(PlineMessage.of("<red>invalid game mode</red>"));
+        channels.expectNoMsg();
     }
 
     private MessageSink stub(JavaTestKit kit) {

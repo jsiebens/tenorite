@@ -9,8 +9,8 @@ import org.immutables.value.Value;
 @ImmutableStyle
 public abstract class CreateChannel {
 
-    public static CreateChannel of(Tempo tempo, GameMode gameMode, String name) {
-        return new CreateChannelBuilder().tempo(tempo).gameMode(gameMode).name(name).build();
+    public static CreateChannel of(Tempo tempo, GameMode gameMode, String name, boolean ephemeral) {
+        return new CreateChannelBuilder().tempo(tempo).gameMode(gameMode).name(name).ephemeral(ephemeral).build();
     }
 
     public abstract Tempo getTempo();
@@ -18,5 +18,7 @@ public abstract class CreateChannel {
     public abstract GameMode getGameMode();
 
     public abstract String getName();
+
+    public abstract boolean isEphemeral();
 
 }
