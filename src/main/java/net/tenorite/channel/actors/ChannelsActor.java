@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static akka.actor.ActorRef.noSender;
 import static akka.dispatch.Futures.sequence;
 import static akka.pattern.Patterns.ask;
 import static java.util.Arrays.stream;
