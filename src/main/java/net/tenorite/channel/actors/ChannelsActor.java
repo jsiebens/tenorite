@@ -11,8 +11,8 @@ import net.tenorite.channel.events.ChannelCreated;
 import net.tenorite.channel.events.ChannelCreationFailed;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Tempo;
-import net.tenorite.modes.*;
-import net.tenorite.modes.classic.Classic;
+import net.tenorite.game.GameMode;
+import net.tenorite.game.GameModes;
 import net.tenorite.util.AbstractActor;
 import scala.Option;
 import scala.concurrent.ExecutionContext;
@@ -30,11 +30,17 @@ import static java.util.stream.StreamSupport.stream;
 
 public class ChannelsActor extends AbstractActor {
 
-    public static Props props() {
-        return Props.create(ChannelsActor.class);
+    public static Props props(GameModes gameModes) {
+        return Props.create(ChannelsActor.class, gameModes);
     }
 
+    private final GameModes gameModes;
+
     private final Map<Tempo, ActorRef> actors = new HashMap<>();
+
+    public ChannelsActor(GameModes gameModes) {
+        this.gameModes = gameModes;
+    }
 
     @Override
     public void preStart() throws Exception {
@@ -42,13 +48,9 @@ public class ChannelsActor extends AbstractActor {
         actors.put(Tempo.NORMAL, context().actorOf(Props.create(ChannelsPerModeActor.class), Tempo.NORMAL.name()));
         actors.put(Tempo.FAST, context().actorOf(Props.create(ChannelsPerModeActor.class), Tempo.FAST.name()));
 
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Classic(), "classic", false), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Pure(), "pure", false), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SticksAndSquares(), "sns", false), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new Jelly(), "jelly", false), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new SevenOFour(), "7o4", false), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new BreakOut(), "breakout", false), noSender()));
-        stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, new GBomb(), "gbomb", false), noSender()));
+        for (GameMode gameMode : gameModes) {
+            stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, gameMode, gameMode.getId().toString().toLowerCase(), false), self()));
+        }
     }
 
     @Override
