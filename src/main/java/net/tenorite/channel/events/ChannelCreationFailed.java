@@ -11,16 +11,17 @@ public abstract class ChannelCreationFailed {
         return new ChannelCreationFailedBuilder().type(Type.INVALID_NAME).build();
     }
 
+    public static ChannelCreationFailed invalidGameMode() {
+        return new ChannelCreationFailedBuilder().type(Type.INVALID_GAME_MODE).build();
+    }
+
     public static ChannelCreationFailed nameAlreadyInUse() {
         return new ChannelCreationFailedBuilder().type(Type.NAME_ALREADY_IN_USE).build();
     }
 
-    private static ChannelCreationFailed of(Type type) {
-        return new ChannelCreationFailedBuilder().type(type).build();
-    }
-
     public enum Type {
         INVALID_NAME,
+        INVALID_GAME_MODE,
         NAME_ALREADY_IN_USE
     }
 

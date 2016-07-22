@@ -19,12 +19,12 @@ import scala.concurrent.ExecutionContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static akka.dispatch.Futures.sequence;
 import static akka.pattern.Patterns.ask;
-import static java.util.Arrays.stream;
 import static java.util.stream.StreamSupport.stream;
 
 public class ChannelsActor extends AbstractActor {
@@ -44,12 +44,8 @@ public class ChannelsActor extends AbstractActor {
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        actors.put(Tempo.NORMAL, context().actorOf(Props.create(ChannelsPerModeActor.class), Tempo.NORMAL.name()));
-        actors.put(Tempo.FAST, context().actorOf(Props.create(ChannelsPerModeActor.class), Tempo.FAST.name()));
-
-        for (GameMode gameMode : gameModes) {
-            stream(Tempo.values()).forEach(t -> self().tell(CreateChannel.of(t, gameMode, gameMode.getId().toString().toLowerCase(), false), self()));
-        }
+        actors.put(Tempo.NORMAL, context().actorOf(Props.create(ChannelsPerTempoActor.class, Tempo.NORMAL, gameModes), Tempo.NORMAL.name()));
+        actors.put(Tempo.FAST, context().actorOf(Props.create(ChannelsPerTempoActor.class, Tempo.FAST, gameModes), Tempo.FAST.name()));
     }
 
     @Override
@@ -68,7 +64,25 @@ public class ChannelsActor extends AbstractActor {
         }
     }
 
-    private static class ChannelsPerModeActor extends AbstractActor {
+    private static class ChannelsPerTempoActor extends AbstractActor {
+
+        private final Tempo tempo;
+
+        private final GameModes gameModes;
+
+        public ChannelsPerTempoActor(Tempo tempo, GameModes gameModes) {
+            this.tempo = tempo;
+            this.gameModes = gameModes;
+        }
+
+        @Override
+        public void preStart() throws Exception {
+            super.preStart();
+            for (GameMode gameMode : gameModes) {
+                String name = gameMode.getId().toString().toLowerCase();
+                context().actorOf(ChannelActor.props(tempo, gameMode, name, false), name);
+            }
+        }
 
         @Override
         public void onReceive(Object o) throws Exception {
@@ -110,18 +124,25 @@ public class ChannelsActor extends AbstractActor {
         }
 
         private void createChannel(CreateChannel c) {
-            if (context().child(c.getName()).isEmpty()) {
-                if (isValid(c.getName())) {
-                    context().actorOf(ChannelActor.props(c.getTempo(), c.getGameMode(), c.getName(), c.isEphemeral()), c.getName());
-                    replyWith(ChannelCreated.of(c.getTempo(), c.getGameMode().getId(), c.getName()));
-                }
-                else {
-                    replyWith(ChannelCreationFailed.invalidName());
-                }
-            }
-            else {
+            if (context().child(c.getName()).isDefined()) {
                 replyWith(ChannelCreationFailed.nameAlreadyInUse());
+                return;
             }
+
+            if (!isValid(c.getName())) {
+                replyWith(ChannelCreationFailed.invalidName());
+                return;
+            }
+
+            Optional<GameMode> optGameMode = gameModes.find(c.getGameModeId());
+
+            if (!optGameMode.isPresent()) {
+                replyWith(ChannelCreationFailed.invalidGameMode());
+                return;
+            }
+
+            context().actorOf(ChannelActor.props(c.getTempo(), optGameMode.get(), c.getName(), c.isEphemeral()), c.getName());
+            replyWith(ChannelCreated.of(c.getTempo(), c.getGameModeId(), c.getName()));
         }
 
         private boolean isValid(String name) {

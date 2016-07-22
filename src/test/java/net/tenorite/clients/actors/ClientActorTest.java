@@ -163,7 +163,7 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         client.tell(Inbound.of("pline 1 /create CLASSIC junit"), noSender());
 
-        channels.expectMsgAllOf(CreateChannel.of(Tempo.FAST, classic, "junit", true));
+        channels.expectMsgAllOf(CreateChannel.of(Tempo.FAST, classic.getId(), "junit", true));
     }
 
     @Test
@@ -181,24 +181,6 @@ public class ClientActorTest extends AbstractActorTestCase {
         client.tell(Inbound.of("pline 1 /create CLASSIC junit invalid"), noSender());
 
         output.expectMsgAllOf(PlineMessage.of("<red>invalid number of arguments</red>"));
-        channels.expectNoMsg();
-    }
-
-    @Test
-    public void testCreateChannelWithInvalidGameMode() {
-        Classic classic = new Classic();
-        Jelly jelly = new Jelly();
-
-        GameModes gameModes = new GameModes(asList(classic, jelly));
-        JavaTestKit channels = newTestKit(accept(CreateChannel.class));
-
-        JavaTestKit output = newTestKit(accept(PlineMessage.class).and(ignoreWelcomeMessages()));
-
-        ActorRef client = system.actorOf(ClientActor.props(Tempo.FAST, "junit", stub(output), gameModes, channels.getRef()));
-
-        client.tell(Inbound.of("pline 1 /create UNKNOWN junit"), noSender());
-
-        output.expectMsgAllOf(PlineMessage.of("<red>invalid game mode</red>"));
         channels.expectNoMsg();
     }
 

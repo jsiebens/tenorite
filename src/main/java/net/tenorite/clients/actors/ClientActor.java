@@ -19,7 +19,6 @@ import scala.concurrent.duration.FiniteDuration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
@@ -79,13 +78,7 @@ final class ClientActor extends AbstractActor {
             write(PlineMessage.of("<red>invalid number of arguments</red>"));
         }
         else {
-            Optional<GameMode> gameMode = gameModes.find(GameModeId.of(split[0]));
-            if (gameMode.isPresent()) {
-                channels.tell(CreateChannel.of(tempo, gameMode.get(), split[1], true), self());
-            }
-            else {
-                write(PlineMessage.of("<red>invalid game mode</red>"));
-            }
+            channels.tell(CreateChannel.of(tempo, GameModeId.of(split[0]), split[1], true), self());
         }
     }
 
@@ -137,6 +130,9 @@ final class ClientActor extends AbstractActor {
             switch (ccf.getType()) {
                 case INVALID_NAME:
                     write(PlineMessage.of("<red>invalid channel name</red>"));
+                    break;
+                case INVALID_GAME_MODE:
+                    write(PlineMessage.of("<red>invalid game mode</red>"));
                     break;
                 case NAME_ALREADY_IN_USE:
                     write(PlineMessage.of("<red>channel name already in use</red>"));
