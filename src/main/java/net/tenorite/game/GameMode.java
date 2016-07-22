@@ -18,8 +18,8 @@ import static net.tenorite.game.PlayingStats.*;
 public abstract class GameMode {
 
     private static final Comparator<PlayingStats> DEFAULT_COMPARATOR =
-        BY_COMBOS.reversed() // most combos first
-            .thenComparing(BY_LEVEL.reversed()) // highest levels first
+        BY_LEVEL.reversed() // highest levels first
+            .thenComparing(BY_COMBOS.reversed()) // most combos first
             .thenComparing(BY_BLOCKS.reversed()) // most blocks first
             .thenComparing(BY_MAX_HEIGTH); // lowest field first
 
