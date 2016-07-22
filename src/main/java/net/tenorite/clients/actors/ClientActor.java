@@ -1,6 +1,7 @@
 package net.tenorite.clients.actors;
 
 import akka.actor.ActorRef;
+import akka.actor.Cancellable;
 import akka.actor.Props;
 import net.tenorite.channel.Channels;
 import net.tenorite.channel.commands.*;
@@ -13,17 +14,24 @@ import net.tenorite.game.GameModes;
 import net.tenorite.protocol.*;
 import net.tenorite.util.AbstractActor;
 import org.springframework.util.StringUtils;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
+import static akka.actor.ActorRef.noSender;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
 final class ClientActor extends AbstractActor {
+
+    private static final long MAX_IDLE_TIME = 1000 * 60 * 30; // 30 minutes
+
+    private static final Object PING = new Object();
 
     static Props props(Tempo tempo, String name, MessageSink sink, GameModes gameModes, ActorRef channels) {
         return Props.create(ClientActor.class, tempo, name, sink, gameModes, channels);
@@ -39,9 +47,13 @@ final class ClientActor extends AbstractActor {
 
     private final ActorRef channels;
 
+    private final Commands commands;
+
     private ActorRef channel;
 
-    private final Commands commands;
+    private Cancellable heartBeat;
+
+    private long lastMessageTimestamp;
 
     public ClientActor(Tempo tempo, String name, MessageSink sink, GameModes gameModes, ActorRef channels) {
         this.tempo = tempo;
@@ -79,6 +91,8 @@ final class ClientActor extends AbstractActor {
 
     @Override
     public void preStart() throws Exception {
+        super.preStart();
+
         write(
             PlayerNumMessage.of(1),
             PlineMessage.of(""),
@@ -89,10 +103,20 @@ final class ClientActor extends AbstractActor {
         );
 
         commands.run(PlineMessage.of("/list"));
+
+        heartBeat = getContext().system().scheduler().schedule(
+            FiniteDuration.create(10, TimeUnit.SECONDS),
+            FiniteDuration.create(10, TimeUnit.SECONDS),
+            self(),
+            PING,
+            context().dispatcher(),
+            noSender());
     }
 
     @Override
     public void postStop() throws Exception {
+        super.postStop();
+        heartBeat.cancel();
         sink.close();
     }
 
@@ -146,10 +170,19 @@ final class ClientActor extends AbstractActor {
         else if (o instanceof Channels) {
             handleChannels((Channels) o);
         }
+        else if (o == PING) {
+            if (idleTime() > MAX_IDLE_TIME) {
+                context().stop(self());
+            }
+            else {
+                write(NOOP);
+            }
+        }
     }
 
     private void handleInbound(Inbound o) {
         MessageParser.parse(o.getMessage()).ifPresent(m -> {
+            lastMessageTimestamp = System.currentTimeMillis();
             if (!(m instanceof PlineMessage) || !commands.run((PlineMessage) m)) {
                 ofNullable(channel).ifPresent(c -> c.tell(m, self()));
             }
@@ -181,6 +214,10 @@ final class ClientActor extends AbstractActor {
             .forEach(sink::write);
     }
 
+    private long idleTime() {
+        return System.currentTimeMillis() - lastMessageTimestamp;
+    }
+
     private static final class Commands {
 
         private final Map<String, BiConsumer<Integer, String>> commands = new HashMap<>();
@@ -206,6 +243,8 @@ final class ClientActor extends AbstractActor {
         }
 
     }
+
+    private static final Message NOOP = tempo -> "";
 
 }
 
