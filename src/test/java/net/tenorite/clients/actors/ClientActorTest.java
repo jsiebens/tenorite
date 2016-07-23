@@ -35,7 +35,7 @@ public class ClientActorTest extends AbstractActorTestCase {
     private static final Set<PlineMessage> WELCOME_MESSAGES = new HashSet<>(asList(
         PlineMessage.of(""),
         PlineMessage.of("Welcome on <b>Tenorite TetriNET</b> Server!"),
-        PlineMessage.of("<i>Join a channel to start playing...</i>")
+        PlineMessage.of("<i>Join or create a channel to start playing...</i>")
     ));
 
     private static Predicate<Object> ignoreWelcomeMessages() {
@@ -143,9 +143,10 @@ public class ClientActorTest extends AbstractActorTestCase {
         client.tell(channels, noSender());
 
         output.expectMsgAllOf(
+            PlineMessage.of("<b>channels:</b>"),
             PlineMessage.of("   a<gray> - " + classic.getDescription(Tempo.FAST) + "</gray>  <blue>(2/6)</blue>"),
             PlineMessage.of("   b<gray> - " + jelly.getDescription(Tempo.FAST) + "</gray>  <red>(FULL)</red>"),
-            PlineMessage.of("<gray>(type /join <name>)</gray>")
+            PlineMessage.of("<purple>(type <b>/join <channel name></b> to join a channel)</purple>")
         );
     }
 

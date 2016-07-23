@@ -63,8 +63,10 @@ final class ClientActor extends AbstractActor {
 
         this.commands = new Commands()
             .register("/join", (i, s) -> joinChannel(s))
-            .register("/list", (i, s) -> channels.tell(ListChannels.instance(), self()))
             .register("/create", (i, s) -> createChannel(s))
+            .register("/list", (i, s) -> channels.tell(ListChannels.instance(), self()))
+            .register("/modes", (i, s) -> listGameModes())
+            .register("/help", (i, s) -> showHelp())
             .register("/exit", (i, s) -> context().stop(self()));
     }
 
@@ -82,6 +84,31 @@ final class ClientActor extends AbstractActor {
         }
     }
 
+    private void showHelp() {
+        write(
+            PlineMessage.of(""),
+            PlineMessage.of("<b>available commands:</b>"),
+            PlineMessage.of(""),
+            PlineMessage.of("   /list <gray>- list all available channels"),
+            PlineMessage.of("   /create <mode id> <channel name> <gray>- create a new channel"),
+            PlineMessage.of("   /join <channel name> <gray>- join an existing channel"),
+            PlineMessage.of("   /modes <gray>- list all available game modes"),
+            PlineMessage.of("   /help <gray>- show this list of commands"),
+            PlineMessage.of("")
+        );
+    }
+
+    private void listGameModes() {
+        write(PlineMessage.of(""));
+        write(PlineMessage.of("<b>modes:</b>"));
+        write(PlineMessage.of(""));
+        for (GameMode gameMode : gameModes) {
+            write(PlineMessage.of(format("   %s<gray> - %s</gray> (id: %s)", gameMode.getTitle(tempo), gameMode.getDescription(tempo), gameMode.getId())));
+        }
+        write(PlineMessage.of(""));
+        write(PlineMessage.of("<purple>(type <b>/create <id> <channel name></b> to create a new channel)</purple>"));
+    }
+
     @Override
     public void preStart() throws Exception {
         super.preStart();
@@ -91,11 +118,10 @@ final class ClientActor extends AbstractActor {
             PlineMessage.of(""),
             PlineMessage.of("Welcome on <b>Tenorite TetriNET</b> Server!"),
             PlineMessage.of(""),
-            PlineMessage.of("<i>Join a channel to start playing...</i>"),
-            PlineMessage.of("")
+            PlineMessage.of("<i>Join or create a channel to start playing...</i>")
         );
 
-        commands.run(PlineMessage.of("/list"));
+        channels.tell(ListChannels.instance(), self());
 
         heartBeat = getContext().system().scheduler().schedule(
             FiniteDuration.create(10, TimeUnit.SECONDS),
@@ -186,6 +212,9 @@ final class ClientActor extends AbstractActor {
     }
 
     private void handleChannels(Channels o) {
+        write(PlineMessage.of(""));
+        write(PlineMessage.of("<b>channels:</b>"));
+        write(PlineMessage.of(""));
         o.getChannels()
             .stream()
             .sorted((a, b) -> a.getName().compareTo(b.getName()))
@@ -201,7 +230,7 @@ final class ClientActor extends AbstractActor {
             });
 
         write(PlineMessage.of(""));
-        write(PlineMessage.of("<gray>(type /join <name>)</gray>"));
+        write(PlineMessage.of("<purple>(type <b>/join <channel name></b> to join a channel)</purple>"));
     }
 
     private void write(Message... messages) {
@@ -214,7 +243,7 @@ final class ClientActor extends AbstractActor {
         return System.currentTimeMillis() - lastMessageTimestamp;
     }
 
-    private static final class Commands {
+    private final class Commands {
 
         private final Map<String, BiConsumer<Integer, String>> commands = new HashMap<>();
 
@@ -231,6 +260,10 @@ final class ClientActor extends AbstractActor {
                     if (commands.containsKey(first)) {
                         String parameters = message.getMessage().substring(first.length()).trim();
                         commands.get(first).accept(message.getSender(), parameters);
+                    }
+                    else {
+                        write(PlineMessage.of("<red>unknown command '" + first + "'"));
+                        showHelp();
                     }
                     return true;
                 }
