@@ -38,6 +38,7 @@ public abstract class PlayingStats {
                                   int lastFieldHeight,
                                   int maxFieldHeight,
                                   int nrOfBlocks,
+                                  String specialsSequence,
                                   Map<Special, Integer> nrOfSpecialsReceived,
                                   Map<Special, Integer> nrOfSpecialsOnOpponent,
                                   Map<Special, Integer> nrOfSpecialsOnTeamPlayer,
@@ -54,6 +55,7 @@ public abstract class PlayingStats {
                 .lastFieldHeight(lastFieldHeight)
                 .maxFieldHeight(maxFieldHeight)
                 .nrOfBlocks(nrOfBlocks)
+                .specialsSequence(specialsSequence)
                 .nrOfSpecialsReceived(nrOfSpecialsReceived)
                 .nrOfSpecialsOnOpponent(nrOfSpecialsOnOpponent)
                 .nrOfSpecialsOnTeamPlayer(nrOfSpecialsOnTeamPlayer)
@@ -111,6 +113,11 @@ public abstract class PlayingStats {
     @Value.Default
     public int getNrOfBlocks() {
         return 0;
+    }
+
+    @Value.Default
+    public String getSpecialsSequence() {
+        return "";
     }
 
     public abstract Map<Special, Integer> getNrOfSpecialsReceived();

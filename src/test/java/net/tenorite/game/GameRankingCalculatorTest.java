@@ -349,7 +349,7 @@ public class GameRankingCalculatorTest {
     }
 
     @Test
-    public void testCalculatorShouldTrackNrOfSpecials() {
+    public void testCalculatorShouldTrackNrAndSequenceOfSpecials() {
         Player playerA = Player.of(1, "john", "doe");
         Player playerB = Player.of(2, "nick", "");
         Player playerC = Player.of(3, "jane", "doe");
@@ -374,6 +374,8 @@ public class GameRankingCalculatorTest {
         );
 
         List<PlayingStats> result = calculator.calculate(new Classic(), game);
+
+        assertThat(result.get(0).getSpecialsSequence()).isEqualTo("aaacgcqnccg");
 
         assertThat(result.get(0).getNrOfSpecialsOnOpponent()).containsOnly(
             entry(Special.ADDLINE, 3),

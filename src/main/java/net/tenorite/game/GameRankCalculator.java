@@ -45,6 +45,8 @@ public final class GameRankCalculator {
 
         private final Map<Integer, Integer> blocks = new HashMap<>();
 
+        private final Map<Integer, String> specialsSequence = new HashMap<>();
+
         private final Map<Integer, Map<Special, Integer>> specialsReceived = new HashMap<>();
 
         private final Map<Integer, Map<Special, Integer>> specialsOnSelf = new HashMap<>();
@@ -66,6 +68,7 @@ public final class GameRankCalculator {
             this.maxFieldHeights.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
             this.lastFieldHeights.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> 0)));
             this.blocks.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> -1)));
+            this.specialsSequence.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> "")));
 
             this.specialsOnOpponent.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> initSpecialsCounts())));
             this.specialsReceived.putAll(game.getPlayers().stream().collect(toMap(Player::getSlot, p -> initSpecialsCounts())));
@@ -139,7 +142,10 @@ public final class GameRankCalculator {
 
             if (!message.isServerMessage()) {
                 if (target == sender) {
-                    ofNullable(players.get(sender)).ifPresent(incrSpecialOnSelf(special));
+                    ofNullable(players.get(sender)).ifPresent(s -> {
+                        incrSpecialOnSelf(special).accept(s);
+                        specialsSequence.compute(sender, (k, v) -> v + message.getSpecial().getLetter());
+                    });
                 }
                 else {
                     Optional<Player> optTargetPlayer = ofNullable(players.get(target));
@@ -157,6 +163,8 @@ public final class GameRankCalculator {
                         }
 
                         incrSpecialReceived(special).accept(targetPlayer);
+
+                        specialsSequence.compute(sender, (k, v) -> v + message.getSpecial().getLetter());
                     }
                 }
             }
@@ -243,6 +251,7 @@ public final class GameRankCalculator {
                 lastFieldHeights.get(slot),
                 maxFieldHeights.get(slot),
                 max(blocks.get(slot), 0),
+                specialsSequence.get(slot),
                 specialsReceived.get(slot),
                 specialsOnOpponent.get(slot),
                 specialsOnTeamPlayer.get(slot),

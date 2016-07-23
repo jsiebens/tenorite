@@ -4,15 +4,21 @@ import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeValidator;
 import net.tenorite.badges.validators.GameWonWithSpecificSpecial;
 import net.tenorite.badges.validators.NrOfSpecialsUsed;
+import net.tenorite.badges.validators.SpecialWords;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
-import net.tenorite.game.*;
+import net.tenorite.game.GameMode;
+import net.tenorite.game.GameModeId;
+import net.tenorite.game.GameRules;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
-import static java.util.Arrays.stream;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static net.tenorite.badges.BadgeValidators.*;
 
 @Component
@@ -38,7 +44,7 @@ public final class Classic extends GameMode {
 
     @Override
     public List<BadgeValidator> getBadgeValidators() {
-        return Arrays.asList(
+        List<BadgeValidator> validators = new ArrayList<>(asList(
             competitor(ID),
             likeAPro(ID),
             likeAKing(ID),
@@ -93,7 +99,11 @@ public final class Classic extends GameMode {
             nuclearLaunch(ID),
             grandTheft(ID),
             closeCall(ID)
-        );
+        ));
+
+        validators.addAll(words(ID));
+
+        return validators;
     }
 
     private static BadgeValidator theSpecialist(GameModeId gameModeId) {
@@ -199,5 +209,32 @@ public final class Classic extends GameMode {
     private static BadgeValidator closeCall(GameModeId gameModeId) {
         return new CloseCall(Badge.of(gameModeId, "CLOSE_CALL"));
     }
+
+    private static List<BadgeValidator> words(GameModeId gameModeId) {
+        return Stream
+            .of(
+                "arc",
+                "bacon",
+                "banana",
+                "barn",
+                "bag",
+                "cab",
+                "cargo",
+                "cobra",
+                "crab",
+                "gas",
+                "groan",
+                "orb",
+                "orca",
+                "rag",
+                "sac",
+                "scar"
+            )
+            .sorted(BY_LENGTH.thenComparing(String::compareTo))
+            .map(w -> new SpecialWords(Badge.of(gameModeId, "WORDS_" + w.toUpperCase()), w))
+            .collect(toList());
+    }
+
+    private static Comparator<String> BY_LENGTH = (s1, s2) -> s1.length() - s2.length();
 
 }
