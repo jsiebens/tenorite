@@ -52,7 +52,7 @@ public class ClientActorTest extends AbstractActorTestCase {
         client.tell(PlineMessage.of("hello world"), noSender());
         client.tell(LvlMessage.of(1, 11), noSender());
 
-        channels.expectMsgAllOf(ListChannels.of(Tempo.NORMAL));
+        channels.expectMsgAllOf(ListChannels.instance());
         output.expectMsgAllOf(PlineMessage.of("hello world"), LvlMessage.of(1, 11));
     }
 
@@ -65,7 +65,7 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         client.tell(Inbound.of("pline 1 /join channel"), noSender());
 
-        channels.expectMsgAllOf(ListChannels.of(Tempo.FAST), ReserveSlot.of(Tempo.FAST, "channel", "junit"));
+        channels.expectMsgAllOf(ListChannels.instance(), ReserveSlot.of("channel", "junit"));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         client.tell(Inbound.of("pline 1 /list"), noSender());
 
-        channels.expectMsgAllOf(ListChannels.of(Tempo.FAST));
+        channels.expectMsgAllOf(ListChannels.instance());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         client.tell(SlotReservationFailed.channelIsFull(), noSender());
 
-        channels.expectMsgAllOf(ListChannels.of(Tempo.FAST));
+        channels.expectMsgAllOf(ListChannels.instance());
         output.expectMsgAllOf(PlineMessage.of("channel is <b>FULL</b>"));
     }
 
@@ -102,7 +102,7 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         client.tell(SlotReservationFailed.channelNotAvailable(), noSender());
 
-        channels.expectMsgAllOf(ListChannels.of(Tempo.FAST));
+        channels.expectMsgAllOf(ListChannels.instance());
         output.expectMsgAllOf(PlineMessage.of("channel is <b>not available</b>"));
     }
 
@@ -120,7 +120,7 @@ public class ClientActorTest extends AbstractActorTestCase {
         client.tell(SlotReserved.instance(), channelB.getRef());
         client.tell(ChannelLeft.of(Tempo.FAST, "channel", "junit"), channelA.getRef());
 
-        channels.expectMsgAllOf(ListChannels.of(Tempo.FAST));
+        channels.expectMsgAllOf(ListChannels.instance());
 
         channelA.expectMsgAllOf(ConfirmSlot.instance(), LeaveChannel.instance());
         channelB.expectMsgAllOf(ConfirmSlot.instance());
@@ -163,7 +163,7 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         client.tell(Inbound.of("pline 1 /create CLASSIC junit"), noSender());
 
-        channels.expectMsgAllOf(CreateChannel.of(Tempo.FAST, classic.getId(), "junit", true));
+        channels.expectMsgAllOf(CreateChannel.of(classic.getId(), "junit", true));
     }
 
     @Test

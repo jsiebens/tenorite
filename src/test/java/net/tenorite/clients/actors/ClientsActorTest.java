@@ -24,10 +24,10 @@ public class ClientsActorTest extends AbstractActorTestCase {
         JavaTestKit clientA = newTestKit();
         JavaTestKit clientB = newTestKit();
 
-        ActorRef clients = system.actorOf(ClientsActor.props(gameModes, channels.getRef()));
+        ActorRef clients = system.actorOf(ClientsActor.props(Tempo.NORMAL, gameModes, channels.getRef()));
 
-        clients.tell(RegisterClient.of(Tempo.NORMAL, "x", noop()), clientA.getRef());
-        clients.tell(RegisterClient.of(Tempo.NORMAL, "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", noop()), clientB.getRef());
+        clients.tell(RegisterClient.of("x", noop()), clientA.getRef());
+        clients.tell(RegisterClient.of("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", noop()), clientB.getRef());
 
         clientA.expectMsgEquals(ClientRegistrationFailed.invalidName());
         clientB.expectMsgEquals(ClientRegistrationFailed.invalidName());
@@ -39,10 +39,10 @@ public class ClientsActorTest extends AbstractActorTestCase {
         JavaTestKit clientA = newTestKit();
         JavaTestKit clientB = newTestKit();
 
-        ActorRef clients = system.actorOf(ClientsActor.props(gameModes, channels.getRef()));
+        ActorRef clients = system.actorOf(ClientsActor.props(Tempo.NORMAL, gameModes, channels.getRef()));
 
-        clients.tell(RegisterClient.of(Tempo.NORMAL, "junit", noop()), clientA.getRef());
-        clients.tell(RegisterClient.of(Tempo.NORMAL, "junit", noop()), clientB.getRef());
+        clients.tell(RegisterClient.of("junit", noop()), clientA.getRef());
+        clients.tell(RegisterClient.of("junit", noop()), clientB.getRef());
 
         clientA.expectMsgClass(ClientRegistered.class);
         clientB.expectMsgEquals(ClientRegistrationFailed.nameAlreadyInUse());

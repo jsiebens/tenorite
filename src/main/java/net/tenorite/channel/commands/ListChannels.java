@@ -1,17 +1,14 @@
 package net.tenorite.channel.commands;
 
-import net.tenorite.core.Tempo;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
 
-@Value.Immutable
+@Value.Immutable(singleton = true)
 @ImmutableStyle
 public abstract class ListChannels {
 
-    public static ListChannels of(Tempo tempo) {
-        return new ListChannelsBuilder().tempo(tempo).build();
+    public static ListChannels instance() {
+        return ListChannelsBuilder.ImmutableListChannels.of();
     }
-
-    public abstract Tempo getTempo();
 
 }

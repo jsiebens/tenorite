@@ -274,7 +274,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
         joinChannel(player5, "e", channelActor);
         joinChannel(player6, "f", channelActor);
 
-        channelActor.tell(ReserveSlot.of(Tempo.NORMAL, "tetrinet", "g"), player7.getRef());
+        channelActor.tell(ReserveSlot.of("tetrinet", "g"), player7.getRef());
 
         player7.expectMsgAllOf(SlotReservationFailed.channelIsFull());
     }
@@ -641,7 +641,7 @@ public class ChannelActorTest extends AbstractActorTestCase {
     }
 
     private void joinChannel(JavaTestKit player, String name, ActorRef channel) {
-        channel.tell(ReserveSlot.of(Tempo.NORMAL, "tetrinet", name), player.getRef());
+        channel.tell(ReserveSlot.of("tetrinet", name), player.getRef());
         channel.tell(ConfirmSlot.instance(), player.getRef());
     }
 

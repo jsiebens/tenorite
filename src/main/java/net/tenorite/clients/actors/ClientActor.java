@@ -63,13 +63,13 @@ final class ClientActor extends AbstractActor {
 
         this.commands = new Commands()
             .register("/join", (i, s) -> joinChannel(s))
-            .register("/list", (i, s) -> channels.tell(ListChannels.of(tempo), self()))
+            .register("/list", (i, s) -> channels.tell(ListChannels.instance(), self()))
             .register("/create", (i, s) -> createChannel(s))
             .register("/exit", (i, s) -> context().stop(self()));
     }
 
     private void joinChannel(String channel) {
-        channels.tell(ReserveSlot.of(tempo, channel, name), self());
+        channels.tell(ReserveSlot.of(channel, name), self());
     }
 
     private void createChannel(String s) {
@@ -78,7 +78,7 @@ final class ClientActor extends AbstractActor {
             write(PlineMessage.of("<red>invalid number of arguments</red>"));
         }
         else {
-            channels.tell(CreateChannel.of(tempo, GameModeId.of(split[0]), split[1], true), self());
+            channels.tell(CreateChannel.of(GameModeId.of(split[0]), split[1], true), self());
         }
     }
 
