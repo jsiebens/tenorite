@@ -1,5 +1,8 @@
 package net.tenorite.util;
 
+/**
+ * @author Johan Siebens
+ */
 public class DeterministicStopWatch implements StopWatch {
 
     private long time;

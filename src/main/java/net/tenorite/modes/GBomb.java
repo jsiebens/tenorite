@@ -18,6 +18,9 @@ import java.util.function.Consumer;
 import static net.tenorite.badges.BadgeValidators.*;
 import static net.tenorite.game.SpecialOccurancy.specialOccurancy;
 
+/**
+ * @author Johan Siebens
+ */
 @Component
 public final class GBomb extends GameMode {
 

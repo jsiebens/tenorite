@@ -3,6 +3,9 @@ package net.tenorite.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Johan Siebens
+ */
 public final class Style {
 
     private static Map<String, String> STYLES = new HashMap<>();

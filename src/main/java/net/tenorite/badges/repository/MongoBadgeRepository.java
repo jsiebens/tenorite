@@ -20,6 +20,9 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
+/**
+ * @author Johan Siebens
+ */
 public class MongoBadgeRepository implements BadgeRepository {
 
     private Jongo jongo;

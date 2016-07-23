@@ -14,6 +14,9 @@ import org.junit.Test;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class GameTest {
 
     private ObjectMapper mapper = new ObjectMapper().registerModule(new Jdk8Module()).registerModule(new GuavaModule());

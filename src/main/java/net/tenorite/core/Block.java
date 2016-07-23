@@ -1,5 +1,8 @@
 package net.tenorite.core;
 
+/**
+ * @author Johan Siebens
+ */
 public enum Block {
 
     LINE(1),

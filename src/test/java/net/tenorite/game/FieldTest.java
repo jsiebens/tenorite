@@ -1,11 +1,13 @@
 package net.tenorite.game;
 
-
 import org.junit.Test;
 
 import static net.tenorite.core.Special.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class FieldTest {
 
     @Test

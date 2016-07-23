@@ -12,6 +12,9 @@ import net.tenorite.game.events.GameFinished;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+/**
+ * @author Johan Siebens
+ */
 public final class NrOfSpecialsUsed extends BadgeValidator {
 
     private final Predicate<Special> specialPredicate;

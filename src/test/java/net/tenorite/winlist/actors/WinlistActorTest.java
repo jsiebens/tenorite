@@ -23,6 +23,9 @@ import static net.tenorite.winlist.WinlistItem.Type.TEAM;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 
+/**
+ * @author Johan Siebens
+ */
 public class WinlistActorTest extends AbstractActorTestCase {
 
     private WinlistRepositoryStub winlistRepository = new WinlistRepositoryStub();

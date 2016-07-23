@@ -1,5 +1,8 @@
 package net.tenorite.util;
 
+/**
+ * @author Johan Siebens
+ */
 public interface StopWatch {
 
     void start();

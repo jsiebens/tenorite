@@ -7,6 +7,9 @@ import akka.dispatch.OnSuccess;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * @author Johan Siebens
+ */
 public abstract class AbstractActor extends UntypedActor {
 
     protected final void replyWith(Object o) {

@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * @author Johan Siebens
+ */
 public interface BadgeRepository {
 
     BadgeOps badgeOps(Tempo tempo);

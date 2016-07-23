@@ -8,6 +8,9 @@ import org.immutables.value.Value;
 
 import java.util.Map;
 
+/**
+ * @author Johan Siebens
+ */
 @Value.Immutable
 @ImmutableStyle
 @JsonDeserialize(as = PlayerStatsBuilder.ImmutablePlayerStats.class)

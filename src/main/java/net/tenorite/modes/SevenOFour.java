@@ -15,6 +15,9 @@ import java.util.function.Consumer;
 import static net.tenorite.badges.BadgeValidators.*;
 import static net.tenorite.game.PlayingStats.*;
 
+/**
+ * @author Johan Siebens
+ */
 @Component
 public final class SevenOFour extends GameMode {
 

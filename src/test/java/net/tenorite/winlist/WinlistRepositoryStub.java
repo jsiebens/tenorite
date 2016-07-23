@@ -10,6 +10,9 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * @author Johan Siebens
+ */
 public class WinlistRepositoryStub implements WinlistRepository {
 
     private Map<String, Map<String, WinlistItem>> data = new HashMap<>();

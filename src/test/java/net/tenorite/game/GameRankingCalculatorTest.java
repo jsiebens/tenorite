@@ -14,6 +14,9 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+/**
+ * @author Johan Siebens
+ */
 public class GameRankingCalculatorTest {
 
     private static Game newGame(GameModeId gameModeId, Consumer<GameBuilder> consumer) {

@@ -10,6 +10,9 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * @author Johan Siebens
+ */
 @Value.Immutable
 @ImmutableStyle
 @JsonDeserialize(as = PlayerBuilder.ImmutablePlayer.class)

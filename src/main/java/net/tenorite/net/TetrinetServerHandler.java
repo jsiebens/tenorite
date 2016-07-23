@@ -21,6 +21,9 @@ import static akka.actor.ActorRef.noSender;
 import static net.tenorite.net.InitTokenDecoder.TETRIFASTER;
 import static net.tenorite.net.InitTokenDecoder.decode;
 
+/**
+ * @author Johan Siebens
+ */
 final class TetrinetServerHandler extends SimpleChannelInboundHandler<String> {
 
     private final Queue<Inbound> received = new ArrayDeque<>();

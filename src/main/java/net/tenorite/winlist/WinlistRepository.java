@@ -6,6 +6,9 @@ import net.tenorite.game.GameModeId;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Johan Siebens
+ */
 public interface WinlistRepository {
 
     WinlistOps winlistOps(Tempo tempo);

@@ -8,6 +8,9 @@ import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 
+/**
+ * @author Johan Siebens
+ */
 @Value.Immutable
 @ImmutableStyle
 public abstract class WinlistMessage implements Message {

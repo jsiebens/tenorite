@@ -6,6 +6,9 @@ import net.tenorite.game.GameModeId;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
 
+/**
+ * @author Johan Siebens
+ */
 @Value.Immutable
 @ImmutableStyle
 @JsonDeserialize(as = BadgeLevelBuilder.ImmutableBadgeLevel.class)

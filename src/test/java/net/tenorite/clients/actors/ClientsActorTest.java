@@ -14,6 +14,9 @@ import org.junit.Test;
 
 import java.util.Collections;
 
+/**
+ * @author Johan Siebens
+ */
 public class ClientsActorTest extends AbstractActorTestCase {
 
     private GameModes gameModes = new GameModes(Collections.emptyList());

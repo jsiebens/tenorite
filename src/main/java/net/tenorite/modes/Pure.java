@@ -12,6 +12,9 @@ import java.util.List;
 
 import static net.tenorite.badges.BadgeValidators.*;
 
+/**
+ * @author Johan Siebens
+ */
 @Component
 public final class Pure extends GameMode {
 

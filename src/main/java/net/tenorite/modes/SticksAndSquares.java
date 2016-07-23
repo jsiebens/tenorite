@@ -13,6 +13,9 @@ import java.util.List;
 import static net.tenorite.badges.BadgeValidators.*;
 import static net.tenorite.game.BlockOccurancy.blockOccurancy;
 
+/**
+ * @author Johan Siebens
+ */
 @Component
 public final class SticksAndSquares extends GameMode {
 

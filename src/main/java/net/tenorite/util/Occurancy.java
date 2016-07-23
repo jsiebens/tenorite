@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
 
+/**
+ * @author Johan Siebens
+ */
 public final class Occurancy {
 
     public static <T extends Enum> Map<T, Integer> normalize(Class<T> type, Map<T, Integer> values) {

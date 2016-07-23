@@ -8,6 +8,9 @@ import net.tenorite.game.events.GameFinished;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * @author Johan Siebens
+ */
 public abstract class BadgeValidator {
 
     protected final Badge badge;

@@ -11,6 +11,9 @@ import net.tenorite.game.events.GameFinished;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * @author Johan Siebens
+ */
 public final class HitchhikersGuide extends BadgeValidator {
 
     static final int THE_ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE = 42;

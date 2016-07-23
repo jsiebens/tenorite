@@ -7,6 +7,9 @@ import org.junit.Before;
 
 import java.util.function.Predicate;
 
+/**
+ * @author Johan Siebens
+ */
 public abstract class AbstractActorTestCase extends AbstractTestCase {
 
     protected ActorSystem system;

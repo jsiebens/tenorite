@@ -7,6 +7,9 @@ import net.tenorite.game.PlayingStats;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Johan Siebens
+ */
 public interface PlayerStatsRepository {
 
     PlayerStatsOps playerStatsOps(Tempo tempo);

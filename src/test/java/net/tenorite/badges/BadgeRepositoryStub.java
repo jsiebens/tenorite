@@ -7,6 +7,9 @@ import java.util.*;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * @author Johan Siebens
+ */
 public class BadgeRepositoryStub implements BadgeRepository, BadgeRepository.BadgeOps {
 
     private Map<String, Map<Badge, BadgeLevel>> badges = new HashMap<>();

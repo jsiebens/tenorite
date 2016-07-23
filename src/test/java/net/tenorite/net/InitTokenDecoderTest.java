@@ -8,6 +8,9 @@ import java.util.Optional;
 import static net.tenorite.net.InitTokenDecoder.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class InitTokenDecoderTest extends AbstractTestCase {
 
     @Test

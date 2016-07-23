@@ -12,6 +12,9 @@ import net.tenorite.game.events.GameFinished;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * @author Johan Siebens
+ */
 public final class NrOfGamesWon extends BadgeValidator {
 
     private final int target;

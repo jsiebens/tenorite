@@ -28,6 +28,9 @@ import java.util.function.Predicate;
 import static akka.actor.ActorRef.noSender;
 import static java.util.Arrays.asList;
 
+/**
+ * @author Johan Siebens
+ */
 public class ClientActorTest extends AbstractActorTestCase {
 
     private GameModes gameModes = new GameModes(Collections.emptyList());

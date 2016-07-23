@@ -11,6 +11,9 @@ import net.tenorite.game.events.GameFinished;
 
 import java.util.function.Consumer;
 
+/**
+ * @author Johan Siebens
+ */
 final class TooEasyForMe extends BadgeValidator {
 
     TooEasyForMe(Badge badge) {

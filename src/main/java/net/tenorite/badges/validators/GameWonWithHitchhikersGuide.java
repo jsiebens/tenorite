@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * @author Johan Siebens
+ */
 public final class GameWonWithHitchhikersGuide extends BadgeValidator {
 
     static final int THE_ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE = 42;

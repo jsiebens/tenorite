@@ -6,6 +6,9 @@ import net.tenorite.game.PlayingStats;
 
 import java.util.Arrays;
 
+/**
+ * @author Johan Siebens
+ */
 public class BadgeValidators {
 
     public static BadgeValidator competitor(GameModeId gameModeId) {

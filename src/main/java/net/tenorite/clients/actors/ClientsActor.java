@@ -12,6 +12,9 @@ import net.tenorite.util.AbstractActor;
 import org.springframework.util.DigestUtils;
 import scala.Option;
 
+/**
+ * @author Johan Siebens
+ */
 final class ClientsActor extends AbstractActor {
 
     public static Props props(Tempo tempo, GameModes gameModes, ActorRef channels) {

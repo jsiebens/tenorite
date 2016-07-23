@@ -8,6 +8,9 @@ import net.tenorite.game.GameModes;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * @author Johan Siebens
+ */
 public final class ChannelsActors {
 
     private final Map<Tempo, ActorRef> actors = new EnumMap<>(Tempo.class);

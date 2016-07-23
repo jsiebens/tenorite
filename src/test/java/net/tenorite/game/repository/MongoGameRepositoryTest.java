@@ -21,6 +21,9 @@ import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class MongoGameRepositoryTest extends AbstractTenoriteServerTestCase {
 
     @Autowired

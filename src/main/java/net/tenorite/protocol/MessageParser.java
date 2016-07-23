@@ -9,6 +9,9 @@ import static java.lang.Integer.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+/**
+ * @author Johan Siebens
+ */
 public class MessageParser {
 
     public static Optional<Message> parse(String raw) {

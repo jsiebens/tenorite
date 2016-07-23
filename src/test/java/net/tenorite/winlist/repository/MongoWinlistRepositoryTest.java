@@ -16,6 +16,9 @@ import static net.tenorite.winlist.WinlistItem.Type.PLAYER;
 import static net.tenorite.winlist.WinlistItem.Type.TEAM;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class MongoWinlistRepositoryTest extends AbstractTenoriteServerTestCase {
 
     @Autowired

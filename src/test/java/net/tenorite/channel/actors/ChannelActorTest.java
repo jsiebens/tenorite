@@ -26,6 +26,9 @@ import org.junit.Test;
 import static akka.actor.ActorRef.noSender;
 import static java.util.Arrays.asList;
 
+/**
+ * @author Johan Siebens
+ */
 public class ChannelActorTest extends AbstractActorTestCase {
 
     @Test

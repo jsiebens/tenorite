@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * @author Johan Siebens
+ */
 public final class NrOfConsecutiveGamesLost extends BadgeValidator {
 
     private final int target;

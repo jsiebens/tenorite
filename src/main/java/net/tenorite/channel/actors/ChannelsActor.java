@@ -25,6 +25,9 @@ import static akka.dispatch.Futures.sequence;
 import static akka.pattern.Patterns.ask;
 import static java.util.stream.StreamSupport.stream;
 
+/**
+ * @author Johan Siebens
+ */
 final class ChannelsActor extends AbstractActor {
 
     public static Props props(Tempo tempo, GameModes gameModes) {

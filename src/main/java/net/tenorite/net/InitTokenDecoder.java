@@ -2,6 +2,9 @@ package net.tenorite.net;
 
 import java.util.Optional;
 
+/**
+ * @author Johan Siebens
+ */
 final class InitTokenDecoder {
 
     public static final String TETRISSTART = "tetrisstart";

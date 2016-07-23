@@ -11,6 +11,9 @@ import org.springframework.web.servlet.ModelAndView;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+/**
+ * @author Johan Siebens
+ */
 @Controller
 public class IndexController {
 

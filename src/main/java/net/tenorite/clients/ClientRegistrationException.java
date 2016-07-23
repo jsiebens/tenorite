@@ -2,6 +2,9 @@ package net.tenorite.clients;
 
 import net.tenorite.clients.events.ClientRegistrationFailed;
 
+/**
+ * @author Johan Siebens
+ */
 public final class ClientRegistrationException extends RuntimeException {
 
     private final ClientRegistrationFailed failed;

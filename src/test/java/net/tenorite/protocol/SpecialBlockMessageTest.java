@@ -6,7 +6,9 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+/**
+ * @author Johan Siebens
+ */
 public class SpecialBlockMessageTest {
 
     @Test

@@ -27,6 +27,9 @@ import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * @author Johan Siebens
+ */
 @Controller
 public class TempoController {
 

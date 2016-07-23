@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 
+/**
+ * @author Johan Siebens
+ */
 final class NuclearLaunch extends BadgeValidator {
 
     public static final int TARGET = 3;

@@ -7,6 +7,9 @@ import org.immutables.value.Value;
 
 import static java.lang.String.format;
 
+/**
+ * @author Johan Siebens
+ */
 @ImmutableStyle
 @Value.Immutable
 public abstract class BadgeEarnedPlineMessage implements Message {

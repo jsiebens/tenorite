@@ -11,6 +11,9 @@ import static java.util.Collections.singletonList;
 import static net.tenorite.game.GameRules.defaultGameRules;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class GameRecorderTest {
 
     private static final Tempo TEMPO = Tempo.NORMAL;

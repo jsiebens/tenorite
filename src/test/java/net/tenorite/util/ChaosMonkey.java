@@ -6,6 +6,9 @@ import net.tenorite.protocol.Message;
 
 import java.util.function.Consumer;
 
+/**
+ * @author Johan Siebens
+ */
 public final class ChaosMonkey extends GameMode {
 
     public static final GameModeId ID = GameModeId.of("CHAOS");

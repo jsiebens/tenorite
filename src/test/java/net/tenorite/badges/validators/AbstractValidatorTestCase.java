@@ -10,6 +10,9 @@ import org.junit.Before;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Johan Siebens
+ */
 public abstract class AbstractValidatorTestCase {
 
     protected static final GameModeId GAME_MODE_ID = GameModeId.of("JUNIT");

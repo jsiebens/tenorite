@@ -16,6 +16,9 @@ import java.util.function.Consumer;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
+/**
+ * @author Johan Siebens
+ */
 public final class SuddenDeath implements GameListener {
 
     private static final ClassicStyleAddMessage FOUR_LINES = ClassicStyleAddMessage.of(0, 4);

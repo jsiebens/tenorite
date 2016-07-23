@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @author Johan Siebens
+ */
 @Value.Immutable
 @ImmutableStyle
 @JsonDeserialize(as = BadgeBuilder.ImmutableBadge.class)

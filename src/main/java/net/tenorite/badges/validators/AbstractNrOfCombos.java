@@ -11,6 +11,9 @@ import net.tenorite.game.events.GameFinished;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * @author Johan Siebens
+ */
 abstract class AbstractNrOfCombos extends BadgeValidator {
 
     private final Function<PlayingStats, Integer> nrOfCombos;

@@ -4,6 +4,9 @@ import net.tenorite.core.Special;
 
 import java.util.List;
 
+/**
+ * @author Johan Siebens
+ */
 public interface GameListener {
 
     GameListener NOOP = new GameListener() {

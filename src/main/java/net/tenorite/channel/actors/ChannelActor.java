@@ -38,6 +38,9 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
+/**
+ * @author Johan Siebens
+ */
 final class ChannelActor extends AbstractActor {
 
     private static final FiniteDuration CLOSE_TIMEOUT = FiniteDuration.apply(10, TimeUnit.MINUTES);

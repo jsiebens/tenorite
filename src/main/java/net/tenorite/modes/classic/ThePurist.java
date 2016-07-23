@@ -10,6 +10,9 @@ import net.tenorite.game.events.GameFinished;
 
 import java.util.function.Consumer;
 
+/**
+ * @author Johan Siebens
+ */
 class ThePurist extends BadgeValidator {
 
     ThePurist(Badge badge) {

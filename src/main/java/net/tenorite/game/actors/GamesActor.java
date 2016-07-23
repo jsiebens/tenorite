@@ -6,6 +6,9 @@ import net.tenorite.game.GameRepository;
 import net.tenorite.game.events.GameFinished;
 import net.tenorite.util.AbstractActor;
 
+/**
+ * @author Johan Siebens
+ */
 public final class GamesActor extends AbstractActor {
 
     public static Props props(GameRepository repository) {

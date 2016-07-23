@@ -13,6 +13,9 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class GameWonAt10BpmTest extends AbstractValidatorTestCase {
 
     private GameWonAt10Bpm validator = new GameWonAt10Bpm(BADGE);

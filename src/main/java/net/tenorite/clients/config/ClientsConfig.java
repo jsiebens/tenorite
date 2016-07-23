@@ -19,6 +19,9 @@ import scala.concurrent.Future;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * @author Johan Siebens
+ */
 @Configuration
 public class ClientsConfig {
 

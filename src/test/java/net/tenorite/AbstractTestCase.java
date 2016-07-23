@@ -1,5 +1,8 @@
 package net.tenorite;
 
+/**
+ * @author Johan Siebens
+ */
 public abstract class AbstractTestCase {
 
     public static final byte[] IP = {(byte) 195, (byte) 139, (byte) 204, (byte) 206};

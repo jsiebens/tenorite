@@ -10,6 +10,9 @@ import net.tenorite.game.events.GameFinished;
 
 import java.util.function.Consumer;
 
+/**
+ * @author Johan Siebens
+ */
 public final class NrOfGamesPlayed extends BadgeValidator {
 
     private final int target;

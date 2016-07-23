@@ -13,6 +13,9 @@ import java.util.function.Consumer;
 
 import static java.util.Arrays.stream;
 
+/**
+ * @author Johan Siebens
+ */
 class HandyMan extends BadgeValidator {
 
     HandyMan(Badge badge) {

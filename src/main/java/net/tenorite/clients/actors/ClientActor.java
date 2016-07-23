@@ -26,6 +26,9 @@ import static akka.actor.ActorRef.noSender;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
+/**
+ * @author Johan Siebens
+ */
 final class ClientActor extends AbstractActor {
 
     private static final long MAX_IDLE_TIME = 1000 * 60 * 30; // 30 minutes

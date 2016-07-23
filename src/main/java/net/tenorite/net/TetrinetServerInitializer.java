@@ -14,6 +14,9 @@ import java.nio.charset.Charset;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 
+/**
+ * @author Johan Siebens
+ */
 public final class TetrinetServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final DelimiterAppender DELIMITER_APPENDER = new DelimiterAppender();

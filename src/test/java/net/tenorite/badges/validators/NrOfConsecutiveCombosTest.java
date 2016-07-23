@@ -18,6 +18,9 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 @RunWith(Parameterized.class)
 public class NrOfConsecutiveCombosTest extends AbstractValidatorTestCase {
 

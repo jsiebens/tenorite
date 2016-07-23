@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @author Johan Siebens
+ */
 public final class WinlistActor extends AbstractActor {
 
     public static Props props(WinlistRepository repository) {

@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * @author Johan Siebens
+ */
 public class GameModes implements Iterable<GameMode> {
 
     private Map<GameModeId, GameMode> modes;

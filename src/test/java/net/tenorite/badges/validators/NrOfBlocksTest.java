@@ -13,6 +13,9 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class NrOfBlocksTest extends AbstractValidatorTestCase {
 
     private NrOfBlocks validator = new NrOfBlocks(BADGE, 10);

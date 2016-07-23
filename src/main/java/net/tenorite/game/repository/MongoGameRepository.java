@@ -16,6 +16,9 @@ import java.util.Optional;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
+/**
+ * @author Johan Siebens
+ */
 public class MongoGameRepository implements GameRepository {
 
     private Jongo jongo;

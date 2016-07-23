@@ -21,6 +21,9 @@ import static net.tenorite.badges.BadgeValidators.*;
 import static net.tenorite.game.GameRules.gameRules;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
 
+/**
+ * @author Johan Siebens
+ */
 @Component
 public final class BreakOut extends GameMode {
 

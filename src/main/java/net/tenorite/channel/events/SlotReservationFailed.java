@@ -1,5 +1,8 @@
 package net.tenorite.channel.events;
 
+/**
+ * @author Johan Siebens
+ */
 public enum SlotReservationFailed {
 
     CHANNEL_IS_FULL,

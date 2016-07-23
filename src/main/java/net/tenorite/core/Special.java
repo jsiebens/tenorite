@@ -3,6 +3,9 @@ package net.tenorite.core;
 import java.util.Arrays;
 import java.util.Optional;
 
+/**
+ * @author Johan Siebens
+ */
 public enum Special {
 
     ADDLINE(1, 'a', true),

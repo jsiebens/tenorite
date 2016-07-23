@@ -5,6 +5,9 @@ import org.immutables.value.Value;
 
 import java.util.List;
 
+/**
+ * @author Johan Siebens
+ */
 @Value.Immutable
 @ImmutableStyle
 public abstract class Channels {

@@ -13,6 +13,9 @@ import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * @author Johan Siebens
+ */
 public final class GameRankCalculator {
 
     public List<PlayingStats> calculate(GameMode gameMode, Game game) {

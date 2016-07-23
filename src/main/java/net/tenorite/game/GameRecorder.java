@@ -12,6 +12,9 @@ import java.util.function.Function;
 import static java.util.Optional.*;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * @author Johan Siebens
+ */
 public final class GameRecorder {
 
     private final String id;

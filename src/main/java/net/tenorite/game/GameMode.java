@@ -15,6 +15,9 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static net.tenorite.game.PlayingStats.*;
 
+/**
+ * @author Johan Siebens
+ */
 public abstract class GameMode {
 
     private static final Comparator<PlayingStats> DEFAULT_COMPARATOR =

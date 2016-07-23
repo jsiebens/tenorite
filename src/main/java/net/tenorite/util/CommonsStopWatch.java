@@ -1,5 +1,8 @@
 package net.tenorite.util;
 
+/**
+ * @author Johan Siebens
+ */
 public final class CommonsStopWatch implements StopWatch {
 
     private final org.apache.commons.lang3.time.StopWatch internal = new org.apache.commons.lang3.time.StopWatch();

@@ -20,6 +20,9 @@ import java.util.function.Supplier;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class TetrinetServerHandlerTest extends AbstractActorTestCase {
 
     private static class ClientStubActor extends UntypedActor {

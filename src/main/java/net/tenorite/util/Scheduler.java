@@ -2,6 +2,9 @@ package net.tenorite.util;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author Johan Siebens
+ */
 public interface Scheduler {
 
     interface Cancellable {

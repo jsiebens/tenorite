@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Consumer;
 
+/**
+ * @author Johan Siebens
+ */
 public final class SpecialWords extends BadgeValidator {
 
     private final String word;

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
 
+/**
+ * @author Johan Siebens
+ */
 @Value.Immutable
 @ImmutableStyle
 @JsonDeserialize(as = WinlistItemBuilder.ImmutableWinlistItem.class)

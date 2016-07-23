@@ -10,6 +10,9 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
 
+/**
+ * @author Johan Siebens
+ */
 public final class Field {
 
     public static final int WIDTH = 12;

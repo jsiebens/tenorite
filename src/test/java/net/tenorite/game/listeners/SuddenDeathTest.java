@@ -19,6 +19,9 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class SuddenDeathTest {
 
     @Test

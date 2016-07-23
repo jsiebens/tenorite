@@ -9,6 +9,9 @@ import net.tenorite.util.AbstractActor;
 
 import java.util.List;
 
+/**
+ * @author Johan Siebens
+ */
 public final class PlayingStatsActor extends AbstractActor {
 
     public static Props props(PlayerStatsRepository playerStatsRepository) {

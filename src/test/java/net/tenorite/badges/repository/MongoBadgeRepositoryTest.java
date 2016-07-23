@@ -20,6 +20,9 @@ import static java.util.Arrays.stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+/**
+ * @author Johan Siebens
+ */
 public class MongoBadgeRepositoryTest extends AbstractTenoriteServerTestCase {
 
     @Autowired

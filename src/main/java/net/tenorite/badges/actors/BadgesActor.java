@@ -9,6 +9,9 @@ import net.tenorite.util.AbstractActor;
 
 import java.util.stream.StreamSupport;
 
+/**
+ * @author Johan Siebens
+ */
 public final class BadgesActor extends AbstractActor {
 
     public static Props props(GameModes gameModes, BadgeRepository badgeRepository) {

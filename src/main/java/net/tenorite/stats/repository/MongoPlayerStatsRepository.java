@@ -15,6 +15,9 @@ import java.util.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
+/**
+ * @author Johan Siebens
+ */
 public class MongoPlayerStatsRepository implements PlayerStatsRepository {
 
     private final Jongo jongo;

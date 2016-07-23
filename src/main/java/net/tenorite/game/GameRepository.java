@@ -5,6 +5,9 @@ import net.tenorite.core.Tempo;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Johan Siebens
+ */
 public interface GameRepository {
 
     GameOps gameOps(Tempo tempo);

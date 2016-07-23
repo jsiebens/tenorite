@@ -21,6 +21,9 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Johan Siebens
+ */
 public class NrOfConsecutiveGamesLostTest {
 
     private static final GameModeId GAME_MODE_ID = GameModeId.of("JUNIT");

@@ -21,6 +21,9 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static net.tenorite.badges.BadgeValidators.*;
 
+/**
+ * @author Johan Siebens
+ */
 @Component
 public final class Classic extends GameMode {
 
