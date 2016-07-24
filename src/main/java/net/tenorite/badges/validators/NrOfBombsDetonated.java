@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.tenorite.modes.classic;
+package net.tenorite.badges.validators;
 
 import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeRepository;
@@ -38,12 +38,13 @@ import static java.util.function.Function.identity;
 /**
  * @author Johan Siebens
  */
-final class NuclearLaunch extends BadgeValidator {
+public final class NrOfBombsDetonated extends BadgeValidator {
 
-    public static final int TARGET = 3;
+    private final int target;
 
-    NuclearLaunch(Badge badge) {
+    public NrOfBombsDetonated(Badge badge, int target) {
         super(badge);
+        this.target = target;
     }
 
     @Override
@@ -66,7 +67,7 @@ final class NuclearLaunch extends BadgeValidator {
 
             if (message instanceof SpecialBlockMessage) {
                 SpecialBlockMessage sb = (SpecialBlockMessage) message;
-                if (isBlockBomb(sb) && nrOfBombs.getOrDefault(sb.getTarget(), 0) >= TARGET) {
+                if (isBlockBomb(sb) && nrOfBombs.getOrDefault(sb.getTarget(), 0) >= target) {
                     ofNullable(allPlayers.get(sb.getSender())).ifPresent(player -> counts.compute(player, (p, x) -> x == null ? 1 : x + 1));
                 }
             }

@@ -97,7 +97,8 @@ public final class GBomb extends GameMode {
 
             thePurist(ID),
 
-            closeCall(ID, Special.GRAVITY)
+            closeCall(ID, Special.GRAVITY),
+            nuclearLaunch(ID, 5)
         );
     }
 

@@ -215,4 +215,8 @@ public class BadgeValidators {
         return new SpecialUsedBeforeDeath(Badge.of(gameModeId, "CLOSE_CALL"), specials);
     }
 
+    public static BadgeValidator nuclearLaunch(GameModeId gameModeId, int target) {
+        return new NrOfBombsDetonated(Badge.of(gameModeId, "NUCLEAR_LAUNCH"), target);
+    }
+
 }

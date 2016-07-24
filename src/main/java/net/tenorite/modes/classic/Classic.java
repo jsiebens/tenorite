@@ -17,6 +17,7 @@ package net.tenorite.modes.classic;
 
 import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeValidator;
+import net.tenorite.badges.validators.NrOfBombsDetonated;
 import net.tenorite.badges.validators.SpecialWords;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
@@ -112,7 +113,7 @@ public final class Classic extends GameMode {
             hitchhikersGuideToVictory(ID),
 
             tooEasyForMe(ID),
-            nuclearLaunch(ID),
+            nuclearLaunch(ID, 3),
             grandTheft(ID),
             closeCall(ID, Special.NUKEFIELD)
         ));
@@ -124,10 +125,6 @@ public final class Classic extends GameMode {
 
     private static BadgeValidator tooEasyForMe(GameModeId gameModeId) {
         return new TooEasyForMe(Badge.of(gameModeId, "TOO_EASY_FOR_ME"));
-    }
-
-    private static BadgeValidator nuclearLaunch(GameModeId gameModeId) {
-        return new NuclearLaunch(Badge.of(gameModeId, "NUCLEAR_LAUNCH"));
     }
 
     private static BadgeValidator grandTheft(GameModeId gameModeId) {
