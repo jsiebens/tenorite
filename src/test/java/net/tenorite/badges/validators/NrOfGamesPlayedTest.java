@@ -36,27 +36,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Johan Siebens
  */
-public class NrOfGamesPlayedTest {
+public class NrOfGamesPlayedTest extends AbstractValidatorTestCase {
 
-    private static final GameModeId GAME_MODE_ID = GameModeId.of("JUNIT");
-
-    private static final BadgeType BADGE_TYPE = BadgeType.of("junit");
-
-    private static final Badge BADGE = Badge.of(GAME_MODE_ID, BADGE_TYPE);
-
-    private BadgeRepositoryStub badgeRepository = new BadgeRepositoryStub();
-
-    private List<BadgeEarned> published = new ArrayList<>();
-
-    private NrOfGamesPlayed validator;
-
-    @Before
-    public void setUp() {
-        badgeRepository.clear();
-        published.clear();
-
-        validator = new NrOfGamesPlayed(BADGE, 10);
-    }
+    private NrOfGamesPlayed validator = new NrOfGamesPlayed(BADGE, 10);
 
     @Test
     public void testEarnBadge() {
@@ -71,7 +53,7 @@ public class NrOfGamesPlayedTest {
         Game game = Game.of("id", 0, 100, Tempo.NORMAL, GAME_MODE_ID, emptyList(), emptyList());
         GameFinished gameFinished = GameFinished.of(game, asList(player1, player2, player3));
 
-        validator.process(gameFinished, badgeRepository, e -> published.add(e));
+        validator.process(gameFinished, badgeRepository, published::add);
 
         assertThat(badgeRepository.getBadgeLevel("john", BADGE).isPresent()).isTrue();
         assertThat(badgeRepository.getBadgeLevel("jane", BADGE).isPresent()).isTrue();
@@ -99,7 +81,7 @@ public class NrOfGamesPlayedTest {
         Game game = Game.of("id", 0, 100, Tempo.NORMAL, GAME_MODE_ID, emptyList(), emptyList());
         GameFinished gameFinished = GameFinished.of(game, asList(player1, player2, player3));
 
-        validator.process(gameFinished, badgeRepository, e -> published.add(e));
+        validator.process(gameFinished, badgeRepository, published::add);
 
         BadgeLevel expected = BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 0, 5, "id");
 

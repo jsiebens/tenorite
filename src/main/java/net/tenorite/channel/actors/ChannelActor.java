@@ -294,9 +294,9 @@ final class ChannelActor extends AbstractActor {
 
     private void handleBadgeEarned(BadgeEarned badgeEarned) {
         BadgeLevel level = badgeEarned.getBadge();
-        if (tempo.equals(level.getTempo()) && gameMode.getId().equals(level.getGameModeId()) && findSlot(level.getName()).isPresent()) {
-            Badge badge = Badge.of(level.getGameModeId(), level.getBadgeType());
-            BadgeEarnedPlineMessage message = BadgeEarnedPlineMessage.of(level.getName(), badge.getTitle(), level.getLevel(), badgeEarned.isUpgrade());
+        GameModeId gameModeId = level.getBadge().getGameModeId();
+        if (tempo.equals(level.getTempo()) && gameMode.getId().equals(gameModeId) && findSlot(level.getName()).isPresent()) {
+            BadgeEarnedPlineMessage message = BadgeEarnedPlineMessage.of(level.getName(), level.getBadge().getTitle(), level.getLevel(), badgeEarned.isUpgrade());
             forEachSlot(s -> s.send(message));
         }
     }

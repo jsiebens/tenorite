@@ -15,22 +15,14 @@
  */
 package net.tenorite.badges.validators;
 
-import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeLevel;
-import net.tenorite.badges.BadgeRepositoryStub;
-import net.tenorite.badges.BadgeType;
 import net.tenorite.badges.events.BadgeEarned;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.Game;
-import net.tenorite.game.GameModeId;
 import net.tenorite.game.Player;
 import net.tenorite.game.PlayingStats;
 import net.tenorite.game.events.GameFinished;
-import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -39,27 +31,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Johan Siebens
  */
-public class NrOfConsecutiveGamesWonTest {
+public class NrOfConsecutiveGamesWonTest extends AbstractValidatorTestCase {
 
-    private static final GameModeId GAME_MODE_ID = GameModeId.of("JUNIT");
-
-    private static final BadgeType BADGE_TYPE = BadgeType.of("junit");
-
-    private static final Badge BADGE = Badge.of(GAME_MODE_ID, BADGE_TYPE);
-
-    private BadgeRepositoryStub badgeRepository = new BadgeRepositoryStub();
-
-    private List<BadgeEarned> published = new ArrayList<>();
-
-    private NrOfConsecutiveGamesWon validator;
-
-    @Before
-    public void setUp() {
-        badgeRepository.clear();
-        published.clear();
-
-        validator = new NrOfConsecutiveGamesWon(BADGE, 5);
-    }
+    private NrOfConsecutiveGamesWon validator = new NrOfConsecutiveGamesWon(BADGE, 5);
 
     @Test
     public void testProgressIsIncreasedWhenPlayerWinsAGame() {
@@ -70,7 +44,7 @@ public class NrOfConsecutiveGamesWonTest {
         Game game = Game.of("id", 0, 100, Tempo.NORMAL, GAME_MODE_ID, emptyList(), emptyList());
         GameFinished gameFinished = GameFinished.of(game, asList(player1, player2, player3));
 
-        validator.process(gameFinished, badgeRepository, e -> published.add(e));
+        validator.process(gameFinished, badgeRepository, published::add);
 
         assertThat(published).isEmpty();
 
@@ -92,7 +66,7 @@ public class NrOfConsecutiveGamesWonTest {
         Game game = Game.of("id", 0, 100, Tempo.NORMAL, GAME_MODE_ID, emptyList(), emptyList());
         GameFinished gameFinished = GameFinished.of(game, asList(player1, player2, player3));
 
-        validator.process(gameFinished, badgeRepository, e -> published.add(e));
+        validator.process(gameFinished, badgeRepository, published::add);
 
         BadgeLevel expected = BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 0, 1, "id");
 
@@ -120,7 +94,7 @@ public class NrOfConsecutiveGamesWonTest {
         Game game = Game.of("id", 0, 100, Tempo.NORMAL, GAME_MODE_ID, emptyList(), emptyList());
         GameFinished gameFinished = GameFinished.of(game, asList(player1, player2, player3));
 
-        validator.process(gameFinished, badgeRepository, e -> published.add(e));
+        validator.process(gameFinished, badgeRepository, published::add);
 
 
         BadgeLevel expected = BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 0, 5, "id");

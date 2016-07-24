@@ -33,8 +33,7 @@ public abstract class BadgeLevel {
         return
             new BadgeLevelBuilder()
                 .tempo(tempo)
-                .gameModeId(badge.getGameModeId())
-                .badgeType(badge.getBadgeType())
+                .badge(badge)
                 .name(name)
                 .timestamp(timestamp)
                 .level(level)
@@ -44,9 +43,7 @@ public abstract class BadgeLevel {
 
     public abstract Tempo getTempo();
 
-    public abstract GameModeId getGameModeId();
-
-    public abstract BadgeType getBadgeType();
+    public abstract Badge getBadge();
 
     public abstract String getName();
 

@@ -70,23 +70,23 @@ public class MongoBadgeRepository implements BadgeRepository {
 
         @Override
         public Optional<BadgeLevel> getBadgeLevel(String name, Badge badge) {
-            return ofNullable(badges.findOne("{gameModeId:#, badgeType:#, name:#}", badge.getGameModeId(), badge.getBadgeType(), name).as(BadgeLevel.class));
+            return ofNullable(badges.findOne("{badge:#, name:#}", badge, name).as(BadgeLevel.class));
         }
 
         @Override
-        public void saveBadgeLevel(BadgeLevel badge) {
+        public void saveBadgeLevel(BadgeLevel badgeLevel) {
             badges
-                .findAndModify("{gameModeId:#, badgeType:#, name:#}", badge.getGameModeId(), badge.getBadgeType(), badge.getName())
-                .with("{$set: #}", badge)
+                .findAndModify("{badge:#, name:#}", badgeLevel.getBadge(), badgeLevel.getName())
+                .with("{$set: #}", badgeLevel)
                 .upsert()
                 .as(BadgeLevel.class);
         }
 
         @Override
-        public long getProgress(Badge type, String name) {
+        public long getProgress(Badge badge, String name) {
             return
                 ofNullable(data
-                    .findOne("{gameModeId:#, badgeType:#, name:#}", type.getGameModeId(), type.getBadgeType(), name)
+                    .findOne("{badge:#, name:#}", badge, name)
                     .projection("{value:1}").as(Value.class)
                 )
                     .map(v -> v.value)
@@ -96,12 +96,12 @@ public class MongoBadgeRepository implements BadgeRepository {
         @Override
         public long updateProgress(Badge badge, String name, long value) {
             if (value == 0) {
-                data.remove("{gameModeId:#, badgeType:#, name:#}", badge.getGameModeId(), badge.getBadgeType(), name);
+                data.remove("{badge:#, name:#}", badge, name);
                 return 0;
             }
             else {
                 data
-                    .findAndModify("{gameModeId:#, badgeType:#, name:#}", badge.getGameModeId(), badge.getBadgeType(), name)
+                    .findAndModify("{badge:#, name:#}", badge, name)
                     .with("{$set: {value:#}}", value)
                     .upsert()
                     .as(Object.class);
@@ -111,13 +111,13 @@ public class MongoBadgeRepository implements BadgeRepository {
 
         @Override
         public Map<Badge, BadgeLevel> badgeLevels(GameModeId gameModeId, String name) {
-            MongoCursor<BadgeLevel> cursor = badges.find("{gameModeId:#, name:#}", gameModeId, name).as(BadgeLevel.class);
-            return stream(cursor.spliterator(), false).collect(Collectors.toMap(bl -> Badge.of(bl.getGameModeId(), bl.getBadgeType()), Function.identity()));
+            MongoCursor<BadgeLevel> cursor = badges.find("{badge.gameModeId:#, name:#}", gameModeId, name).as(BadgeLevel.class);
+            return stream(cursor.spliterator(), false).collect(Collectors.toMap(BadgeLevel::getBadge, Function.identity()));
         }
 
         @Override
         public List<BadgeLevel> badgeLevels(Badge badge) {
-            MongoCursor<BadgeLevel> cursor = badges.find("{gameModeId:#, badgeType:#}", badge.getGameModeId(), badge.getBadgeType()).sort("{level:-1,timestamp:1}").limit(20).as(BadgeLevel.class);
+            MongoCursor<BadgeLevel> cursor = badges.find("{badge:#}", badge).sort("{level:-1,timestamp:1}").limit(20).as(BadgeLevel.class);
             return stream(cursor.spliterator(), false).collect(toList());
         }
 

@@ -101,10 +101,9 @@ public class TempoController {
     @RequestMapping("/t/{tempo}/m/{mode}/badges/{type}")
     public ModelAndView badge(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("type") String type) {
         GameModeId gameModeId = GameModeId.of(mode);
-        BadgeType badgeType = BadgeType.of(type);
 
         GameMode gameMode = gameModes.get(GameModeId.of(mode));
-        Badge badge = Badge.of(gameModeId, badgeType);
+        Badge badge = Badge.of(gameModeId, type);
         List<Badge> badges = gameMode.getBadges();
 
         int i = badges.indexOf(badge);

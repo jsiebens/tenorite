@@ -15,6 +15,7 @@
  */
 package net.tenorite.badges;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import net.tenorite.game.GameModeId;
 import net.tenorite.util.ImmutableStyle;
@@ -34,27 +35,25 @@ import java.util.concurrent.ConcurrentHashMap;
 @JsonDeserialize(as = BadgeBuilder.ImmutableBadge.class)
 public abstract class Badge {
 
-    public static Badge of(GameModeId gameModeId, BadgeType badgeType) {
-        return new BadgeBuilder().gameModeId(gameModeId).badgeType(badgeType).build();
-    }
-
     public static Badge of(GameModeId gameModeId, String badgeId) {
-        return new BadgeBuilder().gameModeId(gameModeId).badgeType(BadgeType.of(badgeId)).build();
+        return new BadgeBuilder().gameModeId(gameModeId).badgeId(badgeId).build();
     }
 
     public abstract GameModeId getGameModeId();
 
-    public abstract BadgeType getBadgeType();
+    public abstract String getBadgeId();
 
     @Value.Lazy
+    @JsonIgnore
     public String getTitle() {
-        String key = getBadgeType() + ".title";
+        String key = getBadgeId() + ".title";
         return properties(getGameModeId()).getProperty(key, key);
     }
 
     @Value.Lazy
+    @JsonIgnore
     public String getDescription() {
-        String key = getBadgeType() + ".description";
+        String key = getBadgeId() + ".description";
         return properties(getGameModeId()).getProperty(key, key);
     }
 

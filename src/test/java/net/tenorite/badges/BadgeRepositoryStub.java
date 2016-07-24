@@ -43,10 +43,7 @@ public class BadgeRepositoryStub implements BadgeRepository, BadgeRepository.Bad
 
     @Override
     public void saveBadgeLevel(BadgeLevel badgeLevel) {
-        GameModeId gameModeId = badgeLevel.getGameModeId();
-        BadgeType badgeType = badgeLevel.getBadgeType();
-        Badge badge = Badge.of(gameModeId, badgeType);
-
+        Badge badge = badgeLevel.getBadge();
         badges.computeIfAbsent(badgeLevel.getName(), s -> new HashMap<>()).put(badge, badgeLevel);
     }
 
