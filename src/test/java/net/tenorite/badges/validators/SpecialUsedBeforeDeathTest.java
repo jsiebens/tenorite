@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.tenorite.modes.classic;
+package net.tenorite.badges.validators;
 
 import net.tenorite.badges.BadgeLevel;
 import net.tenorite.badges.events.BadgeEarned;
 import net.tenorite.badges.validators.AbstractValidatorTestCase;
+import net.tenorite.badges.validators.SpecialUsedBeforeDeath;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
-import net.tenorite.game.*;
+import net.tenorite.game.Game;
+import net.tenorite.game.GameMessage;
+import net.tenorite.game.Player;
+import net.tenorite.game.PlayingStats;
 import net.tenorite.game.events.GameFinished;
 import net.tenorite.protocol.FieldMessage;
 import net.tenorite.protocol.SpecialBlockMessage;
@@ -31,14 +35,15 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Johan Siebens
  */
-public class CloseCallTest extends AbstractValidatorTestCase {
+public class SpecialUsedBeforeDeathTest extends AbstractValidatorTestCase {
 
-    private CloseCall validator = new CloseCall(BADGE);
+    private SpecialUsedBeforeDeath validator = new SpecialUsedBeforeDeath(BADGE, singleton(Special.NUKEFIELD));
 
     @Test
     public void testEarnBadge() {

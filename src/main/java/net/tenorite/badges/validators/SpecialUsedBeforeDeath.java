@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.tenorite.modes.classic;
+package net.tenorite.badges.validators;
 
 import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeRepository;
@@ -26,7 +26,10 @@ import net.tenorite.protocol.FieldMessage;
 import net.tenorite.protocol.Message;
 import net.tenorite.protocol.SpecialBlockMessage;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -36,12 +39,15 @@ import static java.util.function.Function.identity;
 /**
  * @author Johan Siebens
  */
-final class CloseCall extends BadgeValidator {
+public final class SpecialUsedBeforeDeath extends BadgeValidator {
 
-    public static final int TARGET = 20;
+    private static final int TARGET = 20;
 
-    CloseCall(Badge badge) {
+    private final Set<Special> specials;
+
+    public SpecialUsedBeforeDeath(Badge badge, Set<Special> specials) {
         super(badge);
+        this.specials = new HashSet<>(specials);
     }
 
     @Override
@@ -64,7 +70,7 @@ final class CloseCall extends BadgeValidator {
 
             if (message instanceof SpecialBlockMessage) {
                 SpecialBlockMessage sb = (SpecialBlockMessage) message;
-                if ((sb.getSender() == sb.getTarget()) && isNuke(sb) && currentHeights.getOrDefault(sb.getTarget(), 0) >= TARGET) {
+                if ((sb.getSender() == sb.getTarget()) && checkSpecial(sb) && currentHeights.getOrDefault(sb.getTarget(), 0) >= TARGET) {
                     ofNullable(allPlayers.get(sb.getSender())).ifPresent(player -> counts.compute(player, (p, x) -> x == null ? 1 : x + 1));
                 }
             }
@@ -77,8 +83,8 @@ final class CloseCall extends BadgeValidator {
         });
     }
 
-    private boolean isNuke(SpecialBlockMessage sb) {
-        return Objects.equals(sb.getSpecial(), Special.NUKEFIELD);
+    private boolean checkSpecial(SpecialBlockMessage sb) {
+        return specials.contains(sb.getSpecial());
     }
 
 }

@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.tenorite.modes.classic;
+package net.tenorite.badges.validators;
 
 import net.tenorite.badges.BadgeLevel;
 import net.tenorite.badges.events.BadgeEarned;
-import net.tenorite.badges.validators.AbstractValidatorTestCase;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.Game;
@@ -33,9 +32,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Johan Siebens
  */
-public class HandyManTest extends AbstractValidatorTestCase {
+public class AllSpecialsUsedTest extends AbstractValidatorTestCase {
 
-    private HandyMan validator = new HandyMan(BADGE);
+    private AllSpecialsUsed validator = new AllSpecialsUsed(BADGE);
 
     @Test
     public void testIgnoreWhenSomeSpecialsAreNotUsed() {

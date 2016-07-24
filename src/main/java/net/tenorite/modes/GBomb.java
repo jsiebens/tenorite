@@ -16,6 +16,7 @@
 package net.tenorite.modes;
 
 import net.tenorite.badges.BadgeValidator;
+import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameListener;
 import net.tenorite.game.GameMode;
@@ -86,7 +87,17 @@ public final class GBomb extends GameMode {
             eliminator(ID),
             eradicator(ID),
             dropsInTheBucket(ID),
-            dropItLikeItsHot(ID)
+            dropItLikeItsHot(ID),
+
+            newtonsLaw(ID),
+            theTerrorist(ID),
+
+            blackHole(ID),
+            bombSquad(ID),
+
+            thePurist(ID),
+
+            closeCall(ID, Special.GRAVITY)
         );
     }
 
