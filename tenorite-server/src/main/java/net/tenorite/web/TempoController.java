@@ -71,22 +71,22 @@ public class TempoController {
     }
 
     @RequestMapping("/t/{tempo}/m/{mode}/winlist")
-    public ModelAndView winlist(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String gameMode) {
-        GameModeId id = GameModeId.of(gameMode);
+    public ModelAndView winlist(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String gameModeId) {
+        GameMode gameMode = gameModes.find(GameModeId.of(gameModeId)).orElseThrow(NotAvailableException::new);
 
-        List<WinlistItem> winlistItems = winlistRepository.winlistOps(tempo).loadWinlist(id);
+        List<WinlistItem> winlistItems = winlistRepository.winlistOps(tempo).loadWinlist(gameMode.getId());
 
         return
             new ModelAndView("winlist")
                 .addObject("tempo", tempo)
                 .addObject("gameModes", gameModes)
-                .addObject("gameMode", gameModes.get(id))
+                .addObject("gameMode", gameMode)
                 .addObject("winlist", winlistItems);
     }
 
     @RequestMapping("/t/{tempo}/m/{mode}/badges")
     public ModelAndView badges(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String gameModeId) {
-        GameMode gameMode = gameModes.get(GameModeId.of(gameModeId));
+        GameMode gameMode = gameModes.find(GameModeId.of(gameModeId)).orElseThrow(NotAvailableException::new);
 
         List<Badge> badges = gameMode.getBadgeValidators().stream().map(BadgeValidator::getBadge).collect(toList());
 
@@ -100,10 +100,9 @@ public class TempoController {
 
     @RequestMapping("/t/{tempo}/m/{mode}/badges/{type}")
     public ModelAndView badge(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("type") String type) {
-        GameModeId gameModeId = GameModeId.of(mode);
+        GameMode gameMode = gameModes.find(GameModeId.of(mode)).orElseThrow(NotAvailableException::new);
 
-        GameMode gameMode = gameModes.get(GameModeId.of(mode));
-        Badge badge = Badge.of(gameModeId, type);
+        Badge badge = Badge.of(gameMode.getId(), type);
         List<Badge> badges = gameMode.getBadges();
 
         int i = badges.indexOf(badge);
@@ -140,7 +139,7 @@ public class TempoController {
 
     @RequestMapping("/t/{tempo}/m/{mode}/games")
     public ModelAndView recentGames(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode) {
-        GameMode gameMode = gameModes.get(GameModeId.of(mode));
+        GameMode gameMode = gameModes.find(GameModeId.of(mode)).orElseThrow(NotAvailableException::new);
 
         List<Game> games = gameRepository.gameOps(tempo).recentGames(gameMode.getId());
 
@@ -166,7 +165,7 @@ public class TempoController {
 
     @RequestMapping("/t/{tempo}/m/{mode}/games/{id}")
     public ModelAndView replay(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("id") String gameId) {
-        GameMode gameMode = gameModes.get(GameModeId.of(mode));
+        GameMode gameMode = gameModes.find(GameModeId.of(mode)).orElseThrow(NotAvailableException::new);
 
         Optional<Game> optGame = gameRepository.gameOps(tempo).loadGame(gameId);
 
@@ -196,7 +195,7 @@ public class TempoController {
 
     @RequestMapping("/t/{tempo}/m/{mode}/players/{name}")
     public ModelAndView player(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("name") String name) {
-        GameMode gameMode = gameModes.get(GameModeId.of(mode));
+        GameMode gameMode = gameModes.find(GameModeId.of(mode)).orElseThrow(NotAvailableException::new);
 
         PlayerStats playerStats = playerStatsRepository.playerStatsOps(tempo).playerStats(gameMode.getId(), name).orElseGet(() -> PlayerStats.of(gameMode.getId(), name));
         Map<Badge, BadgeLevel> badgeLevels = badgeRepository.badgeOps(tempo).badgeLevels(gameMode.getId(), name);

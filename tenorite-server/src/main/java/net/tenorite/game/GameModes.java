@@ -15,9 +15,10 @@
  */
 package net.tenorite.game;
 
-import net.tenorite.core.NotAvailableException;
-
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
@@ -36,11 +37,6 @@ public class GameModes implements Iterable<GameMode> {
 
     public Optional<GameMode> find(GameModeId id) {
         return ofNullable(modes.get(id));
-    }
-
-    @Deprecated
-    public GameMode get(GameModeId id) {
-        return ofNullable(modes.get(id)).orElseThrow(NotAvailableException::new);
     }
 
     @Override
