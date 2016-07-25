@@ -167,7 +167,7 @@ public class TempoController {
     public ModelAndView replay(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("id") String gameId) {
         GameMode gameMode = gameModes.find(GameModeId.of(mode)).orElseThrow(NotAvailableException::new);
 
-        Optional<Game> optGame = gameRepository.gameOps(tempo).loadGame(gameId);
+        Optional<Game> optGame = gameRepository.gameOps(tempo).loadGame(gameId).filter(g -> g.getGameModeId().equals(gameMode.getId()));
 
         if (optGame.isPresent()) {
             Game game = optGame.get();
