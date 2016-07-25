@@ -101,7 +101,11 @@ public final class GameRecorder {
     }
 
     public void onLvlMessage(LvlMessage lvlMessage) {
-        recordMessage(stopWatch.getTime(), lvlMessage);
+        Player sender = slots.get(lvlMessage.getSender());
+        if (sender != null) {
+            listener.onLevelUpdate(sender, lvlMessage.getLevel());
+            recordMessage(stopWatch.getTime(), lvlMessage);
+        }
     }
 
     public void onSpecialBlockMessage(SpecialBlockMessage specialBlockMessage) {

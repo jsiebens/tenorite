@@ -66,6 +66,11 @@
       </dependency>
       <dependency>
         <groupId>net.tenorite</groupId>
+        <artifactId>tenorite-mode-sprint</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.tenorite</groupId>
         <artifactId>tenorite-mode-sof</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -157,8 +162,9 @@
     <module>tenorite-mode-pure</module>
     <module>tenorite-mode-jelly</module>
     <module>tenorite-mode-sns</module>
-    <module>tenorite-mode-gbomb</module>
+    <module>tenorite-mode-sprint</module>
     <module>tenorite-mode-sof</module>
+    <module>tenorite-mode-gbomb</module>
     <module>tenorite-mode-breakout</module>
     <module>tenorite-server</module>
   </modules>

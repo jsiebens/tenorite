@@ -49,6 +49,10 @@ public interface GameListener {
     default void onFieldUpdate(Player sender, Field field) {
     }
 
+    default void onLevelUpdate(Player sender, int level) {
+        
+    }
+
     default GameListener and(GameListener next) {
         GameListener me = this;
         return new GameListener() {

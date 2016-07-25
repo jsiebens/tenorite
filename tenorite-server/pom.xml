@@ -52,6 +52,10 @@
     </dependency>
     <dependency>
       <groupId>net.tenorite</groupId>
+      <artifactId>tenorite-mode-sprint</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.tenorite</groupId>
       <artifactId>tenorite-mode-sof</artifactId>
     </dependency>
     <dependency>
