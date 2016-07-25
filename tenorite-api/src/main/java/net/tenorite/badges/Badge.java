@@ -73,7 +73,9 @@ public abstract class Badge {
     private static Properties loadAllProperties(String resourceName) throws IOException {
         Properties props = new Properties();
         try (InputStream is = Badge.class.getResourceAsStream(resourceName)) {
-            props.load(is);
+            if (is != null) {
+                props.load(is);
+            }
         }
         return props;
     }
