@@ -6,7 +6,7 @@ script:
       mvn package -P-embedded;
     fi
   - if [ "TRAVIS_TAG" != "" ]; then
-      mvn package -P-embedded && mvn deploy -DskipTests --settings .travis.settings.xml
+      mvn package -P-embedded && mvn deploy -DskipTests --settings .travis.settings.xml;
     fi
 services:
 - mongodb
