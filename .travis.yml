@@ -6,3 +6,7 @@ script: 'mvn -B install -P-embedded'
 
 services:
   - mongodb
+
+cache:
+  directories:
+  - $HOME/.m2
