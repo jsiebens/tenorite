@@ -3,7 +3,7 @@ jdk:
 - oraclejdk8
 install: true
 script:
-  - mvn package -P-embedded
+  - mvn clean install -P-embedded
   - if [ "$TRAVIS_TAG" != "" ]; then
       mvn deploy -DskipTests --settings .travis.settings.xml;
     fi
