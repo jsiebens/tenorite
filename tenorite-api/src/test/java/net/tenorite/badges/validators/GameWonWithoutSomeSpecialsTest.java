@@ -32,9 +32,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Johan Siebens
  */
-public class NoSpecialsUsedTest extends AbstractValidatorTestCase {
+public class GameWonWithoutSomeSpecialsTest extends AbstractValidatorTestCase {
 
-    private NoSpecialsUsed validator = new NoSpecialsUsed(BADGE);
+    private GameWonWithoutSomeSpecials validator = new GameWonWithoutSomeSpecials(BADGE, 2, s -> !Special.ADDLINE.equals(s));
 
     @Test
     public void testIgnoreWhenSomeSpecialsAreUsed() {
@@ -62,8 +62,29 @@ public class NoSpecialsUsedTest extends AbstractValidatorTestCase {
     }
 
     @Test
+    public void testIgnoreWhenRequiredNumberOfSpecialsAreNotUsed() {
+        PlayingStats player1 = PlayingStats.of(Player.of(1, "john", null), b -> b
+            .putNrOfSpecialsOnOpponent(Special.ADDLINE, 1)
+        );
+        PlayingStats player2 = PlayingStats.of(Player.of(2, "jane", null));
+        PlayingStats player3 = PlayingStats.of(Player.of(3, "nick", null));
+
+        Game game = Game.of("id", 0, 100, Tempo.NORMAL, GAME_MODE_ID, emptyList(), emptyList());
+        GameFinished gameFinished = GameFinished.of(game, asList(player1, player2, player3));
+
+        validator.process(gameFinished, badgeRepository, published::add);
+
+        assertThat(published).isEmpty();
+        assertThat(badgeRepository.getBadgeLevel("john", BADGE)).isEmpty();
+        assertThat(badgeRepository.getBadgeLevel("jane", BADGE)).isEmpty();
+        assertThat(badgeRepository.getBadgeLevel("nick", BADGE)).isEmpty();
+    }
+
+    @Test
     public void testEarnBadge() {
-        PlayingStats player1 = PlayingStats.of(Player.of(1, "john", null));
+        PlayingStats player1 = PlayingStats.of(Player.of(1, "john", null), b -> b
+            .putNrOfSpecialsOnOpponent(Special.ADDLINE, 2)
+        );
         PlayingStats player2 = PlayingStats.of(Player.of(2, "jane", null));
         PlayingStats player3 = PlayingStats.of(Player.of(3, "nick", null));
 
@@ -88,7 +109,9 @@ public class NoSpecialsUsedTest extends AbstractValidatorTestCase {
         badgeRepository.saveBadgeLevel(BadgeLevel.of(Tempo.NORMAL, BADGE, "john", 1000, 13, "gameId"));
         badgeRepository.updateProgress(BADGE, "john", 13);
 
-        PlayingStats player1 = PlayingStats.of(Player.of(1, "john", null));
+        PlayingStats player1 = PlayingStats.of(Player.of(1, "john", null), b -> b
+            .putNrOfSpecialsOnOpponent(Special.ADDLINE, 2)
+        );
         PlayingStats player2 = PlayingStats.of(Player.of(2, "jane", null));
         PlayingStats player3 = PlayingStats.of(Player.of(3, "nick", null));
 

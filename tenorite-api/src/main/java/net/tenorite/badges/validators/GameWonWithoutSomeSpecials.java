@@ -19,19 +19,27 @@ import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeRepository;
 import net.tenorite.badges.BadgeValidator;
 import net.tenorite.badges.events.BadgeEarned;
+import net.tenorite.core.Special;
 import net.tenorite.game.Game;
 import net.tenorite.game.PlayingStats;
 import net.tenorite.game.events.GameFinished;
 
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * @author Johan Siebens
  */
-public final class NoSpecialsUsed extends BadgeValidator {
+public final class GameWonWithoutSomeSpecials extends BadgeValidator {
 
-    public NoSpecialsUsed(Badge badge) {
+    private final int requiredNumberSpecials;
+
+    private final Predicate<Special> specialPredicate;
+
+    public GameWonWithoutSomeSpecials(Badge badge, int requiredNumberSpecials, Predicate<Special> exclude) {
         super(badge);
+        this.requiredNumberSpecials = requiredNumberSpecials;
+        this.specialPredicate = exclude;
     }
 
     @Override
@@ -43,9 +51,10 @@ public final class NoSpecialsUsed extends BadgeValidator {
 
         if (!first.getPlayer().isTeamPlayerOf(second.getPlayer())) {
             String name = first.getPlayer().getName();
-            boolean noSpecialsUsed = first.getTotalNrOfSpecialsUsed() == 0;
+            boolean requiredNumberOfSpecialsUsed = first.getTotalNrOfSpecialsUsed() >= requiredNumberSpecials;
+            boolean noSpecialsUsed = first.getTotalNrOfSpecialsUsed(specialPredicate) == 0;
 
-            if (noSpecialsUsed) {
+            if (requiredNumberOfSpecialsUsed && noSpecialsUsed) {
                 long nextLevel = badgeOps.getProgress(badge, name) + 1;
                 updateBadgeLevel(game, name, badge, nextLevel, badgeOps, onBadgeEarned);
             }

@@ -104,7 +104,15 @@ public final class BadgeValidators {
     }
 
     public static BadgeValidator thePurist(GameModeId gameModeId) {
-        return new NoSpecialsUsed(Badge.of(gameModeId, "THE_PURIST"));
+        return new GameWonWithoutSomeSpecials(Badge.of(gameModeId, "THE_PURIST"), 0, s -> true);
+    }
+
+    public static BadgeValidator theDefender(GameModeId gameModeId) {
+        return new GameWonWithoutSomeSpecials(Badge.of(gameModeId, "THE_DEFENDER"), 1, Special::isOffensive);
+    }
+
+    public static BadgeValidator theOffender(GameModeId gameModeId) {
+        return new GameWonWithoutSomeSpecials(Badge.of(gameModeId, "THE_OFFENDER"), 1, Special::isDefensive);
     }
 
     public static BadgeValidator theSpecialist(GameModeId gameModeId) {

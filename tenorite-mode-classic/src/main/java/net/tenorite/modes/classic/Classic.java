@@ -103,6 +103,8 @@ public final class Classic extends GameMode {
             tsunami(ID),
             bombSquad(ID),
             thePurist(ID),
+            theDefender(ID),
+            theOffender(ID),
 
             hitchhikersGuideToTheSpecialist(ID),
             hitchhikersGuideToComboWombo(ID),
