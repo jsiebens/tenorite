@@ -1,5 +1,8 @@
 # Tenorite TetriNET Server #
 
+Tenorite is a new TetriNET server written in Java, 
+built with some modern frameworks such as [Netty](http://netty.io), [Akka](http://akka.io), [Spring Boot](http://projects.spring.io/spring-boot)
+
 ### Features ###
 
 * TetriNET and TetriFAST support
