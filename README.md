@@ -1,9 +1,9 @@
-# Tenorite TetriNET Server #
+# Tenorite TetriNET Server [![Build Status](https://travis-ci.org/jsiebens/tenorite.svg?branch=master)](https://travis-ci.org/jsiebens/tenorite)
 
 Tenorite is a new TetriNET server written in Java, 
 built with some modern frameworks such as [Netty](http://netty.io), [Akka](http://akka.io), [Spring Boot](http://projects.spring.io/spring-boot)
 
-### Features ###
+### Features
 
 * TetriNET and TetriFAST support
 * Elo Rating based winlists
@@ -24,7 +24,7 @@ built with some modern frameworks such as [Netty](http://netty.io), [Akka](http:
 * Replay a game in the browser
 * ...
 
-### Requirements ###
+### Requirements
 
 * Java 8+
 * MongoDB
