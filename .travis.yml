@@ -1,9 +1,13 @@
 language: java
 jdk:
 - oraclejdk8
-script: mvn -B install -P-embedded
-after_success:
-  - test "${TRAVIS_PULL_REQUEST}" == "false" && test "${TRAVIS_TAG}" != "" && mvn deploy -DskipTests --settings .travis.settings.xml
+script:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+      mvn package -P-embedded;
+    fi
+  - if [ "TRAVIS_TAG" != "" ]; then
+      mvn package -P-embedded && mvn deploy -DskipTests --settings .travis.settings.xml
+    fi
 services:
 - mongodb
 cache:
@@ -13,7 +17,7 @@ branches:
   only:
     - master
       # Build tags that match this regex in addition to building the master branch.
-    - /^tenorite-[0-9]+\.[0-9]+\.[0-9]+/
+    - /^release-[0-9]+\.[0-9]+\.[0-9]+/
 env:
   global:
   - secure: kWP2/Xhd+DvGW03tkJ01Ws9j+DxJPs6A4D0g7PCANTb8AcGmoI6G7ErdcrMh7fon0yPgU6sXImZlq/Og2xXwGIxvngdArH0v8bvQ9Y6+KU4or/WLXfHTIHEUS/FElTn8ljlsnz3el4B+y5aPo4gK2Qvql7DHMwx1bX65A6X+YdTYMjjgGFYPRtn38yPxt6YW0hJVCQYbsGTysrguaIKQGaCLAWixYqpd4UxchMCi0yg1IkuiXTajQjnUfANO2XrJ0kGg9U7X3xb9o+p18x+n+J2Yc1K/ldLDJR1BXGq34pb0DxjzfB5Kq8tvdcG0RI694H6Po+TFqzv4AGXVu7OldF6OH/dpL68ts56g+VVQ9Kafjt2HZNoMKJqgv9bu/Bh2f+pTihfsS2nxCJ2zobMdGAPO42pHJD6AEbZ/XYS5ml9ZEqRPnQWAHmeRaNSXzsJp4cCz15PiW5LygSGm79VLtcNlHCK2RNk1kWon9LSYVlVDe7BQwUgGCx89J06qw+DoH1rpNoi50Oj+BLybM/chVE5rIjFHn1ZHZhQiLQM01GYft7CUz/2OA0+H2ndFngcf9f4JZO9TrHONlmDXpn9O5NuJDZBuYOrmjpB0yk64pck/GtsFNkVT0NKGvO2rbI1ChtbIYWPqdAA2MGdZ9E6FotTaCo/62mRewudPvGJ3770=
