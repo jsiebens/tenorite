@@ -16,7 +16,11 @@
 package net.tenorite.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.tenorite.badges.*;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import net.tenorite.badges.Badge;
+import net.tenorite.badges.BadgeLevel;
+import net.tenorite.badges.BadgeRepository;
+import net.tenorite.badges.BadgeValidator;
 import net.tenorite.core.NotAvailableException;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.*;
@@ -33,6 +37,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,7 +169,7 @@ public class TempoController {
     }
 
     @RequestMapping("/t/{tempo}/m/{mode}/games/{id}")
-    public ModelAndView replay(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("id") String gameId) {
+    public ModelAndView replay(@PathVariable("tempo") Tempo tempo, @PathVariable("mode") String mode, @PathVariable("id") String gameId) throws IOException {
         GameMode gameMode = gameModes.find(GameModeId.of(mode)).orElseThrow(NotAvailableException::new);
 
         Optional<Game> optGame = gameRepository.gameOps(tempo).loadGame(gameId).filter(g -> g.getGameModeId().equals(gameMode.getId()));
@@ -176,7 +181,7 @@ public class TempoController {
             Map<String, Object> data = new HashMap<>();
             data.put("players", game.getPlayers());
             data.put("messages", game.getMessages().stream().filter(includeForReplay(gameMode)).collect(toList()));
-            Map map = objectMapper.convertValue(data, Map.class);
+            Map map = objectMapper.readValue(objectMapper.writeValueAsString(data), Map.class);
 
             return
                 new ModelAndView("game")
