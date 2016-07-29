@@ -67,7 +67,7 @@ public final class SevenOFour extends GameMode {
 
     @Override
     public GameListener createGameListener(Scheduler scheduler, Consumer<Message> channel) {
-        return new Listener(channel).and(new SuddenDeath(300, 10, 1, scheduler, channel));
+        return new Listener(channel).and(new SuddenDeath(600, 10, 1, scheduler, channel));
     }
 
     @Override

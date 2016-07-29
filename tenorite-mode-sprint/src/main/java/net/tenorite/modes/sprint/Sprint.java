@@ -19,6 +19,7 @@ import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeValidator;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.*;
+import net.tenorite.game.listeners.SuddenDeath;
 import net.tenorite.protocol.Message;
 import net.tenorite.protocol.PlayerWonMessage;
 import net.tenorite.util.Scheduler;
@@ -68,7 +69,7 @@ public final class Sprint extends GameMode {
 
     @Override
     public GameListener createGameListener(Scheduler scheduler, Consumer<Message> channel) {
-        return new Listener(channel);
+        return new Listener(channel).and(new SuddenDeath(600, 10, 1, scheduler, channel));
     }
 
     @Override
