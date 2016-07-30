@@ -28,3 +28,16 @@ built with some modern frameworks such as [Netty](http://netty.io), [Akka](http:
 
 * Java 8+
 * MongoDB
+
+### Running the server
+
+Tenorite TetriNET server is built with Spring Boot, so an executable jar is available to run the server.
+
+* Install MongoDB
+* Make sure Java 8 is available
+* Download the latest release jar [1.1.0](https://github.com/jsiebens/tenorite/releases/download/v1.1.0/tenorite-server-1.1.0.jar)
+* Start the server using `java -jar`, for example:
+    * `java -jar tenorite-server-1.1.0.jar`
+* MongoDB connection can be configured with `-D` parameter of Spring Boot, for example:
+    * `java -Dspring.data.mongodb.uri=mongodb://localhost:27017/tenorite -jar tenorite-server-1.1.0.jar`
+    * other available properties can be found at [Appendix A. Common Application Properties](http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html)
