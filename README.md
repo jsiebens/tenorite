@@ -40,4 +40,4 @@ Tenorite TetriNET server is built with Spring Boot, so an executable jar is avai
     * `java -jar tenorite-server-1.1.0.jar`
 * MongoDB connection can be configured with `-D` parameter of Spring Boot, for example:
     * `java -Dspring.data.mongodb.uri=mongodb://localhost:27017/tenorite -jar tenorite-server-1.1.0.jar`
-    * other available properties can be found at [Appendix A. Common Application Properties](http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html)
+    * other available properties can be found at [Appendix A. Common Application Properties](http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html) of the Spring Boot Documentation
