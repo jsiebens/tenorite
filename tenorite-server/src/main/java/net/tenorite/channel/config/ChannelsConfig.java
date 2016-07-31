@@ -16,11 +16,22 @@
 package net.tenorite.channel.config;
 
 import akka.actor.ActorSystem;
+import akka.pattern.Patterns;
+import net.tenorite.channel.Channel;
+import net.tenorite.channel.Channels;
+import net.tenorite.channel.ChannelsRegistry;
 import net.tenorite.channel.actors.ChannelsActors;
+import net.tenorite.channel.commands.ListChannels;
 import net.tenorite.game.GameModes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import scala.compat.java8.FutureConverters;
+import scala.concurrent.Future;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * @author Johan Siebens
@@ -37,6 +48,25 @@ public class ChannelsConfig {
     @Bean
     public ChannelsActors channelsActors() {
         return new ChannelsActors(actorSystem, gameModes);
+    }
+
+    @Bean
+    public ChannelsRegistry channelsRegistry() {
+        ChannelsActors channelsActors = channelsActors();
+        return tempo -> {
+            Future<Object> result = Patterns.ask(channelsActors.get(tempo), ListChannels.instance(), 1000);
+            CompletionStage<Object> stage = FutureConverters.toJava(result);
+            return stage.thenCompose(o -> {
+                if (o instanceof Channels) {
+                    return CompletableFuture.completedFuture(((Channels) o).getChannels());
+                }
+                else {
+                    CompletableFuture<List<Channel>> f = new CompletableFuture<>();
+                    f.completeExceptionally(new IllegalStateException());
+                    return f;
+                }
+            });
+        };
     }
 
 }

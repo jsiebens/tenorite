@@ -16,11 +16,12 @@
 package net.tenorite.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeLevel;
 import net.tenorite.badges.BadgeRepository;
 import net.tenorite.badges.BadgeValidator;
+import net.tenorite.channel.Channel;
+import net.tenorite.channel.ChannelsRegistry;
 import net.tenorite.core.NotAvailableException;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.*;
@@ -32,9 +33,11 @@ import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.WinlistRepository;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PropertyComparator;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
@@ -42,8 +45,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -54,6 +59,8 @@ import static java.util.stream.Collectors.toList;
 public class TempoController {
 
     private final GameModes gameModes;
+
+    private final ChannelsRegistry channelsRegistry;
 
     private final WinlistRepository winlistRepository;
 
@@ -66,13 +73,45 @@ public class TempoController {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public TempoController(GameModes gameModes, WinlistRepository winlistRepository, GameRepository gameRepository, BadgeRepository badgeRepository, PlayerStatsRepository playerStatsRepository, ObjectMapper objectMapper) {
+    public TempoController(GameModes gameModes,
+                           ChannelsRegistry channelsRegistry,
+                           WinlistRepository winlistRepository,
+                           GameRepository gameRepository,
+                           BadgeRepository badgeRepository,
+                           PlayerStatsRepository playerStatsRepository,
+                           ObjectMapper objectMapper) {
         this.gameModes = gameModes;
+        this.channelsRegistry = channelsRegistry;
         this.winlistRepository = winlistRepository;
         this.gameRepository = gameRepository;
         this.badgeRepository = badgeRepository;
         this.playerStatsRepository = playerStatsRepository;
         this.objectMapper = objectMapper;
+    }
+
+    @RequestMapping("/t/{tempo}/channels")
+    public DeferredResult<ModelAndView> channels(@PathVariable("tempo") Tempo tempo) {
+        DeferredResult<ModelAndView> deferred = new DeferredResult<>();
+
+        channelsRegistry
+            .listChannels(tempo)
+            .whenComplete((channels, throwable) -> {
+                if (throwable != null) {
+                    deferred.setErrorResult(throwable);
+                }
+                else {
+                    List<Channel> sorted = channels.stream().sorted(new PropertyComparator<>("name", true, true)).collect(toList());
+
+                    ModelAndView mav = new ModelAndView("channels")
+                        .addObject("tempo", tempo)
+                        .addObject("gameModes", gameModes)
+                        .addObject("channels", sorted);
+
+                    deferred.setResult(mav);
+                }
+            });
+
+        return deferred;
     }
 
     @RequestMapping("/t/{tempo}/m/{mode}/winlist")

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/page">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12"><h1>Channels</h1></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-condensed table-hover">
+                    <tr>
+                        <th class="col-sm-1">name</th>
+                        <th class="col-sm-3">game mode</th>
+                        <th class="col-sm-1 right">players</th>
+                    </tr>
+                    <tr th:each="g : ${channels}">
+                        <td class="col-sm-1" th:text="${g.name}"></td>
+                        <td class="col-sm-3" th:text="${g.gameModeId.getTitle(tempo)}"></td>
+                        <td class="col-sm-1 right"><span th:text="${g.nrOfPlayers}"></span>/6</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>
