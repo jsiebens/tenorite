@@ -52,16 +52,6 @@ public final class SticksAndSquares extends GameMode {
     }
 
     @Override
-    public String getTitle(Tempo tempo) {
-        return "Sticks & Squares";
-    }
-
-    @Override
-    public String getDescription(Tempo tempo) {
-        return "only sticks and squares, no specials";
-    }
-
-    @Override
     public List<BadgeValidator> getBadgeValidators() {
         return Arrays.asList(
             competitor(ID),

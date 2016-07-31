@@ -58,16 +58,6 @@ public final class GBomb extends GameMode {
     }
 
     @Override
-    public String getTitle(Tempo tempo) {
-        return "GBomb";
-    }
-
-    @Override
-    public String getDescription(Tempo tempo) {
-        return "only gravity and bombs";
-    }
-
-    @Override
     public GameListener createGameListener(Scheduler scheduler, Consumer<Message> channel) {
         return new SuddenDeath(240, 5, 1, scheduler, channel);
     }

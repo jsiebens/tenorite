@@ -17,8 +17,19 @@ package net.tenorite.game;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import net.tenorite.badges.Badge;
+import net.tenorite.core.Tempo;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Johan Siebens
@@ -39,10 +50,49 @@ public abstract class GameModeId implements Comparable<GameModeId> {
         return value().compareTo(o.value());
     }
 
+    public String getTitle(Tempo tempo) {
+        Properties props = properties(this);
+        return props.getProperty("title." + tempo, props.getProperty("title", value()));
+    }
+
+    public String getDescription(Tempo tempo) {
+        Properties props = properties(this);
+        return props.getProperty("description." + tempo, props.getProperty("description", ""));
+    }
+
+    public Optional<String> getProperty(String key) {
+        return Optional.ofNullable(properties(this).getProperty(key));
+    }
+
     @Override
     @JsonValue
     public String toString() {
         return value();
+    }
+
+    private static final LoadingCache<GameModeId, Properties> PROPERTIES = CacheBuilder.newBuilder()
+        .maximumSize(10)
+        .build(new CacheLoader<GameModeId, Properties>() {
+
+            @Override
+            public Properties load(GameModeId key) throws Exception {
+                return loadAllProperties("/" + key + ".properties");
+            }
+
+        });
+
+    private static Properties properties(GameModeId gameModeId) {
+        return PROPERTIES.getUnchecked(gameModeId);
+    }
+
+    private static Properties loadAllProperties(String resourceName) throws IOException {
+        Properties props = new Properties();
+        try (InputStream is = Badge.class.getResourceAsStream(resourceName)) {
+            if (is != null) {
+                props.load(is);
+            }
+        }
+        return props;
     }
 
 }

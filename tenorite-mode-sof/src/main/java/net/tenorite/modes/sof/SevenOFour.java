@@ -56,16 +56,6 @@ public final class SevenOFour extends GameMode {
     }
 
     @Override
-    public String getTitle(Tempo tempo) {
-        return "Seven 'o Four";
-    }
-
-    @Override
-    public String getDescription(Tempo tempo) {
-        return "7 Four Line Combos to win!";
-    }
-
-    @Override
     public GameListener createGameListener(Scheduler scheduler, Consumer<Message> channel) {
         return new Listener(channel).and(new SuddenDeath(600, 10, 1, scheduler, channel));
     }

@@ -21,12 +21,6 @@ import net.tenorite.game.GameModeId;
 import net.tenorite.util.ImmutableStyle;
 import org.immutables.value.Value;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * @author Johan Siebens
  */
@@ -46,38 +40,15 @@ public abstract class Badge {
     @Value.Lazy
     @JsonIgnore
     public String getTitle() {
-        String key = getBadgeId() + ".title";
-        return properties(getGameModeId()).getProperty(key, key);
+        String key = "badge." + getBadgeId() + ".title";
+        return getGameModeId().getProperty(key).orElse(key);
     }
 
     @Value.Lazy
     @JsonIgnore
     public String getDescription() {
-        String key = getBadgeId() + ".description";
-        return properties(getGameModeId()).getProperty(key, key);
-    }
-
-    private static final Map<GameModeId, Properties> PROPERTIES = new ConcurrentHashMap<>();
-
-    private static Properties properties(GameModeId gameModeId) {
-        return PROPERTIES.computeIfAbsent(gameModeId, g -> {
-            try {
-                return loadAllProperties("/" + g + "_badges.properties");
-            }
-            catch (IOException e) {
-                return new Properties();
-            }
-        });
-    }
-
-    private static Properties loadAllProperties(String resourceName) throws IOException {
-        Properties props = new Properties();
-        try (InputStream is = Badge.class.getResourceAsStream(resourceName)) {
-            if (is != null) {
-                props.load(is);
-            }
-        }
-        return props;
+        String key = "badge." + getBadgeId() + ".description";
+        return getGameModeId().getProperty(key).orElse(key);
     }
 
 }

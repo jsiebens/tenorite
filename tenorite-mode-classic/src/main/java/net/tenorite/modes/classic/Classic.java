@@ -47,16 +47,6 @@ public final class Classic extends GameMode {
     }
 
     @Override
-    public String getTitle(Tempo tempo) {
-        return tempo.equals(Tempo.FAST) ? "TetriFAST" : "TetriNET";
-    }
-
-    @Override
-    public String getDescription(Tempo tempo) {
-        return tempo.equals(Tempo.FAST) ? "classic TetriFAST" : "classic TetriNET";
-    }
-
-    @Override
     public List<BadgeValidator> getBadgeValidators() {
         List<BadgeValidator> validators = new ArrayList<>(asList(
             competitor(ID),

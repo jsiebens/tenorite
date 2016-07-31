@@ -52,16 +52,6 @@ public final class Jelly extends GameMode {
     }
 
     @Override
-    public String getTitle(Tempo tempo) {
-        return "Jelly";
-    }
-
-    @Override
-    public String getDescription(Tempo tempo) {
-        return "just J and L bricks, no specials";
-    }
-
-    @Override
     public List<BadgeValidator> getBadgeValidators() {
         return Arrays.asList(
             competitor(ID),

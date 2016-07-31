@@ -58,16 +58,6 @@ public final class Sprint extends GameMode {
     }
 
     @Override
-    public String getTitle(Tempo tempo) {
-        return "Sprint";
-    }
-
-    @Override
-    public String getDescription(Tempo tempo) {
-        return "Clear 40 lines to win!";
-    }
-
-    @Override
     public GameListener createGameListener(Scheduler scheduler, Consumer<Message> channel) {
         return new Listener(channel).and(new SuddenDeath(600, 10, 1, scheduler, channel));
     }

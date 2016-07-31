@@ -58,12 +58,12 @@ public abstract class GameMode {
         return gameRules;
     }
 
-    public String getTitle(Tempo tempo) {
-        return id.toString();
+    public final String getTitle(Tempo tempo) {
+        return id.getTitle(tempo);
     }
 
-    public String getDescription(Tempo tempo) {
-        return "";
+    public final String getDescription(Tempo tempo) {
+        return id.getDescription(tempo);
     }
 
     public Comparator<PlayingStats> getPlayingStatsComparator() {

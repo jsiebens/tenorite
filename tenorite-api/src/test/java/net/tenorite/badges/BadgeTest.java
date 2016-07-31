@@ -37,8 +37,8 @@ public class BadgeTest {
     public void testTitleAndDescriptionWhenBadgesPropertiesFileIsMissing() {
         Badge badge = Badge.of(GameModeId.of("UNKNOWN"), "BADGE_A");
 
-        assertThat(badge.getTitle()).isEqualTo("BADGE_A.title");
-        assertThat(badge.getDescription()).isEqualTo("BADGE_A.description");
+        assertThat(badge.getTitle()).isEqualTo("badge.BADGE_A.title");
+        assertThat(badge.getDescription()).isEqualTo("badge.BADGE_A.description");
     }
 
 }

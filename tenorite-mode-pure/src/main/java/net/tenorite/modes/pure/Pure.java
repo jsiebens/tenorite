@@ -45,16 +45,6 @@ public final class Pure extends GameMode {
     }
 
     @Override
-    public String getTitle(Tempo tempo) {
-        return "Pure";
-    }
-
-    @Override
-    public String getDescription(Tempo tempo) {
-        return "no specials";
-    }
-
-    @Override
     public List<BadgeValidator> getBadgeValidators() {
         return Arrays.asList(
             competitor(ID),
