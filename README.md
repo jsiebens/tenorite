@@ -42,3 +42,4 @@ Tenorite TetriNET server is built with Spring Boot, so an executable jar is avai
     * `java -jar tenorite-server-1.1.0.jar --spring.data.mongodb.uri=mongodb://localhost:27017/tenorite`
     * more information can be found [here](http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html)
     * other available properties can be found at [Appendix A. Common Application Properties](http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html) of the Spring Boot Documentation
+* You can now browse Tenorite TetriNET Server at http://localhost:8080
