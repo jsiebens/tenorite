@@ -105,7 +105,7 @@ public final class Sprint extends GameMode {
 
         @Override
         public void onLevelUpdate(Player sender, int level) {
-            if (level >= 40) {
+            if (level >= Constants.LEVELS_TO_WIN) {
                 channel.accept(PlayerWonMessage.of(sender.getSlot()));
             }
         }
