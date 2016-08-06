@@ -50,7 +50,7 @@ public interface GameListener {
     }
 
     default void onLevelUpdate(Player sender, int level) {
-        
+
     }
 
     default GameListener and(GameListener next) {
@@ -97,6 +97,12 @@ public interface GameListener {
             public void onFieldUpdate(Player sender, Field field) {
                 me.onFieldUpdate(sender, field);
                 next.onFieldUpdate(sender, field);
+            }
+
+            @Override
+            public void onLevelUpdate(Player sender, int level) {
+                me.onLevelUpdate(sender, level);
+                next.onLevelUpdate(sender, level);
             }
 
         };
