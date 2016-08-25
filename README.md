@@ -35,7 +35,7 @@ Tenorite TetriNET server is built with Spring Boot, so an executable jar is avai
 
 * Install MongoDB
 * Make sure Java 8 is available
-* Download the latest release jar [1.1.1](https://github.com/jsiebens/tenorite/releases/download/v1.1.0/tenorite-server-1.1.0.jar)
+* Download the latest release jar [1.1.1](https://github.com/jsiebens/tenorite/releases/download/v1.1.0/tenorite-server-1.1.1.jar)
 * Start the server using `java -jar`, for example:
     * `java -jar tenorite-server-1.1.1.jar`
 * MongoDB connection can be configured using command line properties or by using an `application.properties` file, for example:
