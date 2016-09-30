@@ -45,10 +45,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -108,6 +106,39 @@ public class TempoController {
                         .addObject("channels", sorted);
 
                     deferred.setResult(mav);
+                }
+            });
+
+        return deferred;
+    }
+
+    @RequestMapping("/t/{tempo}/channels/{name}")
+    public DeferredResult<ModelAndView> channels(@PathVariable("tempo") Tempo tempo, @PathVariable("name") String name) {
+        DeferredResult<ModelAndView> deferred = new DeferredResult<>();
+
+        channelsRegistry
+            .listChannels(tempo)
+            .thenApply(channels -> channels.stream().filter(c -> name.equals(c.getName())).findFirst())
+            .whenComplete((optChannel, throwable) -> {
+                if (throwable != null) {
+                    deferred.setErrorResult(throwable);
+                }
+                else {
+                    if (optChannel.isPresent()) {
+                        Channel channel = optChannel.get();
+                        GameMode gameMode = gameModes.find(channel.getGameModeId()).orElseThrow(NotAvailableException::new);
+
+                        ModelAndView mav = new ModelAndView("channel")
+                            .addObject("tempo", tempo)
+                            .addObject("gameModes", gameModes)
+                            .addObject("gameMode", gameMode)
+                            .addObject("name", name);
+
+                        deferred.setResult(mav);
+                    }
+                    else {
+                        deferred.setErrorResult(new NotAvailableException());
+                    }
                 }
             });
 

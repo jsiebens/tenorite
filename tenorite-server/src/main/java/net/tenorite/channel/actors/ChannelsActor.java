@@ -22,6 +22,7 @@ import net.tenorite.channel.Channels;
 import net.tenorite.channel.commands.CreateChannel;
 import net.tenorite.channel.commands.ListChannels;
 import net.tenorite.channel.commands.ReserveSlot;
+import net.tenorite.channel.commands.Spectate;
 import net.tenorite.channel.events.ChannelCreated;
 import net.tenorite.channel.events.ChannelCreationFailed;
 import net.tenorite.channel.events.SlotReservationFailed;
@@ -78,6 +79,9 @@ final class ChannelsActor extends AbstractActor {
         else if (o instanceof ListChannels) {
             handleListChannels((ListChannels) o);
         }
+        else if (o instanceof Spectate) {
+            handleSpectate((Spectate) o);
+        }
     }
 
     private void handleReserveSlot(ReserveSlot o) {
@@ -104,6 +108,14 @@ final class ChannelsActor extends AbstractActor {
                 .collect(Collectors.toList()),
             ec
         ).onSuccess(onSuccess(i -> sender.tell(Channels.of(i), self)), ec);
+    }
+
+    private void handleSpectate(Spectate o) {
+        Option<ActorRef> channel = context().child(o.getChannel());
+
+        if (channel.isDefined()) {
+            channel.get().forward(o, context());
+        }
     }
 
     private void createChannel(CreateChannel c) {

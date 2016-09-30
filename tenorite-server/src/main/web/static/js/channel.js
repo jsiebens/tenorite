@@ -1,33 +1,29 @@
-function GamePlayer(data) {
-    var players = {};
-    var gameMessages = data.messages;
+function updateField(slot, update) {
+    var field = $('<div/>');
 
-    $.each(data.players, function (i, player) {
-        $('#name' + player.slot).html(player.name);
-        players[player.slot] = player.name;
+    var arrValues = update.split('');
+    $.each(arrValues, function (intIndex, objValue) {
+        var tile = $('<div></div>').addClass('tile');
+
+        if (objValue >= '0' && objValue <= '9') {
+            tile.addClass('tile' + objValue);
+        } else {
+            tile.addClass('tileS').text(objValue);
+        }
+
+        field.append(tile);
     });
 
-    function updateField(slot, update) {
-        var field = $('<div/>');
+    $('#field' + slot).html(field);
+}
 
-        var arrValues = update.split('');
-        $.each(arrValues, function (intIndex, objValue) {
-            var tile = $('<div></div>').addClass('tile');
+function onSocket(socket) {
+    var players = {};
 
-            if (objValue >= '0' && objValue <= '9') {
-                tile.addClass('tile' + objValue);
-            } else {
-                tile.addClass('tileS').text(objValue);
-            }
+    socket.onmessage = function (a) {
+        var message = JSON.parse(a.data).message.split(/ +/);
 
-            field.append(tile);
-        });
-
-        $('#field' + slot).html(field);
-    }
-
-    function handleMessage(m) {
-        var message = m.message.split(/ +/);
+        console.log(message);
 
         if (message[0] === 'f') {
             updateField(message[1], message[2]);
@@ -100,36 +96,29 @@ function GamePlayer(data) {
             $('#name' + message[1]).html('');
             $('#field' + message[1]).html('');
         }
-    }
 
-    function GameRunner(data) {
-        var messages = data.slice();
-
-        function process(current) {
-            handleMessage(current);
-            var next = messages.shift();
-            if (next) {
-                setTimeout(function () {
-                    process(next);
-                }, (next.timestamp - current.timestamp)/6)
-            } else {
-                $('#playButton').removeClass('disabled');
-                $('#specials').prepend('<div><b>Game ended!</b><div>');
-            }
+        if (message[0] === 'newgame') {
+            $('#specials').html('');
         }
 
-        this.start = function () {
-            $('#playButton').addClass('disabled');
-            process(messages.shift())
-        };
-
-    }
-
-    var runner = null;
-
-    this.play = function () {
-        runner = new GameRunner(gameMessages);
-        runner.start();
+        if (message[0] === 'endgame') {
+            $('#field1').html('');
+            $('#field2').html('');
+            $('#field3').html('');
+            $('#field4').html('');
+            $('#field5').html('');
+            $('#field6').html('');
+        }
     };
 
+    socket.onclose = function () {
+        console.log("Closed socket.");
+    };
+    socket.onerror = function () {
+        console.log("Error during transfer.");
+    };
+}
+
+function spectate(tempo, channel) {
+    onSocket(new SockJS('/ws/spectate?tempo=' + tempo + '&channel=' + channel));
 }

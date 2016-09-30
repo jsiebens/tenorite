@@ -18,7 +18,9 @@
                         <th class="col-sm-1 right">players</th>
                     </tr>
                     <tr th:each="g : ${channels}">
-                        <td class="col-sm-1" th:text="${g.name}"></td>
+                        <td class="col-sm-1">
+                            <a th:href="@{/t/{tempo}/channels/{name}(tempo=${tempo},name=${g.name})}" th:text="${g.name}"></a>
+                        </td>
                         <td class="col-sm-3" th:text="${g.gameModeId.getTitle(tempo)}"></td>
                         <td class="col-sm-1 right"><span th:text="${g.nrOfPlayers}"></span>/6</td>
                     </tr>

@@ -16,15 +16,11 @@
 package net.tenorite.channel.actors;
 
 import akka.actor.*;
-import net.tenorite.badges.Badge;
 import net.tenorite.badges.BadgeLevel;
 import net.tenorite.badges.events.BadgeEarned;
 import net.tenorite.badges.protocol.BadgeEarnedPlineMessage;
 import net.tenorite.channel.Channel;
-import net.tenorite.channel.commands.ConfirmSlot;
-import net.tenorite.channel.commands.LeaveChannel;
-import net.tenorite.channel.commands.ListChannels;
-import net.tenorite.channel.commands.ReserveSlot;
+import net.tenorite.channel.commands.*;
 import net.tenorite.channel.events.ChannelJoined;
 import net.tenorite.channel.events.ChannelLeft;
 import net.tenorite.channel.events.SlotReservationFailed;
@@ -69,6 +65,8 @@ final class ChannelActor extends AbstractActor {
     private final Map<ActorRef, Slot> slots = new HashMap<>();
 
     private final Map<ActorRef, Slot> pending = new HashMap<>();
+
+    private final Map<ActorRef, Spectator> spectators = new HashMap<>();
 
     private final AvailableSlots availableSlots = new AvailableSlots();
 
@@ -121,6 +119,9 @@ final class ChannelActor extends AbstractActor {
         else if (o instanceof ConfirmSlot) {
             handleConfirmSlot();
         }
+        else if (o instanceof Spectate) {
+            handleSpectate((Spectate) o);
+        }
         else if (o instanceof LeaveChannel) {
             handleLeaveChannel(sender(), false);
         }
@@ -153,6 +154,29 @@ final class ChannelActor extends AbstractActor {
                 scheduledClose.cancel();
                 scheduledClose = null;
             }
+        }
+    }
+
+    private void handleSpectate(Spectate o) {
+        ActorRef sender = sender();
+
+        Spectator slot = new Spectator(sender);
+        spectators.put(sender, slot);
+        context().watch(sender);
+
+        // send current player list
+        forEachSlot(p -> {
+            slot.send(PlayerJoinMessage.of(p.nr, p.name));
+            slot.send(TeamMessage.of(p.nr, ofNullable(p.team).orElse("")));
+        });
+
+        if (gameRecorder != null) {
+            slot.send(IngameMessage.of());
+            slot.send(gameRecorder.isPaused() ? GamePausedMessage.of() : GameRunningMessage.of());
+            forEachSlot(p -> {
+                Field field = gameRecorder.getField(p.nr).orElseGet(Field::randomCompletedField);
+                slot.send(FieldMessage.of(p.nr, field.getFieldString()));
+            });
         }
     }
 
@@ -227,6 +251,7 @@ final class ChannelActor extends AbstractActor {
 
             // announce new player
             forEachSlot(p -> p.send(PlayerJoinMessage.of(slot.nr, slot.name)));
+            forEachSpecator(p -> p.send(PlayerJoinMessage.of(slot.nr, slot.name)));
 
             // send current player list
             forEachSlot(p -> {
@@ -255,6 +280,9 @@ final class ChannelActor extends AbstractActor {
     }
 
     private void handleLeaveChannel(ActorRef actor, boolean disconnected) {
+        System.out.println(actor);
+
+        spectators.remove(actor);
         ofNullable(pending.remove(actor)).ifPresent(p -> availableSlots.releaseSlot(p.nr));
 
         ofNullable(slots.get(actor)).ifPresent(slot -> {
@@ -270,6 +298,7 @@ final class ChannelActor extends AbstractActor {
 
             // accounce leave in room
             forEachSlot(p -> p.send(PlayerLeaveMessage.of(slot.nr)));
+            forEachSpecator(p -> p.send(PlayerLeaveMessage.of(slot.nr)));
 
             if (gameRecorder != null) {
                 slot.send(EndGameMessage.of());
@@ -353,6 +382,7 @@ final class ChannelActor extends AbstractActor {
                     s.send(message);
                     s.send(newgame);
                 });
+                forEachSpecator(s -> s.send(newgame));
             }
             else {
                 moderator.send(PlineMessage.of("<red>game is already running!</red>"));
@@ -372,6 +402,7 @@ final class ChannelActor extends AbstractActor {
                     s.send(message);
                     s.send(endgame);
                 });
+                forEachSpecator(s -> s.send(endgame));
 
                 resetGameRecorder();
             }
@@ -391,6 +422,7 @@ final class ChannelActor extends AbstractActor {
                     p.send(message);
                     p.send(paused);
                 });
+                forEachSpecator(s -> s.send(paused));
             }
             else {
                 moderator.send(PlineMessage.of("<red>no running game is available!</red>"));
@@ -408,6 +440,7 @@ final class ChannelActor extends AbstractActor {
                     p.send(message);
                     p.send(running);
                 });
+                forEachSpecator(s -> s.send(running));
             }
             else {
                 moderator.send(PlineMessage.of("<red>no paused game is available!</red>"));
@@ -429,6 +462,7 @@ final class ChannelActor extends AbstractActor {
             if (gameRecorder != null) {
                 gameRecorder.onFieldMessage(field);
                 forEachSlot(s -> s.send(field));
+                forEachSpecator(s -> s.send(field));
             }
         }
         else {
@@ -436,6 +470,7 @@ final class ChannelActor extends AbstractActor {
                 if (gameRecorder != null) {
                     gameRecorder.onFieldMessage(field);
                     forEachSlot(op -> op.nr != player.nr, op -> op.send(field));
+                    forEachSpecator(op -> op.send(FieldMessage.of(field.getSender(), gameRecorder.getField(field.getSender()).orElse(Field.empty()).getFieldString())));
                 }
             });
         }
@@ -446,6 +481,7 @@ final class ChannelActor extends AbstractActor {
             if (gameRecorder != null) {
                 gameRecorder.onSpecialBlockMessage(message);
                 forEachSlot(op -> op.nr != message.getSender(), op -> op.send(message));
+                forEachSpecator(op -> op.send(message));
             }
         }
         else {
@@ -453,6 +489,7 @@ final class ChannelActor extends AbstractActor {
                 if (gameRecorder != null) {
                     gameRecorder.onSpecialBlockMessage(message);
                     forEachSlot(op -> op.nr != player.nr, op -> op.send(message));
+                    forEachSpecator(op -> op.send(message));
                 }
             });
         }
@@ -462,12 +499,14 @@ final class ChannelActor extends AbstractActor {
         if (message.getSender() == 0) {
             if (gameRecorder != null && gameRecorder.onClassicStyleAddMessage(message)) {
                 forEachSlot(op -> op.send(message));
+                forEachSpecator(op -> op.send(message));
             }
         }
         else {
             findSlot(sender(), message.getSender()).ifPresent(player -> {
                 if (gameRecorder != null && gameRecorder.onClassicStyleAddMessage(message)) {
                     forEachSlot(op -> op.nr != player.nr, op -> op.send(message));
+                    forEachSpecator(op -> op.send(message));
                 }
             });
         }
@@ -477,6 +516,7 @@ final class ChannelActor extends AbstractActor {
         findSlot(sender(), message.getSender()).ifPresent(loser -> {
             if (gameRecorder != null) {
                 forEachSlot(s -> s.send(message));
+                forEachSpecator(s -> s.send(message));
                 gameRecorder.onPlayerLostMessage(message).ifPresent(this::endGame);
             }
         });
@@ -488,6 +528,7 @@ final class ChannelActor extends AbstractActor {
 
     private void endGame(Game game) {
         forEachSlot(p -> p.send(EndGameMessage.of()));
+        forEachSpecator(p -> p.send(EndGameMessage.of()));
 
         List<PlayingStats> ranking = RANK_CALCULATOR.calculate(gameMode, game);
 
@@ -498,6 +539,7 @@ final class ChannelActor extends AbstractActor {
 
         if (ranking.size() > 1) {
             forEachSlot(p -> p.send(PlayerWonMessage.of(ranking.get(0).getPlayer().getSlot())));
+            forEachSpecator(p -> p.send(PlayerWonMessage.of(ranking.get(0).getPlayer().getSlot())));
         }
 
         resetGameRecorder();
@@ -524,6 +566,10 @@ final class ChannelActor extends AbstractActor {
     }
 
     // =================================================================================================================
+
+    private void forEachSpecator(Consumer<Spectator> playerConsumer) {
+        spectators.values().forEach(playerConsumer);
+    }
 
     private void forEachSlot(Consumer<Slot> playerConsumer) {
         slots.values().forEach(playerConsumer);
@@ -560,6 +606,24 @@ final class ChannelActor extends AbstractActor {
         void releaseSlot(int slot) {
             slots.add(slot);
             Collections.sort(slots);
+        }
+
+    }
+
+    private static final class Spectator {
+
+        private final ActorRef actor;
+
+        public Spectator(ActorRef actor) {
+            this.actor = actor;
+        }
+
+        void send(Message m) {
+            actor.tell(m, noSender());
+        }
+
+        void stop() {
+            actor.tell(PoisonPill.getInstance(), noSender());
         }
 
     }

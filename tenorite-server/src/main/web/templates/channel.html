@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/page">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12"><h1>Channel: <th:block th:text="${name}"></th:block></h1></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-condensed table-hover">
+                    <tr><td th:text="${gameMode.getDescription(tempo)}"></td></tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="player">
+                    <div id="field1" class="field"></div>
+                    <div id="name1" class="name">&nbsp;</div>
+                </div>
+                <div class="player">
+                    <div id="field2" class="field"></div>
+                    <div id="name2" class="name">&nbsp;</div>
+                </div>
+                <div class="player">
+                    <div id="field3" class="field"></div>
+                    <div id="name3" class="name">&nbsp;</div>
+                </div>
+                <div class="player">
+                    <div id="field4" class="field"></div>
+                    <div id="name4" class="name">&nbsp;</div>
+                </div>
+                <div class="player">
+                    <div id="field5" class="field"></div>
+                    <div id="name5" class="name">&nbsp;</div>
+                </div>
+                <div class="player">
+                    <div id="field6" class="field"></div>
+                    <div id="name6" class="name">&nbsp;</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="specials" id="specials" style="clear: both">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="//cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js"></script>
+    <script src="/js/channel.js"></script>
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            spectate([[${tempo.name()}]], [[${name}]]);
+        });
+    </script>
+
+</th:block>
+
+</body>
+</html>
