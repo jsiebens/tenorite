@@ -76,6 +76,8 @@ function onSocket(socket) {
             }
             else if (message[2] === 'o') {
                 line = $('<div></div>').html('<span class="offense">Block Bomb</span> on <b>' + target + '</b> by ' + sender);
+                $('#boom').show();
+                $('#boom').fadeOut("slow");
             }
 
             if (line) {

@@ -80,6 +80,8 @@ function GamePlayer(data) {
             }
             else if (message[2] === 'o') {
                 line = $('<div></div>').html('<span class="offense">Block Bomb</span> on <b>' + target + '</b> by ' + sender);
+                $('#boom').show();
+                $('#boom').fadeOut("slow");
             }
 
             if (line) {
@@ -111,7 +113,7 @@ function GamePlayer(data) {
             if (next) {
                 setTimeout(function () {
                     process(next);
-                }, (next.timestamp - current.timestamp)/6)
+                }, (next.timestamp - current.timestamp))
             } else {
                 $('#playButton').removeClass('disabled');
                 $('#specials').prepend('<div><b>Game ended!</b><div>');
