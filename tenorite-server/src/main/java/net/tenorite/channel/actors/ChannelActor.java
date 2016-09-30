@@ -280,8 +280,6 @@ final class ChannelActor extends AbstractActor {
     }
 
     private void handleLeaveChannel(ActorRef actor, boolean disconnected) {
-        System.out.println(actor);
-
         spectators.remove(actor);
         ofNullable(pending.remove(actor)).ifPresent(p -> availableSlots.releaseSlot(p.nr));
 
