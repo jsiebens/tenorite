@@ -25,6 +25,7 @@ import net.tenorite.badges.protocol.BadgeEarnedPlineMessage;
 import net.tenorite.channel.commands.ConfirmSlot;
 import net.tenorite.channel.commands.LeaveChannel;
 import net.tenorite.channel.commands.ReserveSlot;
+import net.tenorite.channel.commands.Spectate;
 import net.tenorite.channel.events.SlotReservationFailed;
 import net.tenorite.core.Special;
 import net.tenorite.core.Tempo;
@@ -635,6 +636,9 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit player2 = newTestKit();
         JavaTestKit player3 = newTestKit();
 
+        JavaTestKit spectator1 = newTestKit();
+        JavaTestKit spectator2 = newTestKit();
+
         JavaTestKit probe1 = newTestKit();
         probe1.watch(player1.getRef());
 
@@ -644,11 +648,19 @@ public class ChannelActorTest extends AbstractActorTestCase {
         JavaTestKit probe3 = newTestKit();
         probe3.watch(player3.getRef());
 
+        JavaTestKit probe4 = newTestKit();
+        probe4.watch(spectator1.getRef());
+
+        JavaTestKit probe5 = newTestKit();
+        probe5.watch(spectator2.getRef());
+
         ActorRef channelActor = system.actorOf(ChannelActor.props(Tempo.NORMAL, new ChaosMonkey(), "channel", false));
 
         joinChannel(player1, "john", channelActor);
         joinChannel(player2, "jane", channelActor);
         joinChannel(player3, "nick", channelActor);
+        spectateChannel(spectator1, channelActor);
+        spectateChannel(spectator2, channelActor);
 
         channelActor.tell(StartGameMessage.of(1), player1.getRef());
         channelActor.tell(SpecialBlockMessage.of(1, Special.ADDLINE, 2), player1.getRef());
@@ -656,11 +668,17 @@ public class ChannelActorTest extends AbstractActorTestCase {
         probe1.expectTerminated(player1.getRef());
         probe2.expectTerminated(player2.getRef());
         probe3.expectTerminated(player3.getRef());
+        probe4.expectTerminated(spectator1.getRef());
+        probe5.expectTerminated(spectator2.getRef());
     }
 
     private void joinChannel(JavaTestKit player, String name, ActorRef channel) {
         channel.tell(ReserveSlot.of("tetrinet", name), player.getRef());
         channel.tell(ConfirmSlot.instance(), player.getRef());
+    }
+
+    private void spectateChannel(JavaTestKit spectator, ActorRef channel) {
+        channel.tell(Spectate.of("tetrinet"), spectator.getRef());
     }
 
 }

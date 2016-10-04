@@ -106,6 +106,8 @@ final class ChannelActor extends AbstractActor {
             s.send(PlineMessage.of("<red><b>WOOPS!</b> Something went wrong, please try again later</red>"));
             s.stop();
         });
+
+        forEachSpecator(Spectator::stop);
     }
 
     @Override
