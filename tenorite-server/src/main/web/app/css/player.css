@@ -1,3 +1,38 @@
+body {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 17px;
+    background-color: #fafafa;
+    padding-top: 80px;
+}
+
+img.overlay {
+    margin: auto;
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+}
+
+.right {
+    text-align: right;
+}
+
+.wrapper {
+    text-align: center;
+    padding-top: 75px;
+    padding-bottom: 15px;
+}
+
+.footer {
+    text-align: center;
+    padding-bottom: 50px;
+}
+
 .specials {
     margin-top: 20px;
 }

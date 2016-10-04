@@ -5,7 +5,7 @@
 <body>
 
 <th:block layout:fragment="content">
-    <img class="overlay" id="boom" src="/boom.png" />
+    <img class="overlay" id="boom" src="/img/boom.png" />
     <div class="container">
         <div class="row">
             <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small>game <th:block th:text="${id}"></th:block></small></h1></div>
@@ -81,8 +81,6 @@
             </div>
         </div>
     </div>
-
-    <script src="/js/gameplayer.js"></script>
 
     <script th:inline="javascript">
         var player = new GamePlayer([[${data}]]);

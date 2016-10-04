@@ -6,7 +6,7 @@
 <body>
 
 <th:block layout:fragment="content">
-    <img class="overlay" id="boom" src="/boom.png" />
+    <img class="overlay" id="boom" src="/img/boom.png" />
     <div class="container">
         <div class="row">
             <div class="col-md-12"><h1>Channel: <th:block th:text="${name}"></th:block></h1></div>
@@ -52,11 +52,9 @@
         </div>
     </div>
 
-    <script src="//cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js"></script>
-    <script src="/js/channel.js"></script>
     <script th:inline="javascript">
         $(document).ready(function () {
-            spectate([[${tempo.name()}]], [[${name}]]);
+            new Spectator().spectate([[${tempo.name()}]], [[${name}]]);
         });
     </script>
 

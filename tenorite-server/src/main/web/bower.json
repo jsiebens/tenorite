@@ -1,0 +1,9 @@
+{
+  "name": "tenorite-server",
+  "dependencies": {
+    "font-awesome": "^4.6.3",
+    "bootstrap": "^3.3.7",
+    "sockjs-client": "^1.1.1",
+    "josefin-sans": "https://google-fonts.azurewebsites.net/googleFonts/josefinSans?family=Josefin+Sans"
+  }
+}

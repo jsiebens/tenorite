@@ -1,0 +1,30 @@
+{
+  "jsDependenciesFiles": [
+    "bower_components/jquery/dist/jquery.min.js",
+    "bower_components/bootstrap/dist/js/bootstrap.min.js",
+    "bower_components/sockjs-client/dist/sockjs.min.js"
+  ],
+  "cssDependenciesFiles": [
+    "bower_components/josefin-sans/josefinSans.css",
+    "bower_components/bootstrap/dist/css/bootstrap.min.css",
+    "bower_components/font-awesome/css/font-awesome.min.css"
+  ],
+  "cssFiles": [
+    "app/css/*.css"
+  ],
+  "jsFiles": [
+    "app/js/*.js"
+  ],
+  "imgs": [
+    "app/img/*.*"
+  ],
+  "favicon": "app/favicon.ico",
+  "fonts": [
+    "bower_components/font-awesome/fonts/*.*",
+    "bower_components/bootstrap/dist/fonts/*.*"
+  ],
+  "base_fonts": [
+    "bower_components/josefin-sans/*.ttf"
+  ],
+  "dest": "../../../target/web/static"
+}

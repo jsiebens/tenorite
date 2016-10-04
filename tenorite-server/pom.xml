@@ -178,15 +178,64 @@
   <build>
     <resources>
       <resource>
-        <directory>src/main/web</directory>
+        <directory>src/main/resources</directory>
         <filtering>false</filtering>
       </resource>
       <resource>
-        <directory>src/main/resources</directory>
+        <directory>${basedir}/target/web</directory>
         <filtering>false</filtering>
       </resource>
     </resources>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.5.0</version>
+        <configuration>
+          <workingDirectory>src/main/web</workingDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>npm install</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>npm</executable>
+              <arguments>
+                <argument>install</argument>
+              </arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>bower install</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>bower</executable>
+              <arguments>
+                <argument>install</argument>
+              </arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>gulp build</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>gulp</executable>
+              <arguments>
+                <argument>build</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
