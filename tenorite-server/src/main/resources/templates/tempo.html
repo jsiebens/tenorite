@@ -15,16 +15,10 @@
                     <tr>
                         <th class="col-md-1">name</th>
                         <th class="col-md-3">description</th>
-                        <th class="col-md-1"></th>
                     </tr>
                     <tr th:each="g : ${gameModes}">
                         <td th:text="${g.getTitle(tempo)}"></td>
                         <td th:text="${g.getDescription(tempo)}"></td>
-                        <td class="right">
-                            <a th:href="@{/t/{tempo}/m/{mode}/games(tempo=${tempo},mode=${g.id})}">recent games</a>
-                            <a th:href="@{/t/{tempo}/m/{mode}/winlist(tempo=${tempo},mode=${g.id})}">winlist</a>
-                            <a th:href="@{/t/{tempo}/m/{mode}/badges(tempo=${tempo},mode=${g.id})}">badges</a>
-                        </td>
                     </tr>
                 </table>
             </div>
