@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.tenorite;
+package net.tenorite.screenplay.ui;
 
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import net.serenitybdd.screenplay.targets.Target;
 
 /**
  * @author Johan Siebens
  */
-@TenoriteServerTest
-@RunWith(SpringJUnit4ClassRunner.class)
-public abstract class AbstractTenoriteServerTestCase {
+public class TournamentsOverview {
+
+    public static Target TOURNAMENTS = Target.the("List of tournaments").locatedBy(".tournament-name");
 
 }

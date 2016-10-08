@@ -15,14 +15,18 @@
  */
 package net.tenorite;
 
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.lang.annotation.*;
 
 /**
  * @author Johan Siebens
  */
-@TenoriteServerTest
-@RunWith(SpringJUnit4ClassRunner.class)
-public abstract class AbstractTenoriteServerTestCase {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@SpringBootTest(classes = TenoriteServer.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public @interface TenoriteServerTest {
 
 }

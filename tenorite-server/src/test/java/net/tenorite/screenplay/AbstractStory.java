@@ -13,16 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.tenorite;
+package net.tenorite.screenplay;
 
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
+import net.tenorite.TenoriteServerTest;
+import net.thucydides.core.annotations.Managed;
+import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.openqa.selenium.WebDriver;
 
 /**
  * @author Johan Siebens
  */
 @TenoriteServerTest
-@RunWith(SpringJUnit4ClassRunner.class)
-public abstract class AbstractTenoriteServerTestCase {
+@RunWith(SpringIntegrationSerenityRunner.class)
+public abstract class AbstractStory {
+
+    protected final Actor user = Actor.named("John");
+
+    @Managed
+    protected WebDriver webDriver;
+
+    @Before
+    public void johnCanBrowseTheWeb() {
+        user.can(BrowseTheWeb.with(webDriver));
+    }
 
 }

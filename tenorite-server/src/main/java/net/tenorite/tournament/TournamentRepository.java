@@ -13,16 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.tenorite;
+package net.tenorite.tournament;
 
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import net.tenorite.core.Tempo;
+import net.tenorite.game.GameModeId;
+
+import java.util.List;
 
 /**
  * @author Johan Siebens
  */
-@TenoriteServerTest
-@RunWith(SpringJUnit4ClassRunner.class)
-public abstract class AbstractTenoriteServerTestCase {
+public interface TournamentRepository {
+
+    TournamentOps tournamentOps(Tempo tempo);
+
+    interface TournamentOps {
+
+        Tournament saveTournament(Tournament tournament);
+
+        List<Tournament> listTournaments(GameModeId gameModeId);
+
+    }
 
 }

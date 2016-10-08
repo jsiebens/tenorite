@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/page">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="btn-group pull-right" role="group">
+                    <a th:each="g : ${gameModes}"
+                       class="btn btn-default"
+                       th:classappend="${g.id.equals(gameMode.id) ? 'active' : ''}"
+                       th:href="@{/t/{tempo}/m/{mode}/tournaments(tempo=${tempo},mode=${g.id},a=create)}"
+                       th:text="${g.getTitle(tempo)}"></a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small>new tournament</small></h1></div>
+        </div>
+        <div class="row" style="padding-top: 10px;">
+            <div class="col-md-8">
+                <form class="form-horizontal" th:object="${tournamentForm}" method="post" autocomplete="off">
+                    <div class="form-group" th:classappend="${#fields.hasErrors('name')} ? 'has-error' : ''">
+                        <label for="inputName" class="col-sm-2 control-label">name</label>
+                        <div class="col-sm-10">
+                            <input th:field="*{name}" tabindex="1" type="text" class="form-control" id="inputName" placeholder="name"/>
+                            <span class="help-block" th:errors="*{name}"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" th:classappend="${#fields.hasErrors('participants')} ? 'has-error' : ''">
+                        <label for="inputParticipants" class="col-sm-2 control-label">participants</label>
+                        <div class="col-sm-10">
+                            <textarea th:field="*{participants}" tabindex="3" class="form-control" id="inputParticipants" rows="12"></textarea>
+                            <span class="help-block" th:errors="*{participants}"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button id="submitButton" tabindex="4" type="submit" class="btn btn-primary">create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

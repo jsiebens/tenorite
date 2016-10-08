@@ -13,16 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.tenorite;
+package net.tenorite.screenplay.questions;
 
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.Question;
+import net.serenitybdd.screenplay.questions.Text;
+import net.tenorite.screenplay.ui.TournamentsOverview;
+
+import java.util.List;
 
 /**
  * @author Johan Siebens
  */
-@TenoriteServerTest
-@RunWith(SpringJUnit4ClassRunner.class)
-public abstract class AbstractTenoriteServerTestCase {
+public class TheTournaments implements Question<List<String>> {
+
+    @Override
+    public List<String> answeredBy(Actor actor) {
+        return Text.of(TournamentsOverview.TOURNAMENTS).viewedBy(actor).asList();
+    }
+
+    public static TheTournaments displayed() {
+        return new TheTournaments();
+    }
 
 }

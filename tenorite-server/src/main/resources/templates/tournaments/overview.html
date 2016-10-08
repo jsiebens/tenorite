@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/page">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="btn-group pull-right" role="group">
+                    <a th:each="g : ${gameModes}"
+                       class="btn btn-default"
+                       th:classappend="${g.id.equals(gameMode.id) ? 'active' : ''}"
+                       th:href="@{/t/{tempo}/m/{mode}/tournaments(tempo=${tempo},mode=${g.id})}"
+                       th:text="${g.getTitle(tempo)}"></a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small>tournaments</small></h1></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12" style="padding-bottom: 10px">
+                <p><a id="addTournament" class="btn btn-default btn-sm" href="?a=create">create new tournament</a></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-condensed table-hover">
+                    <tr th:each="t : ${tournaments}">
+                        <td class="tournament-name" th:text="${t.name}"></td>
+                        <td th:text="${t.state}" class="right">CREATED</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

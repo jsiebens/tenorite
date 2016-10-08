@@ -6,7 +6,7 @@ jdk:
 install: true
 
 script:
-  - mvn -B clean install -P-embedded | grep -v 'Download'
+  - mvn -B clean install -Dwebdriver.driver=phantomjs -P-embedded | grep -v 'Download'
   - if [ "$TRAVIS_TAG" != "" ]; then
       mvn deploy -DskipTests --settings .travis.settings.xml;
     fi
@@ -21,6 +21,7 @@ cache:
 branches:
   only:
     - master
+    - tournaments
       # Build tags that match this regex in addition to building the master branch.
     - /^v[0-9]+\.[0-9]+\.[0-9]+/
 
