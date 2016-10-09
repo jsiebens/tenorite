@@ -20,14 +20,11 @@ import net.tenorite.core.Tempo;
 import net.tenorite.game.GameModeId;
 import net.tenorite.tournament.Tournament;
 import net.tenorite.tournament.TournamentRepository;
-import org.jongo.Jongo;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 
-import static java.util.Arrays.stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -36,15 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MongoTournamentRepositoryTest extends AbstractTenoriteServerTestCase {
 
     @Autowired
-    private Jongo jongo;
-
-    @Autowired
     private TournamentRepository tournamentRepository;
-
-    @Before
-    public void clear() {
-        stream(Tempo.values()).forEach(t -> MongoTournamentRepository.tournamentCollection(jongo, t).drop());
-    }
 
     @Test
     public void testSaveAndListTournaments() {

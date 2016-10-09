@@ -21,38 +21,46 @@ import net.tenorite.game.GameModeId;
 import net.tenorite.game.PlayingStats;
 import net.tenorite.stats.PlayerStats;
 import net.tenorite.stats.PlayerStatsRepository;
+import net.tenorite.system.config.MongoCollections;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
-import org.jongo.MongoCursor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
+import static java.util.Arrays.stream;
 
 /**
  * @author Johan Siebens
  */
-public class MongoPlayerStatsRepository implements PlayerStatsRepository {
+@Component
+public final class MongoPlayerStatsRepository implements PlayerStatsRepository {
 
-    private final Jongo jongo;
+    private final Map<Tempo, PlayerStatsOps> ops = new EnumMap<>(Tempo.class);
 
-    private final Map<Tempo, MongoCollection> collections = new EnumMap<>(Tempo.class);
-
-    public MongoPlayerStatsRepository(Jongo jongo) {
-        this.jongo = jongo;
+    @Autowired
+    public MongoPlayerStatsRepository(MongoCollections collections) {
+        stream(Tempo.values()).forEach(t -> ops.put(t, createOps(t, collections)));
     }
 
     @Override
     public PlayerStatsOps playerStatsOps(Tempo tempo) {
-        return new MongoPlayerStatsOps(collections.computeIfAbsent(tempo, t -> createCollection(jongo, t)));
+        return ops.get(tempo);
+    }
+
+    private static PlayerStatsOps createOps(Tempo tempo, MongoCollections collections) {
+        return new MongoPlayerStatsOps(collections.getCollection(tempo, "player:stats"));
     }
 
     private static class MongoPlayerStatsOps implements PlayerStatsOps {
 
         private final MongoCollection collection;
 
-        public MongoPlayerStatsOps(MongoCollection collection) {
+        MongoPlayerStatsOps(MongoCollection collection) {
             this.collection = collection;
         }
 

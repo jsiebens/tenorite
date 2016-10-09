@@ -36,14 +36,6 @@ import static org.hamcrest.Matchers.contains;
  */
 public class AddTournamentStory extends AbstractStory {
 
-    @Autowired
-    private Jongo jongo;
-
-    @Before
-    public void clear() {
-        stream(Tempo.values()).forEach(t -> MongoTournamentRepository.tournamentCollection(jongo, t).drop());
-    }
-
     @Test
     public void a_user_should_be_able_to_add_a_first_tournament() {
         givenThat(user).wasAbleTo(

@@ -42,15 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MongoGameRepositoryTest extends AbstractTenoriteServerTestCase {
 
     @Autowired
-    private Jongo jongo;
-
-    @Autowired
     private GameRepository gameRepository;
-
-    @Before
-    public void clear() {
-        stream(Tempo.values()).forEach(t -> MongoGameRepository.createCollection(jongo, t).drop());
-    }
 
     @Test
     public void testSaveAndLoadGame() {

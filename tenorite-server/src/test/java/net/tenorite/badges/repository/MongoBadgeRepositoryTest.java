@@ -22,8 +22,6 @@ import net.tenorite.badges.BadgeLevelBuilder;
 import net.tenorite.badges.BadgeRepository;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameModeId;
-import org.jongo.Jongo;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.util.Arrays.stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
@@ -41,16 +38,7 @@ import static org.assertj.core.api.Assertions.entry;
 public class MongoBadgeRepositoryTest extends AbstractTenoriteServerTestCase {
 
     @Autowired
-    private Jongo jongo;
-
-    @Autowired
     private BadgeRepository badgeRepository;
-
-    @Before
-    public void clear() {
-        stream(Tempo.values()).forEach(t -> MongoBadgeRepository.progressCollection(jongo, t).drop());
-        stream(Tempo.values()).forEach(t -> MongoBadgeRepository.badgeCollection(jongo, t).drop());
-    }
 
     @Test
     public void testSaveAndGetBadge() {

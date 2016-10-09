@@ -15,7 +15,11 @@
  */
 package net.tenorite;
 
+import net.tenorite.system.config.MongoCollections;
+import org.jongo.MongoCollection;
+import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
@@ -24,5 +28,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @TenoriteServerTest
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class AbstractTenoriteServerTestCase {
+
+    @Autowired
+    private MongoCollections collections;
+
+    @Before
+    public final void clearMongoCollections() {
+        collections.forEach(MongoCollection::remove);
+    }
 
 }

@@ -19,37 +19,44 @@ import net.tenorite.core.Tempo;
 import net.tenorite.game.Game;
 import net.tenorite.game.GameModeId;
 import net.tenorite.game.GameRepository;
-import org.jongo.Jongo;
+import net.tenorite.system.config.MongoCollections;
 import org.jongo.MongoCollection;
 import org.jongo.MongoCursor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
 /**
  * @author Johan Siebens
  */
-public class MongoGameRepository implements GameRepository {
+@Component
+public final class MongoGameRepository implements GameRepository {
 
-    private Jongo jongo;
+    private final Map<Tempo, GameOps> ops = new EnumMap<>(Tempo.class);
 
-    private Map<Tempo, MongoCollection> collections = new EnumMap<>(Tempo.class);
-
-    public MongoGameRepository(Jongo jongo) {
-        this.jongo = jongo;
+    @Autowired
+    public MongoGameRepository(MongoCollections collections) {
+        stream(Tempo.values()).forEach(t -> ops.put(t, createOps(t, collections)));
     }
 
     @Override
     public GameOps gameOps(Tempo tempo) {
-        return new MongoGameOps(collections.computeIfAbsent(tempo, t -> createCollection(jongo, t)));
+        return ops.get(tempo);
     }
 
-    private class MongoGameOps implements GameOps {
+    private static GameOps createOps(Tempo tempo, MongoCollections collections) {
+        return new MongoGameOps(collections.getCollection(tempo, "games"));
+    }
+
+    private static class MongoGameOps implements GameOps {
 
         private MongoCollection collection;
 
@@ -73,10 +80,6 @@ public class MongoGameRepository implements GameRepository {
             return stream(cursor.spliterator(), false).collect(toList());
         }
 
-    }
-
-    static MongoCollection createCollection(Jongo jongo, Tempo tempo) {
-        return jongo.getCollection(tempo + ":games");
     }
 
 }

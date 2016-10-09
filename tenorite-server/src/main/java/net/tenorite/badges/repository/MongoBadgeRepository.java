@@ -20,9 +20,11 @@ import net.tenorite.badges.BadgeLevel;
 import net.tenorite.badges.BadgeRepository;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameModeId;
-import org.jongo.Jongo;
+import net.tenorite.system.config.MongoCollections;
 import org.jongo.MongoCollection;
 import org.jongo.MongoCursor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -31,6 +33,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
@@ -38,32 +41,32 @@ import static java.util.stream.StreamSupport.stream;
 /**
  * @author Johan Siebens
  */
-public class MongoBadgeRepository implements BadgeRepository {
+@Component
+public final class MongoBadgeRepository implements BadgeRepository {
 
-    private Jongo jongo;
+    private final Map<Tempo, BadgeOps> ops = new EnumMap<>(Tempo.class);
 
-    private Map<Tempo, MongoCollection> badgeCollections = new EnumMap<>(Tempo.class);
-
-    private Map<Tempo, MongoCollection> progressCollections = new EnumMap<>(Tempo.class);
-
-    public MongoBadgeRepository(Jongo jongo) {
-        this.jongo = jongo;
+    @Autowired
+    public MongoBadgeRepository(MongoCollections collections) {
+        stream(Tempo.values()).forEach(t -> ops.put(t, createOps(t, collections)));
     }
 
     @Override
     public BadgeOps badgeOps(Tempo tempo) {
-        MongoCollection badges = badgeCollections.computeIfAbsent(tempo, t -> badgeCollection(jongo, t));
-        MongoCollection data = progressCollections.computeIfAbsent(tempo, t -> progressCollection(jongo, t));
-        return new MongoBadgeOps(badges, data);
+        return ops.get(tempo);
     }
 
-    private class MongoBadgeOps implements BadgeOps {
+    private static MongoBadgeOps createOps(Tempo tempo, MongoCollections collections) {
+        return new MongoBadgeOps(badgeCollection(tempo, collections), progressCollection(tempo, collections));
+    }
+
+    private static class MongoBadgeOps implements BadgeOps {
 
         private MongoCollection badges;
 
         private MongoCollection data;
 
-        public MongoBadgeOps(MongoCollection badges, MongoCollection data) {
+        MongoBadgeOps(MongoCollection badges, MongoCollection data) {
             this.badges = badges;
             this.data = data;
         }
@@ -137,12 +140,12 @@ public class MongoBadgeRepository implements BadgeRepository {
 
     }
 
-    static MongoCollection badgeCollection(Jongo jongo, Tempo tempo) {
-        return jongo.getCollection(tempo + ":player:badges");
+    private static MongoCollection badgeCollection(Tempo tempo, MongoCollections collections) {
+        return collections.getCollection(tempo, "player:badges");
     }
 
-    static MongoCollection progressCollection(Jongo jongo, Tempo tempo) {
-        return jongo.getCollection(tempo + ":player:badges:progress");
+    private static MongoCollection progressCollection(Tempo tempo, MongoCollections collections) {
+        return collections.getCollection(tempo, "player:badges:progress");
     }
 
 }

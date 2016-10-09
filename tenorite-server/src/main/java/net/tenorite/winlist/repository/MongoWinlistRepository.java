@@ -17,17 +17,20 @@ package net.tenorite.winlist.repository;
 
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameModeId;
+import net.tenorite.system.config.MongoCollections;
 import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.WinlistRepository;
-import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.jongo.MongoCursor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
@@ -35,24 +38,28 @@ import static java.util.stream.StreamSupport.stream;
 /**
  * @author Johan Siebens
  */
-public class MongoWinlistRepository implements WinlistRepository {
+@Component
+public final class MongoWinlistRepository implements WinlistRepository {
 
     static final long MONTH = 1000L * 60L * 60L * 24L * 30L;
 
-    private Jongo jongo;
+    private final Map<Tempo, WinlistOps> ops = new EnumMap<>(Tempo.class);
 
-    private Map<Tempo, MongoCollection> collections = new EnumMap<>(Tempo.class);
-
-    public MongoWinlistRepository(Jongo jongo) {
-        this.jongo = jongo;
+    @Autowired
+    public MongoWinlistRepository(MongoCollections collections) {
+        stream(Tempo.values()).forEach(t -> ops.put(t, createOps(t, collections)));
     }
 
     @Override
     public WinlistOps winlistOps(Tempo tempo) {
-        return new MongoWinlistOps(collections.computeIfAbsent(tempo, t -> createCollection(jongo, t)));
+        return ops.get(tempo);
     }
 
-    private class MongoWinlistOps implements WinlistOps {
+    private static MongoWinlistOps createOps(Tempo tempo, MongoCollections collections) {
+        return new MongoWinlistOps(collections.getCollection(tempo, "winlist"));
+    }
+
+    private static class MongoWinlistOps implements WinlistOps {
 
         private MongoCollection collection;
 
@@ -87,10 +94,6 @@ public class MongoWinlistRepository implements WinlistRepository {
             return stream(as.spliterator(), false).collect(toList());
         }
 
-    }
-
-    static MongoCollection createCollection(Jongo jongo, Tempo tempo) {
-        return jongo.getCollection(tempo + ":winlist");
     }
 
 }

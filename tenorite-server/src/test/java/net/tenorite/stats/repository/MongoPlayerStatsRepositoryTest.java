@@ -24,8 +24,6 @@ import net.tenorite.game.PlayingStats;
 import net.tenorite.stats.PlayerStats;
 import net.tenorite.stats.PlayerStatsBuilder;
 import net.tenorite.stats.PlayerStatsRepository;
-import org.jongo.Jongo;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,15 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MongoPlayerStatsRepositoryTest extends AbstractTenoriteServerTestCase {
 
     @Autowired
-    private Jongo jongo;
-
-    @Autowired
     private PlayerStatsRepository playerStatsRepository;
-
-    @Before
-    public void clear() {
-        stream(Tempo.values()).forEach(t -> MongoPlayerStatsRepository.createCollection(jongo, t).drop());
-    }
 
     @Test
     public void testUpdateAndGetPlayerStats() {

@@ -19,10 +19,13 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
 import net.tenorite.TenoriteServerTest;
+import net.tenorite.system.config.MongoCollections;
 import net.thucydides.core.annotations.Managed;
+import org.jongo.MongoCollection;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Johan Siebens
@@ -30,6 +33,9 @@ import org.openqa.selenium.WebDriver;
 @TenoriteServerTest
 @RunWith(SpringIntegrationSerenityRunner.class)
 public abstract class AbstractStory {
+
+    @Autowired
+    private MongoCollections collections;
 
     protected final Actor user = Actor.named("John");
 
@@ -39,6 +45,11 @@ public abstract class AbstractStory {
     @Before
     public void johnCanBrowseTheWeb() {
         user.can(BrowseTheWeb.with(webDriver));
+    }
+
+    @Before
+    public final void clearMongoCollections() {
+        collections.forEach(MongoCollection::remove);
     }
 
 }

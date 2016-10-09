@@ -20,12 +20,9 @@ import net.tenorite.core.Tempo;
 import net.tenorite.modes.classic.Classic;
 import net.tenorite.winlist.WinlistItem;
 import net.tenorite.winlist.WinlistRepository;
-import org.jongo.Jongo;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.range;
 import static net.tenorite.winlist.WinlistItem.Type.PLAYER;
 import static net.tenorite.winlist.WinlistItem.Type.TEAM;
@@ -37,15 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MongoWinlistRepositoryTest extends AbstractTenoriteServerTestCase {
 
     @Autowired
-    private Jongo jongo;
-
-    @Autowired
     private WinlistRepository winlistRepository;
-
-    @Before
-    public void clear() {
-        stream(Tempo.values()).forEach(t -> MongoWinlistRepository.createCollection(jongo, t).drop());
-    }
 
     @Test
     public void testSaveAndLoadWinlistItems() {

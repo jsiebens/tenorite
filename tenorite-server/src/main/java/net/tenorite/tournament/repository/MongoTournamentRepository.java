@@ -17,6 +17,7 @@ package net.tenorite.tournament.repository;
 
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameModeId;
+import net.tenorite.system.config.MongoCollections;
 import net.tenorite.tournament.Tournament;
 import net.tenorite.tournament.TournamentRepository;
 import org.jongo.Jongo;
@@ -28,6 +29,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
@@ -37,18 +39,20 @@ import static java.util.stream.StreamSupport.stream;
 @Component
 public final class MongoTournamentRepository implements TournamentRepository {
 
-    private final Jongo jongo;
-
-    private final Map<Tempo, MongoTournamentOps> collections = new EnumMap<>(Tempo.class);
+    private final Map<Tempo, MongoTournamentOps> ops = new EnumMap<>(Tempo.class);
 
     @Autowired
-    public MongoTournamentRepository(Jongo jongo) {
-        this.jongo = jongo;
+    public MongoTournamentRepository(MongoCollections collections) {
+        stream(Tempo.values()).forEach(t -> ops.put(t, createOps(t, collections)));
     }
 
     @Override
     public TournamentOps tournamentOps(Tempo tempo) {
-        return collections.computeIfAbsent(tempo, t -> new MongoTournamentOps(tournamentCollection(jongo, tempo)));
+        return ops.get(tempo);
+    }
+
+    private static MongoTournamentOps createOps(Tempo tempo, MongoCollections collections) {
+        return new MongoTournamentOps(collections.getCollection(tempo, "tournament"));
     }
 
     private static class MongoTournamentOps implements TournamentOps {
