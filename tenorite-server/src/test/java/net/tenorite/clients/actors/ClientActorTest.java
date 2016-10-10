@@ -27,8 +27,8 @@ import net.tenorite.channel.events.SlotReserved;
 import net.tenorite.clients.MessageSink;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameModes;
-import net.tenorite.modes.jelly.Jelly;
 import net.tenorite.modes.classic.Classic;
+import net.tenorite.modes.jelly.Jelly;
 import net.tenorite.protocol.Inbound;
 import net.tenorite.protocol.LvlMessage;
 import net.tenorite.protocol.Message;
@@ -136,7 +136,7 @@ public class ClientActorTest extends AbstractActorTestCase {
 
         client.tell(SlotReserved.instance(), channelA.getRef());
         client.tell(SlotReserved.instance(), channelB.getRef());
-        client.tell(ChannelLeft.of(Tempo.FAST, "channel", "junit"), channelA.getRef());
+        client.tell(ChannelLeft.instance(), channelA.getRef());
 
         channels.expectMsgAllOf(ListChannels.instance());
 

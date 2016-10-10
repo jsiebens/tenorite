@@ -19,6 +19,7 @@ import net.tenorite.core.Tempo;
 import net.tenorite.game.GameModeId;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Johan Siebens
@@ -32,6 +33,22 @@ public interface TournamentRepository {
         Tournament saveTournament(Tournament tournament);
 
         List<Tournament> listTournaments(GameModeId gameModeId);
+
+        void incrScore(String tournamentId, String player);
+
+        Optional<Tournament> loadTournament(String id);
+
+        Optional<TournamentMatch> loadTournamentMatch(String id);
+
+        TournamentMatch saveTournamentMatch(TournamentMatch match);
+
+        List<TournamentMatch> saveTournamentMatch(List<TournamentMatch> matches);
+
+        long nrOfUnfinishedMatches(String tournament, int round);
+
+        void openTournamentRound(String tournament, int round);
+
+        String nextTournamentId();
 
     }
 

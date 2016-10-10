@@ -51,7 +51,11 @@ final class ClientActor extends AbstractActor {
     private static final Object PING = new Object();
 
     static Props props(Tempo tempo, String name, MessageSink sink, GameModes gameModes, ActorRef channels) {
-        return Props.create(ClientActor.class, tempo, name, sink, gameModes, channels);
+        return Props.create(ClientActor.class, tempo, name, sink, gameModes, channels, null);
+    }
+
+    static Props props(Tempo tempo, String name, MessageSink sink, GameModes gameModes, ActorRef channels, ActorRef tournamentChannels) {
+        return Props.create(ClientActor.class, tempo, name, sink, gameModes, channels, tournamentChannels);
     }
 
     private final Tempo tempo;
@@ -64,6 +68,8 @@ final class ClientActor extends AbstractActor {
 
     private final ActorRef channels;
 
+    private final ActorRef tournamentChannels;
+
     private final Commands commands;
 
     private ActorRef channel;
@@ -72,14 +78,16 @@ final class ClientActor extends AbstractActor {
 
     private long lastMessageTimestamp;
 
-    public ClientActor(Tempo tempo, String name, MessageSink sink, GameModes gameModes, ActorRef channels) {
+    public ClientActor(Tempo tempo, String name, MessageSink sink, GameModes gameModes, ActorRef channels, ActorRef tournamentChannels) {
         this.tempo = tempo;
         this.name = name;
         this.sink = sink;
         this.gameModes = gameModes;
         this.channels = channels;
+        this.tournamentChannels = tournamentChannels;
 
         this.commands = new Commands()
+            .register("/match", (i, s) -> joinTournamentChannel(s))
             .register("/join", (i, s) -> joinChannel(s))
             .register("/create", (i, s) -> createChannel(s))
             .register("/list", (i, s) -> channels.tell(ListChannels.instance(), self()))
@@ -90,6 +98,10 @@ final class ClientActor extends AbstractActor {
 
     private void joinChannel(String channel) {
         channels.tell(ReserveSlot.of(channel, name), self());
+    }
+
+    private void joinTournamentChannel(String channel) {
+        ofNullable(tournamentChannels).ifPresent(c -> c.tell(ReserveSlot.of(channel, name), self()));
     }
 
     private void createChannel(String s) {

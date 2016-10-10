@@ -25,6 +25,8 @@ import org.jongo.marshall.jackson.oid.MongoObjectId;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * @author Johan Siebens
  */
@@ -33,18 +35,13 @@ import java.util.List;
 @JsonDeserialize(as = TournamentBuilder.ImmutableTournament.class)
 public abstract class Tournament {
 
-    public enum State {
-        CREATED
-    }
-
     public static Tournament of(String name, GameModeId gameModeId, List<String> participants) {
         return new TournamentBuilder()
             .id(new ObjectId().toString())
             .timestamp(System.currentTimeMillis())
             .name(name)
             .gameModeId(gameModeId)
-            .participants(participants)
-            .state(State.CREATED)
+            .participants(participants.stream().map(s -> Score.of(s, 0)).collect(toList()))
             .build();
     }
 
@@ -58,8 +55,6 @@ public abstract class Tournament {
 
     public abstract GameModeId getGameModeId();
 
-    public abstract List<String> getParticipants();
-
-    public abstract State getState();
+    public abstract List<Score> getParticipants();
 
 }

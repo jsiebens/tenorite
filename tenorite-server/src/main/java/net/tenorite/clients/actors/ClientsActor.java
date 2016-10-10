@@ -33,7 +33,11 @@ import scala.Option;
 final class ClientsActor extends AbstractActor {
 
     public static Props props(Tempo tempo, GameModes gameModes, ActorRef channels) {
-        return Props.create(ClientsActor.class, tempo, gameModes, channels);
+        return Props.create(ClientsActor.class, tempo, gameModes, channels, null);
+    }
+
+    public static Props props(Tempo tempo, GameModes gameModes, ActorRef channels, ActorRef tournamentChannels) {
+        return Props.create(ClientsActor.class, tempo, gameModes, channels, tournamentChannels);
     }
 
     private final Tempo tempo;
@@ -42,10 +46,13 @@ final class ClientsActor extends AbstractActor {
 
     private final ActorRef channels;
 
-    public ClientsActor(Tempo tempo, GameModes gameModes, ActorRef channels) {
+    private final ActorRef tournamentChannels;
+
+    public ClientsActor(Tempo tempo, GameModes gameModes, ActorRef channels, ActorRef tournamentChannels) {
         this.tempo = tempo;
         this.gameModes = gameModes;
         this.channels = channels;
+        this.tournamentChannels = tournamentChannels;
     }
 
     @Override
@@ -71,7 +78,7 @@ final class ClientsActor extends AbstractActor {
             replyWith(ClientRegistrationFailed.nameAlreadyInUse());
         }
         else {
-            ActorRef client = context().actorOf(ClientActor.props(tempo, rc.getName(), rc.getChannel(), gameModes, channels), key);
+            ActorRef client = context().actorOf(ClientActor.props(tempo, rc.getName(), rc.getChannel(), gameModes, channels, tournamentChannels), key);
             replyWith(ClientRegistered.of(client));
         }
     }

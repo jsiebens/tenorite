@@ -25,6 +25,7 @@ import net.tenorite.clients.commands.RegisterClient;
 import net.tenorite.clients.events.ClientRegistered;
 import net.tenorite.clients.events.ClientRegistrationFailed;
 import net.tenorite.game.GameModes;
+import net.tenorite.tournament.actors.TournamentChannelsActors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,9 +50,12 @@ public class ClientsConfig {
     @Autowired
     private ChannelsActors channelsActors;
 
+    @Autowired
+    private TournamentChannelsActors tournamentChannelsActors;
+
     @Bean
     public ClientsActors clientsActors() {
-        return new ClientsActors(actorSystem, gameModes, channelsActors);
+        return new ClientsActors(actorSystem, gameModes, channelsActors, tournamentChannelsActors);
     }
 
     @Bean

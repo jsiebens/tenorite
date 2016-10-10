@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.tenorite.clients.actors;
+package net.tenorite.tournament.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import net.tenorite.channel.actors.ChannelsActors;
 import net.tenorite.core.Tempo;
 import net.tenorite.game.GameModes;
-import net.tenorite.tournament.actors.TournamentChannelsActors;
+import net.tenorite.tournament.TournamentRepository;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -28,13 +27,13 @@ import java.util.Map;
 /**
  * @author Johan Siebens
  */
-public final class ClientsActors {
+public final class TournamentChannelsActors {
 
     private final Map<Tempo, ActorRef> actors = new EnumMap<>(Tempo.class);
 
-    public ClientsActors(ActorSystem actorSystem, GameModes gameModes, ChannelsActors channelsActors, TournamentChannelsActors tournamentChannelsActors) {
+    public TournamentChannelsActors(ActorSystem actorSystem, GameModes gameModes, TournamentRepository tournamentRepository) {
         for (Tempo tempo : Tempo.values()) {
-            ActorRef ref = actorSystem.actorOf(ClientsActor.props(tempo, gameModes, channelsActors.get(tempo), tournamentChannelsActors.get(tempo)));
+            ActorRef ref = actorSystem.actorOf(TournamentChannelsActor.props(tempo, gameModes, tournamentRepository));
             actors.put(tempo, ref);
         }
     }

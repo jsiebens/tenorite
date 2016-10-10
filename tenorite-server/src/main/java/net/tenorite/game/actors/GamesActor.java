@@ -19,6 +19,7 @@ import akka.actor.Props;
 import net.tenorite.game.Game;
 import net.tenorite.game.GameRepository;
 import net.tenorite.game.events.GameFinished;
+import net.tenorite.tournament.events.TournamentGameFinished;
 import net.tenorite.util.AbstractActor;
 
 /**
@@ -39,6 +40,7 @@ public final class GamesActor extends AbstractActor {
     @Override
     public void preStart() throws Exception {
         subscribe(GameFinished.class);
+        subscribe(TournamentGameFinished.class);
     }
 
     @Override
@@ -47,6 +49,13 @@ public final class GamesActor extends AbstractActor {
             GameFinished gf = (GameFinished) message;
             if (gf.getRanking().size() > 1) {
                 Game game = gf.getGame();
+                gameRepository.gameOps(game.getTempo()).saveGame(game);
+            }
+        }
+        else if (message instanceof TournamentGameFinished) {
+            TournamentGameFinished tgf = (TournamentGameFinished) message;
+            if (tgf.getRanking().size() > 1) {
+                Game game = tgf.getGame();
                 gameRepository.gameOps(game.getTempo()).saveGame(game);
             }
         }

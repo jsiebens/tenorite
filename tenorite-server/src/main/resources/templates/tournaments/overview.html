@@ -30,7 +30,11 @@
                 <table class="table table-condensed table-hover">
                     <tr th:each="t : ${tournaments}">
                         <td class="tournament-name" th:text="${t.name}"></td>
-                        <td th:text="${t.state}" class="right">CREATED</td>
+                        <td class="right">
+                            <a th:href="@{/t/{tempo}/m/{mode}/tournaments/{id}(tempo=${tempo},mode=${gameMode.id},id=${t.id})}">
+                                leaderboard
+                            </a>
+                        </td>
                     </tr>
                 </table>
             </div>
