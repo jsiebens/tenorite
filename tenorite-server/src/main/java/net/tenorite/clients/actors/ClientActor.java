@@ -214,6 +214,12 @@ final class ClientActor extends AbstractActor {
                 case CHANNEL_NOT_AVAILABLE:
                     write(PlineMessage.of("channel is <b>not available</b>"));
                     break;
+                case MATCH_ALREADY_FINISHED:
+                    write(PlineMessage.of("match is <b>already finished</b>"));
+                    break;
+                case MATCH_STILL_BLOCKED:
+                    write(PlineMessage.of("match is <b>not yet scheduled</b>"));
+                    break;
             }
         }
         else if (o instanceof ChannelLeft) {

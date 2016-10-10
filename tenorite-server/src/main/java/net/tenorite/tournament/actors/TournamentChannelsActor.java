@@ -68,9 +68,20 @@ final class TournamentChannelsActor extends AbstractActor {
             channel.get().forward(o, context());
         }
         else {
-            Optional<ActorRef> opt = createChannel(o.getChannel());
+            Optional<TournamentMatch> opt = getTournamentMatch(o.getChannel());
+            //Optional<ActorRef> opt = createChannel(o.getChannel());
             if (opt.isPresent()) {
-                opt.get().forward(o, context());
+                TournamentMatch match = opt.get();
+                if (match.getState().equals(TournamentMatch.State.FINISHED)) {
+                    replyWith(SlotReservationFailed.matchAlreadyFinished());
+                }
+                else if (match.getState().equals(TournamentMatch.State.BLOCKED)) {
+                    replyWith(SlotReservationFailed.matchStillBlocked());
+                }
+                else {
+                    GameMode gameMode = gameModes.find(match.getGameModeId()).orElseThrow(IllegalArgumentException::new);
+                    context().actorOf(TournamentChannelActor.props(tempo, gameMode, match), match.getId());
+                }
             }
             else {
                 replyWith(SlotReservationFailed.channelNotAvailable());
@@ -85,17 +96,15 @@ final class TournamentChannelsActor extends AbstractActor {
             channel.get().forward(o, context());
         }
         else {
-            createChannel(o.getChannel()).ifPresent(a -> a.forward(o, context()));
+            getTournamentMatch(o.getChannel()).ifPresent(match -> {
+                GameMode gameMode = gameModes.find(match.getGameModeId()).orElseThrow(IllegalArgumentException::new);
+                context().actorOf(TournamentChannelActor.props(tempo, gameMode, match), match.getId());
+            });
         }
     }
 
-    private Optional<ActorRef> createChannel(String id) {
-        Optional<TournamentMatch> tournamentMatch = tournamentRepository.tournamentOps(tempo).loadTournamentMatch(id);
-        return
-            tournamentMatch.map(m -> {
-                GameMode gameMode = gameModes.find(m.getGameModeId()).orElseThrow(IllegalArgumentException::new);
-                return context().actorOf(TournamentChannelActor.props(tempo, gameMode, m), id);
-            });
+    private Optional<TournamentMatch> getTournamentMatch(String id) {
+        return tournamentRepository.tournamentOps(tempo).loadTournamentMatch(id);
     }
 
 }

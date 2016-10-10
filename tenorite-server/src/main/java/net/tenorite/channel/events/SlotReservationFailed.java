@@ -21,7 +21,9 @@ package net.tenorite.channel.events;
 public enum SlotReservationFailed {
 
     CHANNEL_IS_FULL,
-    CHANNEL_NOT_AVAILABLE;
+    CHANNEL_NOT_AVAILABLE,
+    MATCH_ALREADY_FINISHED,
+    MATCH_STILL_BLOCKED;
 
     public static SlotReservationFailed channelIsFull() {
         return CHANNEL_IS_FULL;
@@ -29,6 +31,14 @@ public enum SlotReservationFailed {
 
     public static SlotReservationFailed channelNotAvailable() {
         return CHANNEL_NOT_AVAILABLE;
+    }
+
+    public static SlotReservationFailed matchAlreadyFinished() {
+        return MATCH_ALREADY_FINISHED;
+    }
+
+    public static SlotReservationFailed matchStillBlocked() {
+        return MATCH_STILL_BLOCKED;
     }
 
 }
