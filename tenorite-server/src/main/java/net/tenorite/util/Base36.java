@@ -5,7 +5,7 @@ package net.tenorite.util;
  */
 public final class Base36 {
 
-    private static final String SEED = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final String SEED = "abcdefghijklmnopqrstuvwxyz0123456789";
 
     public static String convert(long value) {
         int base = SEED.length();

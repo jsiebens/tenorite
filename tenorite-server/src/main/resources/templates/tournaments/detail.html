@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/page">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12"><h1><span th:text="${gameMode.getTitle(tempo)}">gameMode</span> <small>tournament: <b th:text="${tournament.name}"></b></small></h1></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Leaderboard</h3>
+                <table class="table table-condensed table-hover">
+                    <tr th:each="s : ${tournament.participants}">
+                        <td th:text="${s.name}"></td>
+                        <td class="right" th:text="${s.score}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6" th:each="r : ${rounds}">
+                <h3>Round <th:block th:text="${r.key}"></th:block></h3>
+                <table class="table table-condensed table-hover">
+                    <tr th:each="m : ${r.value}">
+                        <td class="col-md-1" th:text="${m.id}"></td>
+                        <td class="col-md-4">
+                            <th:block th:each="a, iterStat : ${m.players}" th:text="!${iterStat.last} ? ${a.name} + ' - ': ${a.name}"></th:block>
+                        </td>
+                        <td class="right col-md-1">
+                            <th:block th:each="a, iterStat : ${m.players}" th:text="!${iterStat.last} ? ${a.score} + ' - ': ${a.score}"></th:block>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4" th:each="m : ${matches}">
+                Match: <span th:text="${m.id}"></span><small class="pull-right" th:text="${m.state.name()}"></small>
+                <table class="table table-condensed table-hover">
+                    <tr th:each="p : ${m.players}">
+                        <td th:text="${p.name}"></td>
+                        <td class="right" th:text="${p.score}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

@@ -87,6 +87,12 @@ public final class MongoTournamentRepository implements TournamentRepository {
         }
 
         @Override
+        public List<TournamentMatch> listTournamentMatches(String tournament) {
+            Iterable<TournamentMatch> cursor = tournamentMatches.find("{tournament:#}", tournament).as(TournamentMatch.class);
+            return stream(cursor.spliterator(), false).collect(toList());
+        }
+
+        @Override
         public Tournament saveTournament(Tournament tournament) {
             tournaments.save(tournament);
             return tournament;

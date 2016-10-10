@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.beans.PropertyEditorSupport;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -119,12 +120,14 @@ public class TournamentController {
                              Model model) {
         GameMode gameMode = gameModes.find(GameModeId.of(mode)).orElseThrow(NotAvailableException::new);
         Tournament tournament = tournamentRepository.tournamentOps(tempo).loadTournament(id).orElseThrow(NotAvailableException::new);
+        List<TournamentMatch> matches = tournamentRepository.tournamentOps(tempo).listTournamentMatches(id);
 
         model.addAttribute("tempo", tempo);
         model.addAttribute("mode", mode);
         model.addAttribute("gameMode", gameMode);
         model.addAttribute("gameModes", gameModes);
         model.addAttribute("tournament", tournament);
+        model.addAttribute("rounds", matches.stream().collect(Collectors.groupingBy(TournamentMatch::getRound)));
 
         return "tournaments/detail";
     }
@@ -174,7 +177,7 @@ public class TournamentController {
         @Override
         public void setAsText(String text) throws IllegalArgumentException {
             if (StringUtils.hasText(text)) {
-                List<String> participants = Arrays.stream(text.split("\n")).map(String::trim).distinct().collect(toList());
+                List<String> participants = Arrays.stream(text.split("\n")).map(String::trim).filter(StringUtils::hasText).distinct().collect(toList());
                 setValue(participants);
             }
             else {

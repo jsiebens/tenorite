@@ -40,6 +40,8 @@ public interface TournamentRepository {
 
         Optional<TournamentMatch> loadTournamentMatch(String id);
 
+        List<TournamentMatch> listTournamentMatches(String tournament);
+
         TournamentMatch saveTournamentMatch(TournamentMatch match);
 
         List<TournamentMatch> saveTournamentMatch(List<TournamentMatch> matches);
